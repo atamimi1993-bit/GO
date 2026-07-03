@@ -1,0 +1,122 @@
+{
+  "name": "MoveRequest",
+  "type": "object",
+  "properties": {
+    "customer_name": {
+      "type": "string"
+    },
+    "customer_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "customer_phone": {
+      "type": "string"
+    },
+    "pickup_address": {
+      "type": "string"
+    },
+    "dropoff_address": {
+      "type": "string"
+    },
+    "move_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "move_time": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "quoted",
+        "accepted",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "items_summary": {
+      "type": "string"
+    },
+    "total_weight_lbs": {
+      "type": "number",
+      "default": 0
+    },
+    "distance_miles": {
+      "type": "number",
+      "default": 0
+    },
+    "truck_size_needed": {
+      "type": "string",
+      "enum": [
+        "small",
+        "medium",
+        "large",
+        "extra_large"
+      ]
+    },
+    "base_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "fuel_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "tax_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "tax_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "app_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "driver_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "total_price": {
+      "type": "number",
+      "default": 0
+    },
+    "driver_payout": {
+      "type": "number",
+      "default": 0
+    },
+    "assigned_driver_id": {
+      "type": "string"
+    },
+    "assigned_driver_name": {
+      "type": "string"
+    },
+    "liability_signed": {
+      "type": "boolean",
+      "default": false
+    },
+    "liability_signed_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "needs_storage": {
+      "type": "boolean",
+      "default": false
+    },
+    "items_pdf_url": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "pickup_address",
+    "dropoff_address",
+    "move_date"
+  ]
+}

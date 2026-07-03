@@ -1,0 +1,47 @@
+{
+  "name": "StorageFacility",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "zip": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "size_options": {
+      "type": "string"
+    },
+    "price_range": {
+      "type": "string"
+    },
+    "climate_controlled": {
+      "type": "boolean",
+      "default": false
+    },
+    "rating": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "address",
+    "city",
+    "state"
+  ]
+}

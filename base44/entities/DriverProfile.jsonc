@@ -1,0 +1,70 @@
+{
+  "name": "DriverProfile",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "license_number": {
+      "type": "string"
+    },
+    "license_expiry": {
+      "type": "string",
+      "format": "date"
+    },
+    "license_doc_url": {
+      "type": "string"
+    },
+    "insurance_doc_url": {
+      "type": "string"
+    },
+    "profile_photo_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "suspended",
+        "rejected"
+      ],
+      "default": "pending_review"
+    },
+    "service_area": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "default": 5.0
+    },
+    "total_jobs": {
+      "type": "number",
+      "default": 0
+    },
+    "total_earnings": {
+      "type": "number",
+      "default": 0
+    },
+    "available": {
+      "type": "boolean",
+      "default": true
+    },
+    "company_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "full_name",
+    "email",
+    "phone",
+    "license_number"
+  ]
+}

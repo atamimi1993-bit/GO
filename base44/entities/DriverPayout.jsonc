@@ -1,0 +1,40 @@
+{
+  "name": "DriverPayout",
+  "type": "object",
+  "properties": {
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "move_request_id": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "paid",
+        "deducted"
+      ],
+      "default": "pending"
+    },
+    "deduction_reason": {
+      "type": "string"
+    },
+    "deduction_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "driver_profile_id",
+    "move_request_id",
+    "amount"
+  ]
+}

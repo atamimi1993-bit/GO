@@ -1,0 +1,76 @@
+{
+  "name": "Truck",
+  "type": "object",
+  "properties": {
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "make": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "year": {
+      "type": "number"
+    },
+    "size_category": {
+      "type": "string",
+      "enum": [
+        "small",
+        "medium",
+        "large",
+        "extra_large"
+      ]
+    },
+    "capacity_lbs": {
+      "type": "number"
+    },
+    "license_plate": {
+      "type": "string"
+    },
+    "registration_doc_url": {
+      "type": "string"
+    },
+    "inspection_doc_url": {
+      "type": "string"
+    },
+    "insurance_doc_url": {
+      "type": "string"
+    },
+    "fuel_type": {
+      "type": "string",
+      "enum": [
+        "gasoline",
+        "diesel",
+        "electric",
+        "hybrid"
+      ],
+      "default": "gasoline"
+    },
+    "mpg": {
+      "type": "number",
+      "default": 10
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "company_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "driver_profile_id",
+    "make",
+    "model",
+    "size_category",
+    "license_plate"
+  ]
+}

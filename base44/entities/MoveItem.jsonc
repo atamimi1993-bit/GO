@@ -1,0 +1,45 @@
+{
+  "name": "MoveItem",
+  "type": "object",
+  "properties": {
+    "move_request_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "furniture",
+        "electronics",
+        "appliances",
+        "boxes",
+        "fragile",
+        "heavy_equipment",
+        "clothing",
+        "other"
+      ]
+    },
+    "weight_lbs": {
+      "type": "number",
+      "default": 0
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1
+    },
+    "special_handling": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "move_request_id",
+    "name",
+    "weight_lbs"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "HelpArticle",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "customer",
+        "driver",
+        "general"
+      ]
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "content",
+    "category"
+  ]
+}
