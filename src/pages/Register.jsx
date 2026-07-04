@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
@@ -18,6 +19,9 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+  const [promoChannel, setPromoChannel] = useState("email");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneCarrier, setPhoneCarrier] = useState("");
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -50,6 +54,13 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
+      try {
+        await base44.auth.updateMe({
+          promo_channel: promoChannel,
+          phone_number: (promoChannel === "text" || promoChannel === "both") ? phoneNumber : undefined,
+          phone_carrier: (promoChannel === "text" || promoChannel === "both") ? phoneCarrier : undefined,
+        });
+      } catch { /* non-blocking */ }
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Invalid verification code");
@@ -217,6 +228,60 @@ export default function Register() {
             />
           </div>
         </div>
+
+        {/* Promo preferences */}
+        <div className="space-y-3">
+          <div>
+            <Label>Promo Preferences</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">Choose how you'd like to receive special offers from GO.</p>
+          </div>
+          <RadioGroup value={promoChannel} onValueChange={setPromoChannel} className="grid grid-cols-2 gap-2">
+            {[
+              { value: "email", label: "Email" },
+              { value: "text", label: "Text" },
+              { value: "both", label: "Both" },
+              { value: "none", label: "No thanks" },
+            ].map((opt) => (
+              <label
+                key={opt.value}
+                className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${promoChannel === opt.value ? "border-primary bg-primary/5" : "border-input"}`}
+              >
+                <RadioGroupItem value={opt.value} />
+                <span className="text-sm">{opt.label}</span>
+              </label>
+            ))}
+          </RadioGroup>
+          {(promoChannel === "text" || promoChannel === "both") && (
+            <div className="space-y-2">
+              <Input
+                type="tel"
+                placeholder="Phone number (e.g. 5551234567)"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="h-11"
+                required
+              />
+              <select
+                value={phoneCarrier}
+                onChange={(e) => setPhoneCarrier(e.target.value)}
+                className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                required
+              >
+                <option value="">Select carrier…</option>
+                <option value="att">AT&T</option>
+                <option value="verizon">Verizon</option>
+                <option value="tmobile">T-Mobile</option>
+                <option value="sprint">Sprint</option>
+                <option value="boost">Boost Mobile</option>
+                <option value="cricket">Cricket</option>
+                <option value="metropcs">Metro PCS</option>
+                <option value="uscellular">US Cellular</option>
+                <option value="googlefi">Google Fi</option>
+              </select>
+            </div>
+          )}
+        </div>
+
         <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
           {loading ? (
             <>

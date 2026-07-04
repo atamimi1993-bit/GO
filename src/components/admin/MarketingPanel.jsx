@@ -124,42 +124,22 @@ export default function MarketingPanel() {
   const sendPromoEmail = async (campaign) => {
     setSending(campaign.code);
     try {
-      // Fetch audience: customers or drivers
-      let recipients = [];
-      if (campaign.audience === 'drivers') {
-        const drivers = await base44.entities.DriverProfile.filter({ status: 'approved' }, '-created_date', 200);
-        recipients = drivers.map((d) => d.email).filter(Boolean);
-      } else {
-        const moves = await base44.entities.MoveRequest.filter({}, '-created_date', 200);
-        recipients = [...new Set(moves.map((m) => m.customer_email).filter(Boolean))];
-      }
-
-      if (recipients.length === 0) {
-        toast({ title: 'No recipients', description: `No ${campaign.audience} found to send this promotion to.`, variant: 'destructive' });
-        setSending(null);
-        return;
-      }
-
-      const subject = campaign.audience === 'drivers'
-        ? `GO Driver Reward: ${campaign.title}`
-        : `Special Offer from GO: ${campaign.title}`;
-
-      const body = campaign.audience === 'drivers'
-        ? `Hello Driver,\n\n${campaign.description}\n\nUse code: ${campaign.code}\n\nThank you for being part of the GO team!\n\n— The GO Team`
-        : `Hi there,\n\n${campaign.description}\n\nUse promo code ${campaign.code} at checkout to claim your discount.\n\nBook your move today at GO!\n\n— The GO Team`;
-
-      let sent = 0;
-      for (const email of recipients) {
-        try {
-          await base44.integrations.Core.SendEmail({ to: email, subject, body, from_name: 'GO' });
-          sent++;
-        } catch { /* skip individual failures */ }
-      }
-
-      toast({
-        title: 'Campaign sent!',
-        description: `${campaign.title} was emailed to ${sent} ${campaign.audience}.`,
+      const res = await base44.functions.invoke('send-promo-campaign', {
+        campaign_title: campaign.title,
+        campaign_description: campaign.description,
+        promo_code: campaign.code,
+        audience: campaign.audience,
+        discount_percent: campaign.discount_percent,
       });
+      const { emailsSent = 0, textsSent = 0, totalReach = 0 } = res.data || {};
+      if (totalReach === 0) {
+        toast({ title: 'No recipients', description: `No opted-in ${campaign.audience} found. Users set their text/email preferences at signup.`, variant: 'destructive' });
+      } else {
+        toast({
+          title: 'Campaign sent!',
+          description: `${campaign.title}: ${emailsSent} email(s) and ${textsSent} text(s) delivered.`,
+        });
+      }
     } catch (err) {
       toast({ title: 'Send failed', description: err.message, variant: 'destructive' });
     }

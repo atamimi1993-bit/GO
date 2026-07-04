@@ -1,4 +1,6 @@
 {
+  "name": "User",
+  "type": "object",
   "properties": {
     "role": {
       "type": "string",
@@ -7,11 +9,36 @@
         "admin",
         "user"
       ]
+    },
+    "promo_channel": {
+      "type": "string",
+      "enum": [
+        "email",
+        "text",
+        "both",
+        "none"
+      ],
+      "default": "none"
+    },
+    "phone_number": {
+      "type": "string"
+    },
+    "phone_carrier": {
+      "type": "string",
+      "enum": [
+        "att",
+        "verizon",
+        "tmobile",
+        "sprint",
+        "boost",
+        "cricket",
+        "metropcs",
+        "uscellular",
+        "googlefi"
+      ]
     }
   },
   "required": [
     "role"
-  ],
-  "name": "User",
-  "type": "object"
+  ]
 }
