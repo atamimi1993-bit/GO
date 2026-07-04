@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { COUNTRY_LIST } from '@/lib/pricing';
 
 const COUNTRIES = COUNTRY_LIST.map(c => c.name);
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default function LeadFinder({ onLeadsGenerated }) {
   const [location, setLocation] = useState('');
@@ -65,6 +66,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
       } catch (err) {
         console.error(`Failed for ${country}:`, err);
       }
+      await sleep(300);
     }
 
     setProgress((p) => ({ ...p, current: COUNTRIES.length, country: 'Done', totalFound: totals.found, totalCreated: totals.created }));

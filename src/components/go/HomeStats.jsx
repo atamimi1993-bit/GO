@@ -8,9 +8,10 @@ export default function HomeStats() {
     queryKey: ['homeStats'],
     queryFn: async () => {
       try {
+        // Approximate counts for display purposes — limited to 50 for performance
         const [completedMoves, drivers] = await Promise.all([
-          base44.entities.MoveRequest.filter({ status: 'completed' }, '-created_date', 500),
-          base44.entities.DriverProfile.filter({ status: 'approved' }, '-rating', 500),
+          base44.entities.MoveRequest.filter({ status: 'completed' }, '-created_date', 50),
+          base44.entities.DriverProfile.filter({ status: 'approved' }, '-rating', 50),
         ]);
         const ratedDrivers = drivers.filter(d => d.total_jobs > 0);
         const avgRating = ratedDrivers.length > 0

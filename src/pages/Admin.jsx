@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import StatCard from '@/components/admin/StatCard';
-import DriverPerformance from '@/components/admin/DriverPerformance';
-import BulkPayoutPanel from '@/components/admin/BulkPayoutPanel';
-import MoveCalendar from '@/components/admin/MoveCalendar';
-import EarningsCharts from '@/components/admin/EarningsCharts';
+const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
+const BulkPayoutPanel = lazy(() => import('@/components/admin/BulkPayoutPanel'));
+const MoveCalendar = lazy(() => import('@/components/admin/MoveCalendar'));
+const EarningsCharts = lazy(() => import('@/components/admin/EarningsCharts'));
 import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
-import MarketingPanel from '@/components/admin/MarketingPanel';
-import ExpenseReviewPanel from '@/components/admin/ExpenseReviewPanel';
-import AdminWorldMap from '@/components/admin/AdminWorldMap';
+const MarketingPanel = lazy(() => import('@/components/admin/MarketingPanel'));
+const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
+const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -127,25 +127,39 @@ export default function Admin() {
         </div>
 
         {/* Global operations map */}
-        <AdminWorldMap />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <AdminWorldMap />
+        </Suspense>
 
         {/* Move calendar */}
-        <MoveCalendar scrollRef={scrollRef} />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <MoveCalendar scrollRef={scrollRef} />
+        </Suspense>
 
         {/* Performance charts */}
-        <EarningsCharts />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <EarningsCharts />
+        </Suspense>
 
         {/* Driver performance */}
-        <DriverPerformance />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <DriverPerformance />
+        </Suspense>
 
         {/* Marketing & promotions */}
-        <MarketingPanel />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <MarketingPanel />
+        </Suspense>
 
         {/* Driver expense receipts */}
-        <ExpenseReviewPanel />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <ExpenseReviewPanel />
+        </Suspense>
 
         {/* Bulk payout processing */}
-        <BulkPayoutPanel scrollRef={scrollRef} />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <BulkPayoutPanel scrollRef={scrollRef} />
+        </Suspense>
 
         {/* AI Lead Finder */}
         <LeadFinder onLeadsGenerated={load} />

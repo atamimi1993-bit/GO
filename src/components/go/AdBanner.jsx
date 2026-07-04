@@ -97,10 +97,13 @@ export default function AdBanner({ audience = 'customers' }) {
 
       {/* Dots indicator */}
       {ads.length > 1 && (
-        <div className="flex justify-center gap-1.5 mt-2">
+        <div role="tablist" aria-label="Advertisement slides" className="flex justify-center gap-1.5 mt-2">
           {ads.map((_, i) => (
             <button
               key={i}
+              role="tab"
+              aria-selected={i === currentIdx}
+              aria-label={`Advertisement ${i + 1} of ${ads.length}`}
               onClick={(e) => { e.preventDefault(); setCurrentIdx(i); }}
               className={`h-1.5 rounded-full transition-all ${
                 i === currentIdx ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'

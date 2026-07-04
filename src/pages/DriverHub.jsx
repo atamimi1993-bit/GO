@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Link, useOutletContext, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import DriverTrackingControls from '@/components/go/DriverTrackingControls';
-import DriverLeaderboardCard from '@/components/go/DriverLeaderboardCard';
-import ExpenseSubmission from '@/components/go/ExpenseSubmission';
-import DriverNavigationCard from '@/components/go/DriverNavigationCard';
-import ComplianceManager from '@/components/go/ComplianceManager';
+const DriverTrackingControls = lazy(() => import('@/components/go/DriverTrackingControls'));
+const DriverLeaderboardCard = lazy(() => import('@/components/go/DriverLeaderboardCard'));
+const ExpenseSubmission = lazy(() => import('@/components/go/ExpenseSubmission'));
+const DriverNavigationCard = lazy(() => import('@/components/go/DriverNavigationCard'));
+const ComplianceManager = lazy(() => import('@/components/go/ComplianceManager'));
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 import AdBanner from '@/components/go/AdBanner';
-import StripeConnectCard from '@/components/go/StripeConnectCard';
+const StripeConnectCard = lazy(() => import('@/components/go/StripeConnectCard'));
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
 
 export default function DriverHub() {
@@ -161,10 +161,14 @@ export default function DriverHub() {
       </div>
 
       {/* Stripe Connect — automatic payouts */}
-      <StripeConnectCard profile={profile} onUpdated={setProfile} />
+      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <StripeConnectCard profile={profile} onUpdated={setProfile} />
+      </Suspense>
 
       {/* Compliance & documents */}
-      <ComplianceManager driverProfile={profile} onUpdated={setProfile} />
+      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <ComplianceManager driverProfile={profile} onUpdated={setProfile} />
+      </Suspense>
 
       {/* Signed contract */}
       {contract && (
@@ -198,20 +202,28 @@ export default function DriverHub() {
           </div>
           <div className="space-y-4">
             {activeJobs.map(job => (
-              <DriverNavigationCard key={job.id} job={job} />
+              <Suspense key={job.id} fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+                <DriverNavigationCard job={job} />
+              </Suspense>
             ))}
           </div>
         </div>
       )}
 
       {/* Expense receipts */}
-      <ExpenseSubmission driverProfile={profile} />
+      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <ExpenseSubmission driverProfile={profile} />
+      </Suspense>
 
       {/* Driver leaderboard */}
-      <DriverLeaderboardCard currentDriverId={profile.id} />
+      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <DriverLeaderboardCard currentDriverId={profile.id} />
+      </Suspense>
 
       {profile.status === 'approved' && (
-        <DriverTrackingControls driverProfile={profile} />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <DriverTrackingControls driverProfile={profile} />
+        </Suspense>
       )}
     </div>
     </PullToRefresh>

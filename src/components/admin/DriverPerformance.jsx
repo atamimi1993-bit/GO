@@ -77,13 +77,13 @@ export default function DriverPerformance() {
             <table role="table" className="w-full text-sm">
               <thead role="rowgroup">
                 <tr role="row" className="text-left text-xs text-muted-foreground border-b">
-                  <th role="columnheader" className="pb-2 pr-3 font-medium">Driver</th>
-                  <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Active</th>
-                  <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Completed</th>
-                  <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Total Jobs</th>
-                  <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Earnings</th>
-                  <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Pending</th>
-                  <th role="columnheader" className="pb-2 font-medium text-right">Status</th>
+                  <th role="columnheader" scope="col" className="pb-2 pr-3 font-medium">Driver</th>
+                  <th role="columnheader" scope="col" className="pb-2 pr-3 font-medium text-right">Active</th>
+                  <th role="columnheader" scope="col" className="pb-2 pr-3 font-medium text-right">Completed</th>
+                  <th role="columnheader" scope="col" className="pb-2 pr-3 font-medium text-right">Total Jobs</th>
+                  <th role="columnheader" scope="col" className="pb-2 pr-3 font-medium text-right">Earnings</th>
+                  <th role="columnheader" scope="col" className="pb-2 pr-3 font-medium text-right">Pending</th>
+                  <th role="columnheader" scope="col" className="pb-2 font-medium text-right">Status</th>
                 </tr>
               </thead>
               <tbody role="rowgroup">

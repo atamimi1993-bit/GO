@@ -47,14 +47,20 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
       <p className="text-xs text-muted-foreground mb-3">
         {move.pickup_address} → {move.dropoff_address}
       </p>
-      <div className="flex items-center gap-1 mb-4">
+      <div
+        role="radiogroup"
+        aria-label={`Star rating for ${rateeName}`}
+        className="flex items-center gap-1 mb-4"
+      >
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
             type="button"
+            role="radio"
+            aria-checked={stars === n}
+            aria-label={`${n} star${n !== 1 ? 's' : ''}`}
             onClick={() => setStars(n)}
             className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            aria-label={`Rate ${n} stars`}
           >
             <Star
               size={28}
