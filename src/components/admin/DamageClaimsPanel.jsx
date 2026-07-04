@@ -295,6 +295,7 @@ export default function DamageClaimsPanel() {
       <div className="flex gap-1.5 overflow-x-auto pb-3 mb-3 -mx-1 px-1">
         <button
           onClick={() => setFilter('all')}
+          aria-label="Filter claims by status: All"
           className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap border transition-colors ${
             filter === 'all' ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:bg-muted'
           }`}
@@ -307,6 +308,7 @@ export default function DamageClaimsPanel() {
             <button
               key={s}
               onClick={() => setFilter(s)}
+              aria-label={`Filter claims by status: ${cfg.label}`}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap border transition-colors ${
                 filter === s ? `${cfg.color} ring-1 ring-current` : 'border-border text-muted-foreground hover:bg-muted'
               }`}

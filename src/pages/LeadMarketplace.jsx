@@ -77,7 +77,8 @@ export default function LeadMarketplace() {
 
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or location..." className="pl-9" />
+          <label htmlFor="lead-search" className="sr-only">Search leads by name or location</label>
+          <Input id="lead-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or location..." className="pl-9" />
         </div>
 
         {loading ? (

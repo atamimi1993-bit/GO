@@ -53,6 +53,18 @@ export function TabHistoryProvider({ children }) {
     setTabStacks(prev => ({ ...prev, [tabPath]: [tabPath] }));
   }, []);
 
+  const pushToTabStack = useCallback((tabPath, currentPath) => {
+    if (!tabPath || !currentPath) return;
+    setTabStacks(prev => {
+      const stack = prev[tabPath] ? [...prev[tabPath]] : [tabPath];
+      if (stack[stack.length - 1] !== currentPath) {
+        stack.push(currentPath);
+      }
+      if (stack.length > 20) stack.shift();
+      return { ...prev, [tabPath]: stack };
+    });
+  }, []);
+
   // Handle back navigation within a tab
   const goBackInTab = useCallback(() => {
     const currentTab = getActiveTab(location.pathname);
@@ -74,7 +86,7 @@ export function TabHistoryProvider({ children }) {
   }, [tabStacks, location.pathname, navigate]);
 
   return (
-    <TabHistoryContext.Provider value={{ tabHistory: tabStacks, getTargetPath, resetTabStack, goBackInTab }}>
+    <TabHistoryContext.Provider value={{ tabHistory: tabStacks, getTargetPath, resetTabStack, pushToTabStack, goBackInTab }}>
       {children}
     </TabHistoryContext.Provider>
   );

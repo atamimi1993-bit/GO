@@ -252,6 +252,7 @@ export default function AdminWorldMap() {
                     </div>
                   </Popup>
                   <Tooltip>
+                    <span className="sr-only">{isCompleted ? 'Completed move' : 'Active move'}: </span>
                     <span aria-hidden="true">{isCompleted ? '✅' : '🔴'}</span> {isCompleted ? 'Completed' : 'Active'} — {pin.customer}
                   </Tooltip>
                 </CircleMarker>
@@ -276,6 +277,7 @@ export default function AdminWorldMap() {
                   </div>
                 </Popup>
                 <Tooltip>
+                  <span className="sr-only">Driver: </span>
                   <span aria-hidden="true">🚚</span> {pin.name} — {pin.serviceArea}
                 </Tooltip>
               </Marker>

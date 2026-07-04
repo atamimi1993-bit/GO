@@ -123,6 +123,8 @@ export default function DriverAvailabilityCalendar({ driverProfile }) {
                   key={day.toISOString()}
                   onClick={() => !isPast && toggleDate(day)}
                   disabled={isPast || toggling === dateStr}
+                  aria-pressed={isAvailable}
+                  aria-label={`${format(day, 'MMMM d, yyyy')} — ${isPast ? 'Past date' : isAvailable ? 'Available' : 'Unavailable'}`}
                   className={`aspect-square rounded-lg text-xs font-medium transition-colors flex items-center justify-center ${
                     isPast
                       ? 'text-muted-foreground/30 cursor-not-allowed'

@@ -33,7 +33,7 @@ const customerTabs = [
 export default function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { getTargetPath, resetTabStack } = useTabHistory();
+  const { getTargetPath, resetTabStack, pushToTabStack } = useTabHistory();
   const { user } = useAuth();
   const [navigating, setNavigating] = useState(false);
 
@@ -77,6 +77,7 @@ export default function BottomTabBar() {
                 e.preventDefault();
                 setNavigating(true);
                 navigate(getTargetPath(tab.path));
+                pushToTabStack(tab.path, location.pathname);
               }
             }}
             style={{ touchAction: 'manipulation' }}

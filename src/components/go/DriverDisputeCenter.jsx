@@ -130,6 +130,7 @@ function DisputeCard({ report, expanded, onToggle, onResponded }) {
     <div className={`border rounded-xl overflow-hidden ${responded ? 'border-emerald-500/30' : 'border-red-500/30'}`}>
       <button
         onClick={onToggle}
+        aria-label={expanded ? 'Collapse dispute details' : 'Expand dispute details'}
         className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
       >
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${responded ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
