@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,7 @@ import PageHeader from '@/components/go/PageHeader';
 export default function MyTrucks() {
   const navigate = useNavigate();
   const { scrollRef } = useOutletContext();
+  const { user } = useAuth();
   const [trucks, setTrucks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [driverProfile, setDriverProfile] = useState(null);
@@ -30,9 +32,9 @@ export default function MyTrucks() {
   });
 
   const load = async () => {
+    if (!user?.email) { setLoading(false); return; }
     try {
-      const u = await base44.auth.me();
-      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
       if (profiles.length > 0) {
         setDriverProfile(profiles[0]);
         const t = await base44.entities.Truck.filter({ driver_profile_id: profiles[0].id });
@@ -43,7 +45,7 @@ export default function MyTrucks() {
   };
   useEffect(() => {
     load();
-  }, []);
+  }, [user]);
 
   const handleUpload = async (field, e) => {
     const file = e.target.files?.[0];

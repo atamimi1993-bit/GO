@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/lib/AuthContext';
 import { Banknote, Loader2, ShieldCheck } from 'lucide-react';
 
 export default function DriverPaymentInfo() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -19,10 +21,10 @@ export default function DriverPaymentInfo() {
   });
 
   useEffect(() => {
+    if (!user?.email) { setLoading(false); return; }
     (async () => {
       try {
-        const u = await base44.auth.me();
-        const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+        const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
         if (profiles.length > 0) {
           const p = profiles[0];
           setProfile(p);
@@ -36,7 +38,7 @@ export default function DriverPaymentInfo() {
       } catch {}
       setLoading(false);
     })();
-  }, []);
+  }, [user]);
 
   const handleSave = async () => {
     if (!form.bank_name || !form.bank_routing_number || !form.bank_account_number) {

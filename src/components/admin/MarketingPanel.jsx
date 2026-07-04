@@ -118,7 +118,7 @@ export default function MarketingPanel() {
 
         {/* Send action */}
         <div className="mt-auto">
-          <Button size="sm" className="w-full min-h-[44px] bg-purple-500 hover:bg-purple-600" aria-label={`Send ${ad.headline} campaign`} onClick={() => sendPromoEmail(ad)} disabled={sending === ad.id}>
+          <Button size="sm" className="w-full min-h-[44px] bg-purple-500 hover:bg-purple-600" aria-label={`Broadcast campaign: ${ad.headline}`} onClick={() => sendPromoEmail(ad)} disabled={sending === ad.id}>
             {sending === ad.id ? <Loader2 size={14} aria-hidden="true" className="animate-spin mr-1" /> : <Mail size={14} aria-hidden="true" className="mr-1" />}
             Broadcast
           </Button>

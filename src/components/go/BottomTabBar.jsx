@@ -33,7 +33,7 @@ const customerTabs = [
 export default function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { getTargetPath } = useTabHistory();
+  const { getTargetPath, resetTabStack } = useTabHistory();
   const { user } = useAuth();
   const [navigating, setNavigating] = useState(false);
 
@@ -68,7 +68,10 @@ export default function BottomTabBar() {
             onClick={(e) => {
               if (active) {
                 if (location.pathname === tab.path) {
+                  // Re-selecting active tab root — reset stack to root
                   e.preventDefault();
+                  resetTabStack(tab.path);
+                  navigate(tab.path);
                 }
               } else {
                 e.preventDefault();

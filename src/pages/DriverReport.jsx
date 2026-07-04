@@ -40,9 +40,9 @@ export default function DriverReport() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const load = useCallback(async () => {
+    if (!user?.email) { setLoading(false); return; }
     try {
-      const u = await base44.auth.me();
-      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
       if (profiles.length === 0) {
         setLoading(false);
         return;

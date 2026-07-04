@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Link, useOutletContext, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 const DriverTrackingControls = lazy(() => import('@/components/go/DriverTrackingControls'));
@@ -20,18 +21,17 @@ import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCi
 export default function DriverHub() {
   const { scrollRef } = useOutletContext();
   const location = useLocation();
+  const { user } = useAuth();
   const pendingApplication = location.state?.pendingApplication;
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const [contract, setContract] = useState(null);
   const [activeJobs, setActiveJobs] = useState([]);
 
   const load = useCallback(async () => {
+    if (!user?.email) { setLoading(false); return; }
     try {
-      const u = await base44.auth.me();
-      setUser(u);
-      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
         const contracts = await base44.entities.Contract.filter({
@@ -51,7 +51,7 @@ export default function DriverHub() {
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [load, user]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 

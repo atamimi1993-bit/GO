@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, DollarSign, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -18,14 +19,15 @@ const STATUS_COLORS = {
 export default function MyPayouts() {
   const navigate = useNavigate();
   const { scrollRef } = useOutletContext();
+  const { user } = useAuth();
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
   const load = async () => {
+    if (!user?.email) { setLoading(false); return; }
     try {
-      const u = await base44.auth.me();
-      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
       if (profiles.length > 0) {
         const p = await base44.entities.DriverPayout.filter({ driver_profile_id: profiles[0].id }, '-created_date', 50);
         setPayouts(p);
@@ -36,7 +38,7 @@ export default function MyPayouts() {
   };
   useEffect(() => {
     load();
-  }, []);
+  }, [user]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 

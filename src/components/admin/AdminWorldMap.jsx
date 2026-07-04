@@ -23,9 +23,36 @@ const driverIcon = L.divIcon({
 
 const geocodeCache = new Map();
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getCachedGeocode(address) {
+  // Check in-memory cache first
+  if (geocodeCache.has(address)) return geocodeCache.get(address);
+  // Check sessionStorage
+  try {
+    const stored = sessionStorage.getItem('geocode_' + address);
+    if (stored !== null) {
+      const coords = stored === 'null' ? null : JSON.parse(stored);
+      geocodeCache.set(address, coords);
+      return coords;
+    }
+  } catch {}
+  return undefined; // not cached
+}
+
+function setCachedGeocode(address, coords) {
+  geocodeCache.set(address, coords);
+  try {
+    sessionStorage.setItem('geocode_' + address, coords ? JSON.stringify(coords) : 'null');
+  } catch {}
+}
+
 async function geocodeAddress(address) {
   if (!address || address.trim().length < 3) return null;
-  if (geocodeCache.has(address)) return geocodeCache.get(address);
+  const cached = getCachedGeocode(address);
+  if (cached !== undefined) return cached;
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
@@ -33,12 +60,29 @@ async function geocodeAddress(address) {
     );
     const data = await res.json();
     const coords = data.length > 0 ? [parseFloat(data[0].lat), parseFloat(data[0].lon)] : null;
-    geocodeCache.set(address, coords);
+    setCachedGeocode(address, coords);
     return coords;
   } catch {
-    geocodeCache.set(address, null);
+    setCachedGeocode(address, null);
     return null;
   }
+}
+
+// Geocode addresses in parallel batches of 5 with 500ms delay between batches
+async function geocodeBatch(addresses) {
+  const results = [];
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < addresses.length; i += BATCH_SIZE) {
+    const batch = addresses.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.all(batch.map(({ address }) => geocodeAddress(address)));
+    for (let j = 0; j < batch.length; j++) {
+      results.push({ ...batch[j], coords: batchResults[j] });
+    }
+    if (i + BATCH_SIZE < addresses.length) {
+      await sleep(500);
+    }
+  }
+  return results;
 }
 
 export default function AdminWorldMap() {
@@ -76,29 +120,25 @@ export default function AdminWorldMap() {
     let cancelled = false;
     setGeocoding(true);
     (async () => {
-      const pins = [];
-      for (const m of moves.slice(0, 20)) {
-        if (cancelled) return;
-        const addr = m.pickup_address;
-        if (!addr) continue;
-        const coords = await geocodeAddress(addr);
-        if (coords) {
-          pins.push({
-            id: m.id,
-            coords,
-            address: addr,
-            customer: m.customer_name || 'Unknown',
-            status: m.status,
-            date: m.move_date,
-            price: m.total_price,
-            currency: m.currency,
-          });
-        }
-      }
-      if (!cancelled) {
-        setMovePins(pins);
-        setGeocoding(false);
-      }
+      const addresses = moves.slice(0, 20)
+        .filter(m => m.pickup_address)
+        .map(m => ({ address: m.pickup_address, move: m }));
+      const results = await geocodeBatch(addresses);
+      if (cancelled) return;
+      const pins = results
+        .filter(r => r.coords)
+        .map(r => ({
+          id: r.move.id,
+          coords: r.coords,
+          address: r.address,
+          customer: r.move.customer_name || 'Unknown',
+          status: r.move.status,
+          date: r.move.move_date,
+          price: r.move.total_price,
+          currency: r.move.currency,
+        }));
+      setMovePins(pins);
+      setGeocoding(false);
     })();
     return () => { cancelled = true; };
   }, [moves]);
@@ -111,25 +151,23 @@ export default function AdminWorldMap() {
     }
     let cancelled = false;
     (async () => {
-      const pins = [];
-      for (const d of drivers.slice(0, 20)) {
-        if (cancelled) return;
-        const area = d.service_area;
-        if (!area) continue;
-        const coords = await geocodeAddress(area);
-        if (coords) {
-          pins.push({
-            id: d.id,
-            coords,
-            name: d.full_name,
-            serviceArea: area,
-            status: d.status,
-            rating: d.rating,
-            totalJobs: d.total_jobs,
-          });
-        }
-      }
-      if (!cancelled) setDriverPins(pins);
+      const addresses = drivers.slice(0, 20)
+        .filter(d => d.service_area)
+        .map(d => ({ address: d.service_area, driver: d }));
+      const results = await geocodeBatch(addresses);
+      if (cancelled) return;
+      const pins = results
+        .filter(r => r.coords)
+        .map(r => ({
+          id: r.driver.id,
+          coords: r.coords,
+          name: r.driver.full_name,
+          serviceArea: r.address,
+          status: r.driver.status,
+          rating: r.driver.rating,
+          totalJobs: r.driver.total_jobs,
+        }));
+      setDriverPins(pins);
     })();
     return () => { cancelled = true; };
   }, [drivers]);

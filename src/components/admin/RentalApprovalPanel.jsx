@@ -134,6 +134,7 @@ export default function RentalApprovalPanel({ scrollRef }) {
                 <Button
                   size="sm"
                   className="bg-emerald-500 hover:bg-emerald-600"
+                  aria-label={`Approve listing for ${r.make} ${r.model}`}
                   disabled={processingId === r.id}
                   onClick={() => handleAction(r.id, 'approve')}
                 >
@@ -143,6 +144,7 @@ export default function RentalApprovalPanel({ scrollRef }) {
                 <Button
                   size="sm"
                   variant="outline"
+                  aria-label={`Reject listing for ${r.make} ${r.model}`}
                   disabled={processingId === r.id}
                   onClick={() => handleAction(r.id, 'reject')}
                 >

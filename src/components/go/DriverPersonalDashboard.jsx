@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 import {
@@ -22,7 +23,9 @@ const STATUS_COLORS = {
   cancelled: 'bg-red-500/10 text-red-700 dark:text-red-300',
 };
 
-export default function DriverPersonalDashboard({ user }) {
+export default function DriverPersonalDashboard({ user: propUser }) {
+  const { user: authUser } = useAuth();
+  const user = propUser || authUser;
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [moves, setMoves] = useState([]);
@@ -30,9 +33,9 @@ export default function DriverPersonalDashboard({ user }) {
   const [ratings, setRatings] = useState([]);
 
   const load = useCallback(async () => {
+    if (!user?.email) { setLoading(false); return; }
     try {
-      const u = await base44.auth.me();
-      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
       if (profiles.length === 0) {
         setLoading(false);
         return;
@@ -55,7 +58,7 @@ export default function DriverPersonalDashboard({ user }) {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load, user]);
 
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;

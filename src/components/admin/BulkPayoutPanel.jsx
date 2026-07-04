@@ -141,7 +141,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
       </div>
 
         {/* Summary bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20" aria-live="polite">
           <div className="flex items-center gap-4">
             <div>
               <p className="text-2xl font-display font-bold text-amber-600 dark:text-amber-400">
@@ -226,7 +226,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
                           <Checkbox
                             checked={isSel}
                             onCheckedChange={() => toggleSelect(p.id)}
-                            aria-label={`Select payout from ${p.pickup} to ${p.dropoff}`}
+                            aria-label={`Select payout of $${(p.amount || 0).toFixed(2)} for ${group.driver_name} from ${p.pickup}`}
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm truncate">{p.pickup} → {p.dropoff}</p>

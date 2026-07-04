@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/lib/AuthContext';
 import { CreditCard, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function StripeConnectCard({ profile: initialProfile, onUpdated }) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [profile, setProfile] = useState(initialProfile);
   const [loading, setLoading] = useState(!initialProfile);
   const [connecting, setConnecting] = useState(false);
@@ -13,15 +15,15 @@ export default function StripeConnectCard({ profile: initialProfile, onUpdated }
 
   useEffect(() => {
     if (initialProfile) return;
+    if (!user?.email) { setLoading(false); return; }
     (async () => {
       try {
-        const u = await base44.auth.me();
-        const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+        const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
         if (profiles.length > 0) setProfile(profiles[0]);
       } catch {}
       setLoading(false);
     })();
-  }, [initialProfile]);
+  }, [initialProfile, user]);
 
   useEffect(() => {
     if (initialProfile) setProfile(initialProfile);
@@ -48,8 +50,7 @@ export default function StripeConnectCard({ profile: initialProfile, onUpdated }
         toast({ title: 'Setup incomplete', description: 'Please complete your Stripe onboarding to receive automatic payouts.', variant: 'destructive' });
       }
       // Refresh profile from server
-      const u = await base44.auth.me();
-      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
         if (onUpdated) onUpdated(profiles[0]);

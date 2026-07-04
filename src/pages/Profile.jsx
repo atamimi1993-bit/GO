@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,18 +17,14 @@ import DriverProfileDashboard from '@/components/go/DriverProfileDashboard';
 export default function Profile() {
   const navigate = useNavigate();
   const { scrollRef } = useOutletContext();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, checkUserAuth } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser).finally(() => setLoading(false));
-  }, []);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
-    <PullToRefresh onRefresh={async () => { const u = await base44.auth.me(); setUser(u); }} scrollRef={scrollRef}>
+    <PullToRefresh onRefresh={async () => { await checkUserAuth(); }} scrollRef={scrollRef}>
     <div className="max-w-md mx-auto">
       <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]"><ArrowLeft size={16} /> Back</button>
       <h1 className="text-2xl font-display font-bold mb-6">My Account</h1>
