@@ -7,6 +7,8 @@ import StatCard from '@/components/admin/StatCard';
 const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
 const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
 const MoveStatusTracker = lazy(() => import('@/components/admin/MoveStatusTracker'));
+const GrowthSummary = lazy(() => import('@/components/admin/GrowthSummary'));
+const RecordExportButton = lazy(() => import('@/components/admin/RecordExportButton'));
 const BulkPayoutPanel = lazy(() => import('@/components/admin/BulkPayoutPanel'));
 const MoveCalendar = lazy(() => import('@/components/admin/MoveCalendar'));
 const EarningsCharts = lazy(() => import('@/components/admin/EarningsCharts'));
@@ -167,9 +169,21 @@ export default function Admin() {
           <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
         </div>
 
+        {/* Download all records for record-keeping */}
+        <div className="mb-6">
+          <Suspense fallback={<SectionSkeleton />}>
+            <RecordExportButton />
+          </Suspense>
+        </div>
+
         {/* Quick access links */}
         <Suspense fallback={<SectionSkeleton />}>
           <AdminQuickLinks />
+        </Suspense>
+
+        {/* Growth summary — monthly revenue, completed moves, driver payouts */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <GrowthSummary />
         </Suspense>
 
         {/* Move status tracker */}
