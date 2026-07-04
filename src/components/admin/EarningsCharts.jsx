@@ -7,6 +7,16 @@ import {
 } from 'recharts';
 import { BarChart3, Loader2, TrendingUp, DollarSign, Truck } from 'lucide-react';
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 640);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isMobile;
+};
+
 const fmt = (n) => `$${(n || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
 const COLORS = ['#10b981', '#3b82f6', '#a855f7', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
@@ -22,6 +32,7 @@ export default function EarningsCharts() {
   const { toast } = useToast();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     base44.functions.invoke('admin-dashboard', { action: 'driver_performance' })
@@ -146,11 +157,11 @@ export default function EarningsCharts() {
         {chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">No earnings data yet.</p>
         ) : (
-          <div className="w-full h-64">
+          <div className="w-full h-64 min-w-[300px] overflow-x-auto">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-25} textAnchor="end" height={50} className="fill-muted-foreground" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-25} textAnchor="end" height={isMobile ? 40 : 50} className="fill-muted-foreground" />
                 <YAxis tickFormatter={(v) => fmt(v)} tick={{ fontSize: 11 }} className="fill-muted-foreground" />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }} />
                 <Bar dataKey="earnings" name="Earnings" fill={CHART_COLORS.earnings} radius={[4, 4, 0, 0]} />
@@ -168,11 +179,11 @@ export default function EarningsCharts() {
         {chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">No job data yet.</p>
         ) : (
-          <div className="w-full h-64">
+          <div className="w-full h-64 min-w-[300px] overflow-x-auto">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-25} textAnchor="end" height={50} className="fill-muted-foreground" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-25} textAnchor="end" height={isMobile ? 40 : 50} className="fill-muted-foreground" />
                 <YAxis tick={{ fontSize: 11 }} allowDecimals={false} className="fill-muted-foreground" />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
