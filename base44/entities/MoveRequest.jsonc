@@ -207,6 +207,14 @@
       "type": "string",
       "format": "date-time"
     },
+    "reminder_24h_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "reminder_1h_sent": {
+      "type": "boolean",
+      "default": false
+    },
     "declined_driver_ids": {
       "type": "string",
       "default": ""
@@ -387,21 +395,7 @@
     "move_date"
   ],
   "rls": {
-    "create": {
-      "$or": [
-        {
-          "created_by_id": "{{user.id}}"
-        },
-        {
-          "data.customer_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
+    "create": true,
     "read": {
       "$or": [
         {
