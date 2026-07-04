@@ -24,9 +24,17 @@
       "type": "string",
       "enum": [
         "car",
-        "truck",
+        "suv",
+        "pickup",
         "van",
-        "trailer"
+        "truck",
+        "box_truck",
+        "flatbed",
+        "semi",
+        "trailer",
+        "rv",
+        "motorcycle",
+        "bus"
       ],
       "default": "truck"
     },

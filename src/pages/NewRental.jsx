@@ -118,10 +118,18 @@ export default function NewRental() {
             <Select value={form.vehicle_type} onValueChange={(v) => setForm(f => ({ ...f, vehicle_type: v }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="truck">Truck</SelectItem>
                 <SelectItem value="car">Car</SelectItem>
+                <SelectItem value="suv">SUV</SelectItem>
+                <SelectItem value="pickup">Pickup Truck</SelectItem>
                 <SelectItem value="van">Van</SelectItem>
+                <SelectItem value="truck">Truck</SelectItem>
+                <SelectItem value="box_truck">Box Truck</SelectItem>
+                <SelectItem value="flatbed">Flatbed</SelectItem>
+                <SelectItem value="semi">Semi / Tractor</SelectItem>
                 <SelectItem value="trailer">Trailer</SelectItem>
+                <SelectItem value="rv">RV / Camper</SelectItem>
+                <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                <SelectItem value="bus">Bus</SelectItem>
               </SelectContent>
             </Select>
           </div>

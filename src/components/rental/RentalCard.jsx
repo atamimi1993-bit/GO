@@ -1,13 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Truck, Car, Fuel, Calendar } from 'lucide-react';
+import { MapPin, Truck, Car, Fuel, Calendar, Bus, Bike, Caravan } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const VEHICLE_ICONS = {
   car: Car,
-  truck: Truck,
+  suv: Car,
+  pickup: Truck,
   van: Truck,
-  trailer: Truck,
+  truck: Truck,
+  box_truck: Truck,
+  flatbed: Truck,
+  semi: Truck,
+  trailer: Caravan,
+  rv: Caravan,
+  motorcycle: Bike,
+  bus: Bus,
+};
+
+const VEHICLE_LABELS = {
+  car: 'Car', suv: 'SUV', pickup: 'Pickup', van: 'Van', truck: 'Truck',
+  box_truck: 'Box Truck', flatbed: 'Flatbed', semi: 'Semi', trailer: 'Trailer',
+  rv: 'RV', motorcycle: 'Motorcycle', bus: 'Bus',
 };
 
 export default function RentalCard({ rental }) {
@@ -29,7 +43,7 @@ export default function RentalCard({ rental }) {
           </div>
         )}
         <div className="absolute top-2 left-2">
-          <Badge className="capitalize bg-background/90 backdrop-blur">{rental.vehicle_type}</Badge>
+          <Badge className="bg-background/90 backdrop-blur">{VEHICLE_LABELS[rental.vehicle_type] || rental.vehicle_type}</Badge>
         </div>
         {!rental.available && (
           <div className="absolute inset-0 bg-background/60 flex items-center justify-center">

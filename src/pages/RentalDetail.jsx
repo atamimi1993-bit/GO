@@ -3,12 +3,22 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Loader2, MapPin, Fuel, Calendar, Truck, Car, Gauge, User, Phone, Mail } from 'lucide-react';
+import { ArrowLeft, Loader2, MapPin, Fuel, Calendar, Truck, Car, Gauge, User, Phone, Mail, Bus, Bike, Caravan } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
 import RentalRequestForm from '@/components/rental/RentalRequestForm';
 import { useToast } from '@/components/ui/use-toast';
 
-const VEHICLE_ICONS = { car: Car, truck: Truck, van: Truck, trailer: Truck };
+const VEHICLE_ICONS = {
+  car: Car, suv: Car, pickup: Truck, van: Truck, truck: Truck,
+  box_truck: Truck, flatbed: Truck, semi: Truck, trailer: Caravan,
+  rv: Caravan, motorcycle: Bike, bus: Bus,
+};
+
+const VEHICLE_LABELS = {
+  car: 'Car', suv: 'SUV', pickup: 'Pickup', van: 'Van', truck: 'Truck',
+  box_truck: 'Box Truck', flatbed: 'Flatbed', semi: 'Semi', trailer: 'Trailer',
+  rv: 'RV', motorcycle: 'Motorcycle', bus: 'Bus',
+};
 
 export default function RentalDetail() {
   const { id } = useParams();
@@ -66,7 +76,7 @@ export default function RentalDetail() {
         <div>
           <h1 className="text-2xl font-display font-bold">{rental.make} {rental.model}</h1>
           <div className="flex items-center gap-2 mt-1">
-            <Badge className="capitalize">{rental.vehicle_type}</Badge>
+            <Badge>{VEHICLE_LABELS[rental.vehicle_type] || rental.vehicle_type}</Badge>
             {rental.year && <span className="text-sm text-muted-foreground">{rental.year}</span>}
           </div>
         </div>

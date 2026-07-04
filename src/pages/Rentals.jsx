@@ -69,10 +69,18 @@ export default function Rentals() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="truck">Trucks</SelectItem>
               <SelectItem value="car">Cars</SelectItem>
+              <SelectItem value="suv">SUVs</SelectItem>
+              <SelectItem value="pickup">Pickups</SelectItem>
               <SelectItem value="van">Vans</SelectItem>
+              <SelectItem value="truck">Trucks</SelectItem>
+              <SelectItem value="box_truck">Box Trucks</SelectItem>
+              <SelectItem value="flatbed">Flatbeds</SelectItem>
+              <SelectItem value="semi">Semis</SelectItem>
               <SelectItem value="trailer">Trailers</SelectItem>
+              <SelectItem value="rv">RVs</SelectItem>
+              <SelectItem value="motorcycle">Motorcycles</SelectItem>
+              <SelectItem value="bus">Buses</SelectItem>
             </SelectContent>
           </Select>
         </div>
