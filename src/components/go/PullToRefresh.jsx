@@ -102,8 +102,8 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
     >
       {(pullDistance > 0 || refreshing) && (
         <div
-          className="absolute left-0 right-0 flex items-center justify-center z-50 pointer-events-none"
-          style={{ top: 0, transform: `translateY(${pullDistance - 40}px)` }}
+          className="left-0 right-0 flex items-center justify-center pointer-events-none"
+          style={{ position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', zIndex: 100, transform: `translateY(${pullDistance}px)` }}
         >
           {refreshing ? (
             <Loader2 className="text-primary animate-spin" size={24} />

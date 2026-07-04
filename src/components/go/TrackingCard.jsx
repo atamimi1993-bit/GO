@@ -40,6 +40,7 @@ export default function TrackingCard({ move }) {
     <Link
       to={`/move/${move.id}`}
       className="block bg-card border rounded-2xl p-5 hover:shadow-md transition-shadow select-none"
+      aria-label={`Track move from ${move.pickup_address} to ${move.dropoff_address}, status ${move.status}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">

@@ -190,6 +190,8 @@ export default function DriverDashboard() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
+                aria-label={`Filter drivers: ${s === 'all' ? 'All Drivers' : s === 'pending_review' ? 'Pending' : s.charAt(0).toUpperCase() + s.slice(1)}`}
+                aria-pressed={statusFilter === s}
                 className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border transition-colors min-h-[40px] ${
                   statusFilter === s
                     ? 'bg-primary text-primary-foreground border-primary'
@@ -209,6 +211,8 @@ export default function DriverDashboard() {
             <button
               key={opt.key}
               onClick={() => toggleSort(opt.key)}
+              aria-pressed={sortKey === opt.key}
+              aria-label={`Sort by ${opt.label}, ${sortDir === 'desc' ? 'descending' : 'ascending'}`}
               className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap ${
                 sortKey === opt.key
                   ? 'bg-primary/10 border-primary/30 text-primary'

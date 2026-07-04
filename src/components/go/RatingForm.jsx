@@ -7,7 +7,6 @@ import { useToast } from '@/components/ui/use-toast';
 
 export default function RatingForm({ move, direction, raterId, raterName, rateeId, rateeName, onSubmitted, onError }) {
   const [stars, setStars] = useState(0);
-  const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
@@ -54,14 +53,12 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
             key={n}
             type="button"
             onClick={() => setStars(n)}
-            onMouseEnter={() => setHover(n)}
-            onMouseLeave={() => setHover(0)}
             className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label={`Rate ${n} stars`}
           >
             <Star
               size={28}
-              className={(hover || stars) >= n ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}
+              className={stars >= n ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}
             />
           </button>
         ))}

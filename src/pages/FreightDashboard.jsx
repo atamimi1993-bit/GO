@@ -121,6 +121,8 @@ export default function FreightDashboard() {
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
+              aria-label={`Filter jobs: ${tab.label}`}
+              aria-pressed={filter === tab.key}
               className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
                 filter === tab.key
                   ? 'bg-blue-500 text-white'
