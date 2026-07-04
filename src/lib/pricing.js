@@ -198,18 +198,18 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Operational subtotal = everything it costs to do the job (base + fuel + driver labor)
   const operationalSubtotal = baseCost + fuelCost + driverPayout;
 
-  // GO platform fee — 20% of the FULL operational cost (GO's profit scales with every dollar)
-  const appFee = operationalSubtotal * APP_FEE_RATE;
+  // GO platform fee — 20% of the TOTAL customer price (GO's profit is 20% of what the customer pays)
+  // Solve: total = ops + fee + tax,  fee = 0.20*total,  tax = (ops + fee)*rate
+  //   => total = ops*(1+rate) / (1 - 0.20*(1+rate))
+  const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
+  const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
+  const totalPrice = operationalSubtotal * (1 + taxRate) / (1 - APP_FEE_RATE * (1 + taxRate));
+  const appFee = totalPrice * APP_FEE_RATE;
   const goProfit = appFee; // GO keeps this; customer already paid for gas/miles/driver
   const driverFee = 0;
 
-  // Tax rate: country config overrides state — applied to operational + platform fee
-  const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
-  const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
+  // Tax applied to operational + platform fee
   const taxAmount = (operationalSubtotal + appFee) * taxRate;
-
-  // Total price (in USD) — customer pays operational + GO fee + tax
-  const totalPrice = operationalSubtotal + appFee + taxAmount;
 
   // Currency conversion
   const currencyCode = currency || country?.currency || 'USD';
