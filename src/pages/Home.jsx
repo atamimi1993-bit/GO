@@ -85,6 +85,70 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Happy Customers & Movers */}
+      <section>
+        <h2 className="text-2xl font-display font-bold text-center mb-2">Happy Customers & Movers</h2>
+        <p className="text-center text-muted-foreground text-sm mb-10">Real people, real moves, real smiles.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            {
+              name: 'Sarah M.',
+              role: 'Customer',
+              quote: 'The driver was on time, super careful with my furniture, and the live tracking gave me total peace of mind.',
+              photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
+            },
+            {
+              name: 'Marcus T.',
+              role: 'GO Driver',
+              quote: 'I make my own schedule and earn great money. The app makes it so easy to find jobs near me.',
+              photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+            },
+            {
+              name: 'Jennifer L.',
+              role: 'Customer',
+              quote: 'Moved my entire apartment in one trip. Pricing was transparent and the driver was a pro.',
+              photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+            },
+            {
+              name: 'David K.',
+              role: 'GO Driver',
+              quote: 'Best decision I made was signing up as a driver. Flexible hours and steady work every week.',
+              photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
+            },
+            {
+              name: 'Emily R.',
+              role: 'Customer',
+              quote: 'I could see exactly where my stuff was the whole time. No stress, no surprises. Highly recommend!',
+              photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
+            },
+            {
+              name: 'James W.',
+              role: 'GO Driver',
+              quote: 'The tracking feature makes customers feel safe. Tips went up as soon as I started using it.',
+              photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
+            },
+          ].map((t, i) => (
+            <div key={i} className="bg-card rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-4 mb-4">
+                <img
+                  src={t.photo}
+                  alt={t.name}
+                  className="w-14 h-14 rounded-full object-cover"
+                  loading="lazy"
+                />
+                <div>
+                  <p className="font-display font-bold text-sm">{t.name}</p>
+                  <p className={`text-xs font-medium ${t.role === 'GO Driver' ? 'text-emerald-600' : 'text-blue-600'}`}>
+                    {t.role}
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">"{t.quote}"</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Quick Links */}
       <section className="grid md:grid-cols-2 gap-4">
         <Link to="/storage" className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 hover:shadow-md transition-shadow group">

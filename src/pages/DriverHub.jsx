@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import DriverTrackingControls from '@/components/go/DriverTrackingControls';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function DriverHub() {
@@ -111,6 +112,10 @@ export default function DriverHub() {
           </Button>
         </Link>
       </div>
+
+      {profile.status === 'approved' && (
+        <DriverTrackingControls driverProfile={profile} />
+      )}
     </div>
   );
 }

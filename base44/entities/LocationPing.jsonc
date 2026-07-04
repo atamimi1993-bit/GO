@@ -1,0 +1,38 @@
+{
+  "name": "LocationPing",
+  "type": "object",
+  "properties": {
+    "move_request_id": {
+      "type": "string"
+    },
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "number"
+    },
+    "lng": {
+      "type": "number"
+    },
+    "milestone": {
+      "type": "string",
+      "enum": [
+        "en_route_to_pickup",
+        "arrived_at_pickup",
+        "items_loaded",
+        "en_route_to_dropoff",
+        "arrived_at_dropoff",
+        "delivered"
+      ],
+      "default": "en_route_to_pickup"
+    },
+    "note": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "move_request_id",
+    "lat",
+    "lng"
+  ]
+}

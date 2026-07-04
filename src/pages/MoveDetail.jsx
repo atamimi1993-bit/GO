@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
+import MoveTracker from '@/components/go/MoveTracker';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail } from 'lucide-react';
 import moment from 'moment';
 
@@ -98,6 +99,13 @@ export default function MoveDetail() {
         <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 mb-4">
           <h3 className="font-display font-bold text-sm mb-2 text-emerald-800">Assigned Driver</h3>
           <p className="font-medium">{move.assigned_driver_name}</p>
+        </div>
+      )}
+
+      {/* Live Tracking */}
+      {move.assigned_driver_id && ['accepted', 'in_progress', 'completed'].includes(move.status) && (
+        <div className="mb-4">
+          <MoveTracker moveId={move.id} />
         </div>
       )}
 
