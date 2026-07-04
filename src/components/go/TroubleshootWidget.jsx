@@ -158,7 +158,7 @@ export default function TroubleshootWidget({ initialOpen = false }) {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm bg-card border rounded-2xl shadow-2xl flex flex-col" style={{ maxHeight: '75vh' }}>
+        <div className="fixed bottom-20 md:bottom-6 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm bg-card border rounded-2xl shadow-2xl flex flex-col" style={{ maxHeight: '70vh' }}>
           {/* Header */}
           <div className="flex items-center gap-2 p-3 border-b bg-amber-500 text-white rounded-t-2xl">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
