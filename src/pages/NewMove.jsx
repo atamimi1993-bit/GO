@@ -159,11 +159,12 @@ export default function NewMove() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <div aria-live="polite" aria-atomic="true" className="sr-only">{STEPS[step]} — Step {step + 1} of {STEPS.length}</div>
       {/* Progress */}
       <div className="flex items-center gap-2 mb-8">
         {STEPS.map((s, i) => (
           <React.Fragment key={s}>
-            <div className={`flex items-center gap-2 ${i <= step ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+            <div className={`flex items-center gap-2 ${i <= step ? 'text-emerald-600' : 'text-muted-foreground'}`} aria-label={`Step ${i + 1}: ${s}${i < step ? ' (completed)' : i === step ? ' (current)' : ''}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                 i < step ? 'bg-emerald-500 text-white' : i === step ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400' : 'bg-muted'
               }`}>

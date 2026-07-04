@@ -179,6 +179,7 @@ export default function Support() {
                   placeholder="Type your message..."
                   disabled={sending || creating}
                   className="flex-1"
+                  aria-label="Type your message"
                 />
                 <Button onClick={handleSend} disabled={sending || creating || !input.trim()} className="bg-emerald-500 hover:bg-emerald-600" size="icon" aria-label="Send message">
                   {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}

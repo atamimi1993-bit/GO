@@ -146,7 +146,7 @@ export default function DriverTrackingControls({ driverProfile }) {
 
         <div className="grid grid-cols-2 gap-2">
           {MILESTONES.map((m) => (
-            <Button key={m.key} size="sm" variant="outline" onClick={() => sendPing(m.key)}>
+            <Button key={m.key} size="sm" variant="outline" onClick={() => sendPing(m.key)} aria-label={m.label}>
               <m.icon size={14} className="mr-1" /> {m.label}
             </Button>
           ))}
