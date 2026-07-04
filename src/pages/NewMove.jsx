@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useBlocker } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/use-toast';
 import ItemForm from '@/components/go/ItemForm';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import LiabilityAgreement from '@/components/go/LiabilityAgreement';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { calculateMovePrice, recommendTruckSize, TRUCK_SIZE_LABELS, STATE_TAX_RATES } from '@/lib/pricing';
 import { ArrowLeft, ArrowRight, Upload, Trash2, Package, MapPin, Calendar, FileText, Loader2 } from 'lucide-react';
 
@@ -32,6 +33,11 @@ export default function NewMove() {
   const [items, setItems] = useState([]);
   const [truckSize, setTruckSize] = useState('medium');
   const [pricing, setPricing] = useState(null);
+
+  const hasData = form.pickup_address || items.length > 0;
+  const blocker = useBlocker(({ currentLocation, nextLocation }) =>
+    hasData && step > 0 && currentLocation.pathname !== nextLocation.pathname
+  );
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -371,6 +377,21 @@ export default function NewMove() {
           </Button>
         )}
       </div>
+
+      {blocker.state === 'blocked' && (
+        <AlertDialog open onOpenChange={() => blocker.reset()}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Leave without saving?</AlertDialogTitle>
+              <AlertDialogDescription>Your move details will be lost if you leave now.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => blocker.reset()}>Stay</AlertDialogCancel>
+              <AlertDialogAction onClick={() => blocker.proceed()}>Leave</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }

@@ -70,7 +70,7 @@ export default function HelpCenter() {
               {getArticles(cat).map((article, i) => (
                 <AccordionItem key={article.id || i} value={`${cat}-${i}`}>
                   <AccordionTrigger className="px-5 text-sm font-medium">{article.title}</AccordionTrigger>
-                  <AccordionContent className="px-5 text-sm text-muted-foreground leading-relaxed">
+                  <AccordionContent className="px-5 text-sm text-muted-foreground leading-relaxed select-text">
                     {article.content}
                   </AccordionContent>
                 </AccordionItem>

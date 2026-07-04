@@ -151,7 +151,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">"{t.quote}"</p>
+              <p className="text-sm text-muted-foreground leading-relaxed select-text">"{t.quote}"</p>
             </div>
           ))}
         </div>

@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
 import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import BottomTabBar from '@/components/go/BottomTabBar';
 
 const navItems = [
@@ -61,15 +62,23 @@ export default function AppLayout() {
                 <User size={16} className="mr-1" /> Account
               </Button>
             </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => base44.auth.logout('/')}
-              className="text-muted-foreground"
-              aria-label="Sign out"
-            >
-              <LogOut size={16} />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => base44.auth.logout('/')}
+                    className="text-muted-foreground"
+                    aria-label="Sign out"
+                  >
+                    <LogOut size={16} />
+                    <span className="sr-only">Sign out</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Sign out</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </header>

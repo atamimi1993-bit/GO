@@ -127,7 +127,7 @@ export default function MoveDetail() {
       {move.notes && (
         <div className="bg-card border rounded-2xl p-5 mt-4">
           <h3 className="font-display font-bold text-sm mb-1">Notes</h3>
-          <p className="text-sm text-muted-foreground">{move.notes}</p>
+          <p className="text-sm text-muted-foreground select-text">{move.notes}</p>
         </div>
       )}
     </div>

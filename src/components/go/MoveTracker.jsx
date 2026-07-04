@@ -54,7 +54,7 @@ export default function MoveTracker({ moveId }) {
       </div>
 
       {latestPing && latestPing.lat ? (
-        <div role="region" aria-label="Live driver tracking map" className="h-64 w-full">
+        <div role="region" aria-label="Live driver tracking map" tabIndex={0} className="h-64 w-full">
           <MapContainer
             center={[latestPing.lat, latestPing.lng]}
             zoom={13}
