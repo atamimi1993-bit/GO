@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
+import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck, ShieldCheck, AlertCircle, Clock, Weight } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency, calculateMovePrice } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
@@ -101,6 +101,44 @@ export default function AvailableJobs() {
   };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
+
+  // No driver profile yet
+  if (!driverProfile) {
+    return (
+      <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
+        <div className="max-w-xl mx-auto text-center py-16">
+          <div className="w-20 h-20 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Truck className="text-emerald-600 dark:text-emerald-400" size={36} />
+          </div>
+          <h1 className="text-2xl font-display font-bold mb-3">Register as a Driver First</h1>
+          <p className="text-muted-foreground mb-6">You need a driver account to browse and accept jobs.</p>
+          <Button onClick={() => navigate('/driver-register')} className="bg-emerald-500 hover:bg-emerald-600">
+            Register as Driver
+          </Button>
+        </div>
+      </PullToRefresh>
+    );
+  }
+
+  // Not approved yet
+  if (driverProfile.status !== 'approved') {
+    return (
+      <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
+        <div className="max-w-xl mx-auto text-center py-16">
+          <div className="w-20 h-20 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Clock className="text-yellow-600 dark:text-yellow-400" size={36} />
+          </div>
+          <h1 className="text-2xl font-display font-bold mb-3">Account Under Review</h1>
+          <p className="text-muted-foreground mb-6">
+            Your driver application is being reviewed. Once approved, you'll be able to browse and pick the jobs you want.
+          </p>
+          <Button variant="outline" onClick={() => navigate('/driver-hub')}>
+            Back to Driver Hub
+          </Button>
+        </div>
+      </PullToRefresh>
+    );
+  }
 
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
