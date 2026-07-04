@@ -18,11 +18,16 @@ export default function DriverRateConfirmation({ move, onConfirmed }) {
 
   const handleConfirm = async () => {
     setConfirming(true);
+    // Optimistic: update local move state immediately, revert on error
     onConfirmed();
+    const prevConfirmed = move.driver_rate_confirmed;
+    move.driver_rate_confirmed = true;
     try {
       await base44.entities.MoveRequest.update(move.id, { driver_rate_confirmed: true });
       toast({ title: 'Rate confirmed!' });
     } catch (err) {
+      move.driver_rate_confirmed = prevConfirmed;
+      onConfirmed();
       toast({ title: 'Could not confirm', description: err.message, variant: 'destructive' });
     }
     setConfirming(false);

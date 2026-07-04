@@ -63,6 +63,13 @@ export default function DriverNavigationCard({ job }) {
     { name: 'Apple Maps', url: appleMapsUrl, color: 'bg-gray-700 hover:bg-gray-800', icon: '🍎', ariaLabel: 'Open route in Apple Maps' },
     { name: 'Waze', url: wazeUrl, color: 'bg-cyan-500 hover:bg-cyan-600', icon: '🚗', ariaLabel: 'Open route in Waze' },
   ];
+  // Map emoji icons to accessible JSX (emoji hidden from screen readers, sr-only label provided)
+  const renderAppIcon = (app) => (
+    <>
+      <span aria-hidden="true" className="text-xl">{app.icon}</span>
+      <span className="sr-only">{app.name}</span>
+    </>
+  );
 
   const hasCoords = pickupCoords && dropoffCoords;
   const routePath = hasCoords ? [pickupCoords, dropoffCoords] : [];
@@ -148,7 +155,7 @@ export default function DriverNavigationCard({ job }) {
               aria-label={app.ariaLabel}
               className={`flex flex-col items-center gap-1.5 ${app.color} text-white rounded-xl py-3 px-2 transition-colors`}
             >
-              <span className="text-xl">{app.icon}</span>
+              {renderAppIcon(app)}
               <span className="text-xs font-semibold">{app.name}</span>
             </a>
           ))}

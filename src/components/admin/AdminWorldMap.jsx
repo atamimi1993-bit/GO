@@ -15,7 +15,7 @@ L.Icon.Default.mergeOptions({
 
 // Driver icon (blue truck marker)
 const driverIcon = L.divIcon({
-  html: `<div style="background:#3b82f6;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);">🚚</div>`,
+  html: `<div style="background:#3b82f6;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);">D</div>`,
   className: '',
   iconSize: [28, 28],
   iconAnchor: [14, 14],
@@ -162,7 +162,7 @@ export default function AdminWorldMap() {
           <span className="text-muted-foreground">Completed ({completedClients.length})</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-base leading-none">🚚</span>
+          <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
           <span className="text-muted-foreground">Driver ({driverPins.length})</span>
         </div>
       </div>
@@ -205,7 +205,7 @@ export default function AdminWorldMap() {
                 >
                   <Popup>
                     <div className="text-sm">
-                      <p className="font-bold mb-1">{isCompleted ? '✅ Completed' : '🔴 Active Client'}</p>
+                      <p className="font-bold mb-1"><span aria-hidden="true">{isCompleted ? '✅' : '🔴'}</span> {isCompleted ? 'Completed' : 'Active Client'}</p>
                       <p><strong>Customer:</strong> {pin.customer}</p>
                       <p><strong>Address:</strong> {pin.address}</p>
                       <p><strong>Status:</strong> {pin.status?.replace('_', ' ')}</p>
@@ -214,7 +214,7 @@ export default function AdminWorldMap() {
                     </div>
                   </Popup>
                   <Tooltip>
-                    {isCompleted ? '✅ Completed' : '🔴 Active'} — {pin.customer}
+                    <span aria-hidden="true">{isCompleted ? '✅' : '🔴'}</span> {isCompleted ? 'Completed' : 'Active'} — {pin.customer}
                   </Tooltip>
                 </CircleMarker>
               );
@@ -229,7 +229,7 @@ export default function AdminWorldMap() {
               >
                 <Popup>
                   <div className="text-sm">
-                    <p className="font-bold mb-1">🚚 Driver</p>
+                    <p className="font-bold mb-1"><span aria-hidden="true">🚚</span> Driver</p>
                     <p><strong>Name:</strong> {pin.name}</p>
                     <p><strong>Service Area:</strong> {pin.serviceArea}</p>
                     <p><strong>Status:</strong> {pin.status?.replace('_', ' ')}</p>
@@ -238,7 +238,7 @@ export default function AdminWorldMap() {
                   </div>
                 </Popup>
                 <Tooltip>
-                  🚚 {pin.name} — {pin.serviceArea}
+                  <span aria-hidden="true">🚚</span> {pin.name} — {pin.serviceArea}
                 </Tooltip>
               </Marker>
             ))}

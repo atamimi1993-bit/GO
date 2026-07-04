@@ -123,7 +123,11 @@ export default function Support() {
             {creating ? <Loader2 size={14} className="animate-spin mr-1" /> : <Plus size={14} className="mr-1" />} New Chat
           </Button>
           {loadingList ? (
-            <div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={20} /></div>
+            <div className="space-y-2 px-1 py-2">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="animate-pulse bg-muted rounded-lg h-8 w-full" />
+              ))}
+            </div>
           ) : conversations.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">No conversations yet</p>
           ) : (

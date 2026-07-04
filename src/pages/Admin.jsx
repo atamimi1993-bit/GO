@@ -58,8 +58,11 @@ export default function Admin() {
   useEffect(() => { load(); }, [load]);
 
   const handleDriverAction = async (driverId, action) => {
+    const driver = data?.pendingDrivers?.find((d) => d.id === driverId);
     setProcessingId(driverId);
     const prevPendingDrivers = data?.pendingDrivers || [];
+    // Brief processing toast
+    toast({ title: 'Processing...', description: `${action === 'approve_driver' ? 'Approving' : 'Rejecting'} ${driver?.full_name || 'driver'}` });
     // Optimistically remove the driver from the pending list
     if (data?.pendingDrivers) {
       setData((prev) => ({
@@ -69,7 +72,7 @@ export default function Admin() {
     }
     try {
       await base44.functions.invoke('admin-dashboard', { action, driver_id: driverId });
-      toast({ title: action === 'approve_driver' ? 'Driver approved' : 'Driver rejected' });
+      toast({ title: `${driver?.full_name || 'Driver'} has been ${action === 'approve_driver' ? 'approved' : 'rejected'}` });
       await load();
     } catch (err) {
       // Restore the original pending drivers list on error
