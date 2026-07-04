@@ -31,8 +31,9 @@ function computeNextTrigger(frequency, dayOfWeek, fromTime) {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me().catch(() => null);
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const isAuthed = await base44.auth.isAuthenticated();
+    if (!isAuthed) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await base44.auth.me();
     if (user.role !== 'admin') return Response.json({ error: 'Admin access required' }, { status: 403 });
 
     const now = new Date();
