@@ -136,7 +136,7 @@ export default function MarketingPanel() {
           </div>
           <div>
             <h2 className="font-display font-bold text-lg">Marketing & Promotions</h2>
-            <p className="text-xs text-muted-foreground">Auto-generated ad campaigns. Customer ads refresh every 2 weeks, driver ads every month.</p>
+            <p className="text-xs text-muted-foreground">Auto-generated ad campaigns. Customer and driver ads refresh every 2 weeks.</p>
           </div>
         </div>
         <Button size="sm" className="min-h-[44px]" variant="outline" onClick={load} aria-label="Refresh campaigns">
@@ -166,7 +166,7 @@ export default function MarketingPanel() {
             <div>
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-1.5">
                 <Truck size={14} className="text-blue-500" /> Driver Campaigns
-                <Badge variant="secondary" className="ml-1 text-xs">Every month</Badge>
+                <Badge variant="secondary" className="ml-1 text-xs">Every 2 weeks</Badge>
               </h3>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {driverAds.map(renderAdCard)}
