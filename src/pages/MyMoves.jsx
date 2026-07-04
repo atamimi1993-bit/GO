@@ -78,7 +78,7 @@ export default function MyMoves() {
       ) : (
         <div className="space-y-3">
           {moves.map(move => (
-            <Link key={move.id} to={`/move/${move.id}`} className="block select-none bg-card border rounded-2xl p-5 hover:shadow-md transition-shadow">
+            <Link key={move.id} to={`/move/${move.id}`} className="block select-none bg-card border rounded-2xl p-5 hover:shadow-md transition-shadow" aria-label={`Move from ${move.pickup_address} to ${move.dropoff_address}, status ${move.status?.replace('_', ' ')}, $${move.total_price?.toFixed(2)}`}>
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">

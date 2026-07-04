@@ -64,6 +64,7 @@ export default function MoveTracker({ moveId }) {
             dragging={false}
             touchZoom={false}
             doubleClickZoom={false}
+            aria-hidden={true}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

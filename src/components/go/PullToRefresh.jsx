@@ -69,7 +69,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   };
 
   useEffect(() => {
-    const node = wrapperRef.current;
+    const node = (scrollRef && scrollRef.current) ? scrollRef.current : wrapperRef.current;
     if (!node) return;
     node.addEventListener('touchstart', handleTouchStart, { passive: false });
     node.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -79,7 +79,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
       node.removeEventListener('touchmove', handleTouchMove);
       node.removeEventListener('touchend', handleTouchEnd);
     };
-  }, []);
+  }, [scrollRef]);
 
   return (
     <div
