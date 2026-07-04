@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Receipt, Camera, Loader2, Fuel, Milestone, Wrench, FileQuestion,
-  CheckCircle2, XCircle, Clock, TrendingUp, Upload,
+  CheckCircle2, XCircle, Clock, TrendingUp, Upload, Briefcase,
 } from 'lucide-react';
 
 const EXPENSE_TYPES = [
@@ -25,6 +25,7 @@ const STATUS_STYLES = {
 export default function ExpenseSubmission({ driverProfile }) {
   const { toast } = useToast();
   const [receipts, setReceipts] = useState([]);
+  const [activeJobs, setActiveJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -41,12 +42,24 @@ export default function ExpenseSubmission({ driverProfile }) {
   const load = useCallback(async () => {
     if (!driverProfile?.id) return;
     try {
-      const data = await base44.entities.ExpenseReceipt.filter(
-        { driver_profile_id: driverProfile.id },
-        '-created_date',
-        50
-      );
+      const [data, jobs] = await Promise.all([
+        base44.entities.ExpenseReceipt.filter(
+          { driver_profile_id: driverProfile.id },
+          '-created_date',
+          50
+        ),
+        base44.entities.MoveRequest.filter(
+          { assigned_driver_id: driverProfile.id, status: { $in: ['accepted', 'in_progress'] } },
+          '-move_date',
+          20
+        ).catch(() => []),
+      ]);
       setReceipts(data);
+      setActiveJobs(jobs || []);
+      // Auto-select the current active job if none chosen yet
+      if (jobs?.length > 0 && !form.move_request_id) {
+        setForm((prev) => ({ ...prev, move_request_id: jobs[0].id }));
+      }
     } catch {
       setReceipts([]);
     }
@@ -155,16 +168,27 @@ export default function ExpenseSubmission({ driverProfile }) {
             />
           </div>
 
-          {/* Move ID (optional) */}
+          {/* Current job (auto-linked) */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Move Request ID (optional)</label>
-            <input
-              type="text"
-              placeholder="Link to a specific move"
-              value={form.move_request_id}
-              onChange={(e) => setForm({ ...form, move_request_id: e.target.value })}
-              className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            />
+            <label className="text-sm font-medium mb-1 block">Linked Job</label>
+            {activeJobs.length > 0 ? (
+              <select
+                value={form.move_request_id}
+                onChange={(e) => setForm({ ...form, move_request_id: e.target.value })}
+                className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                {activeJobs.map((j) => (
+                  <option key={j.id} value={j.id}>
+                    {j.pickup_address} → {j.dropoff_address}
+                    {j.status === 'in_progress' ? ' (in progress)' : ''}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="flex items-center gap-2 h-11 rounded-md border border-input bg-muted/30 px-3 text-sm text-muted-foreground">
+                <Briefcase size={14} /> No active job — receipt will be unlinked
+              </div>
+            )}
           </div>
 
           {/* Description */}
@@ -242,6 +266,7 @@ export default function ExpenseSubmission({ driverProfile }) {
                     <p className="text-sm font-medium capitalize">{r.expense_type} — ${r.amount.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground truncate">
                       {r.use_estimate ? 'Estimate rate' : 'Receipt attached'}
+                      {r.move_request_id ? ` · Linked to job` : ' · Unlinked'}
                       {r.description ? ` · ${r.description}` : ''}
                     </p>
                   </div>
