@@ -16,7 +16,7 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode }) {
     { label: `Base cost (${TRUCK_SIZE_LABELS[truckSize] || truckSize})`, value: pricing.baseCost },
     { label: fuelLabel, value: pricing.fuelCost },
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
-    { label: 'GO App Fee (10%)', value: pricing.appFee },
+    { label: 'GO App Fee (25%)', value: pricing.appFee },
     { label: 'Driver Fee (5%)', value: pricing.driverFee },
   ];
 

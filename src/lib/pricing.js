@@ -129,7 +129,7 @@ const COUNTRY_LIST = Object.entries(COUNTRY_CONFIG)
   .map(([code, cfg]) => ({ code, name: cfg.name }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-const APP_FEE_RATE = 0.10;
+const APP_FEE_RATE = 0.25;
 const DRIVER_FEE_RATE = 0.05;
 const MI_TO_KM = 1.60934;
 const LB_TO_KG = 0.453592;
