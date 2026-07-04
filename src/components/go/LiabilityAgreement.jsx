@@ -14,7 +14,7 @@ export default function LiabilityAgreement({ onSign }) {
         </div>
         <h3 className="font-display font-bold text-lg">Liability Agreement</h3>
       </div>
-      <div className="bg-muted rounded-xl p-4 text-sm text-foreground space-y-3 max-h-48 overflow-y-auto mb-4 select-text">
+      <div className="bg-muted rounded-xl p-4 text-sm text-foreground space-y-3 max-h-48 overflow-y-auto mb-4 select-text overscroll-none">
         <p><strong>By signing this agreement, you acknowledge and agree to the following terms:</strong></p>
         <p>1. You agree to work with GO and its network of independent drivers for the transportation of your listed items.</p>
         <p>2. In the event of any stolen, damaged, or lost items during the move, you must first contact the driver(s) assigned to your job to resolve the issue directly.</p>

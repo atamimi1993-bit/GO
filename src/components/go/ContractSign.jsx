@@ -127,7 +127,7 @@ export default function ContractSign({
       </div>
 
       {/* Contract body */}
-      <div className="bg-muted rounded-xl p-4 text-sm text-foreground space-y-3 max-h-72 overflow-y-auto mb-4 select-text">
+      <div className="bg-muted rounded-xl p-4 text-sm text-foreground space-y-3 max-h-72 overflow-y-auto mb-4 select-text overscroll-none">
         {contract.terms.map((term, i) => (
           <p key={i} className="leading-relaxed">{i === 0 ? <strong>{term}</strong> : term}</p>
         ))}

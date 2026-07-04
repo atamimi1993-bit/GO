@@ -281,7 +281,7 @@ export default function MoveCalendar({ scrollRef }) {
               <MapPin size={16} /> No moves scheduled for this day.
             </div>
           ) : (
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            <div className="space-y-2 max-h-[300px] overflow-y-auto overscroll-none">
               {selectedDayMoves.map((m) => (
                 <div key={m.id} className="flex items-center justify-between gap-2 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
                   <div className="min-w-0 flex-1">

@@ -100,7 +100,7 @@ export default function QuickAddItems({ onAdd, existingItems }) {
           aria-label="Search common items"
         />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1 overscroll-none">
         {filtered.map(item => {
           const qty = quantities[item.name] || 1;
           return (

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { User, Mail, Loader2, ArrowLeft } from 'lucide-react';
+import { User, Mail, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import StripeConnectCard from '@/components/go/StripeConnectCard';
@@ -54,14 +54,26 @@ export default function Profile() {
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 mt-2">
-              Delete Account
+            <Button variant="outline" className="w-full border-destructive text-destructive hover:bg-destructive/10 mt-2 min-h-[44px]">
+              <Trash2 size={16} className="mr-2" /> Delete Account
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-              <AlertDialogDescription>This will permanently delete your account and all associated data including moves, driver profile, and payouts. This action cannot be undone.</AlertDialogDescription>
+              <AlertDialogDescription asChild>
+                <div className="space-y-2 text-sm">
+                  <p>This will permanently and irreversibly delete:</p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    <li>Your account and login credentials</li>
+                    <li>All move requests and history</li>
+                    <li>Your driver profile and documents (if applicable)</li>
+                    <li>All pending and completed payouts</li>
+                    <li>Loyalty points and referral records</li>
+                  </ul>
+                  <p className="font-medium text-destructive">This action cannot be undone.</p>
+                </div>
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>

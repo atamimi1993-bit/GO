@@ -96,7 +96,7 @@ export default function MoveChat({ move, currentUser, driverProfile }) {
         </span>
       </div>
 
-      <div ref={scrollRef} className="max-h-80 overflow-y-auto space-y-2 mb-3 min-h-[100px]">
+      <div ref={scrollRef} className="max-h-80 overflow-y-auto space-y-2 mb-3 min-h-[100px] overscroll-none">
         {messages.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-8">
             No messages yet. Start the conversation!
