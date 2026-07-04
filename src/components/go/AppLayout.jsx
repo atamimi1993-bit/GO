@@ -35,7 +35,7 @@ export default function AppLayout() {
                 to={item.path}
                 className={`select-none px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === item.path
-                    ? 'bg-emerald-50 text-emerald-700'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >

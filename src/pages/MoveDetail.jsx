@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
-import MoveTracker from '@/components/go/MoveTracker';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+
+const MoveTracker = lazy(() => import('@/components/go/MoveTracker'));
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
@@ -114,7 +115,9 @@ export default function MoveDetail() {
       {/* Live Tracking */}
       {move.assigned_driver_id && ['accepted', 'in_progress', 'completed'].includes(move.status) && (
         <div className="mb-4">
-          <MoveTracker moveId={move.id} />
+          <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+            <MoveTracker moveId={move.id} />
+          </Suspense>
         </div>
       )}
 

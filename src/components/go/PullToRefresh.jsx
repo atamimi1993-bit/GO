@@ -4,7 +4,7 @@ import { Loader2, RefreshCw } from 'lucide-react';
 const THRESHOLD = 70;
 const MAX_PULL = 100;
 
-export default function PullToRefresh({ onRefresh, children, scrollRef }) {
+export default function PullToRefresh({ onRefresh, children, scrollRef, disabled }) {
   const [pulling, setPulling] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -18,14 +18,13 @@ export default function PullToRefresh({ onRefresh, children, scrollRef }) {
   };
 
   const handleTouchStart = (e) => {
-    if (isAtTop() && !refreshing) {
-      startY.current = e.touches[0].clientY;
-      setPulling(true);
-    }
+    if (disabled || refreshing || !isAtTop()) return;
+    startY.current = e.touches[0].clientY;
+    setPulling(true);
   };
 
   const handleTouchMove = (e) => {
-    if (!pulling || refreshing) return;
+    if (disabled || !pulling || refreshing) return;
     const diff = e.touches[0].clientY - startY.current;
     if (diff > 0) {
       setPullDistance(Math.min(diff * 0.5, MAX_PULL));
@@ -55,6 +54,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef }) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       className="relative"
+      style={{ isolation: 'isolate', willChange: 'transform' }}
     >
       {(pullDistance > 0 || refreshing) && (
         <div
@@ -76,6 +76,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef }) {
         style={{
           transform: `translateY(${pullDistance}px)`,
           transition: pulling ? 'none' : 'transform 0.3s ease',
+          willChange: 'transform',
         }}
       >
         {children}
