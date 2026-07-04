@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ const fmt = (n) => `$${(n || 0).toLocaleString(undefined, { minimumFractionDigit
 
 export default function DriverPerformance() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAllDrivers, setShowAllDrivers] = useState(false);
@@ -93,7 +95,7 @@ export default function DriverPerformance() {
               </thead>
               <tbody role="rowgroup">
                 {visibleDrivers.map((d) => (
-                  <tr role="row" key={d.id} className="border-b last:border-0 hover:bg-muted/30">
+                  <tr role="row" key={d.id} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" onClick={() => navigate(`/driver/${d.id}`)}>
                     <td role="cell" className="py-3 pr-3">
                       <div className="flex items-center gap-2 min-w-0">
                         <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
@@ -149,7 +151,7 @@ export default function DriverPerformance() {
           {/* Mobile card list view */}
           <div className="sm:hidden space-y-3">
             {visibleDrivers.map((d) => (
-              <div key={d.id} className="border rounded-xl p-4 space-y-3">
+              <div key={d.id} className="border rounded-xl p-4 space-y-3 cursor-pointer hover:border-emerald-300 transition-colors" onClick={() => navigate(`/driver/${d.id}`)}>
                 {/* Driver name + status */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
