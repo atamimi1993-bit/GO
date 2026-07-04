@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -40,6 +40,7 @@ export default function DriverDashboard() {
   const [sortKey, setSortKey] = useState('total_earnings');
   const [sortDir, setSortDir] = useState('desc');
   const [statusFilter, setStatusFilter] = useState('all');
+  const mountedRef = useRef(true);
 
   const isAdmin = user?.role === 'admin';
 
@@ -50,15 +51,21 @@ export default function DriverDashboard() {
     }
     try {
       const res = await base44.functions.invoke('admin-dashboard', { action: 'driver_performance' });
+      if (!mountedRef.current) return;
       setData(res.data);
     } catch (err) {
+      if (!mountedRef.current) return;
       toast({ title: 'Failed to load driver data', description: err.message, variant: 'destructive' });
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }, [toast, isAdmin]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    mountedRef.current = true;
+    load();
+    return () => { mountedRef.current = false; };
+  }, [load]);
 
   const toggleSort = (key) => {
     if (sortKey === key) {

@@ -222,14 +222,14 @@ export default function BulkPayoutPanel({ scrollRef }) {
                     {group.payouts.map((p) => {
                       const isSel = selected.has(p.id);
                       return (
-                        <div key={p.id} className="flex items-center gap-3 p-3 hover:bg-muted/30" aria-label={`Payout $${p.amount} for ${group.driver_name}: ${p.pickup} to ${p.dropoff}`}>
+                        <div key={p.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 hover:bg-muted/30" aria-label={`Payout $${p.amount} for ${group.driver_name}: ${p.pickup} to ${p.dropoff}`}>
                           <Checkbox
                             checked={isSel}
                             onCheckedChange={() => toggleSelect(p.id)}
                             aria-label={`Select payout of $${(p.amount || 0).toFixed(2)} for ${group.driver_name} from ${p.pickup}`}
                           />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm truncate">{p.pickup} → {p.dropoff}</p>
+                            <p className="text-sm truncate text-xs">{p.pickup} → {p.dropoff}</p>
                             <p className="text-xs text-muted-foreground">
                               {p.customer_name || 'Unknown customer'}
                               {p.move_date && ` · ${format(parseISO(p.move_date), 'MMM d, yyyy')}`}

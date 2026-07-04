@@ -33,7 +33,22 @@ export default function AvailableJobs() {
     setLoading(false);
   };
   useEffect(() => {
-    load();
+    let cancelled = false;
+    const loadInitial = async () => {
+      try {
+        const u = await base44.auth.me();
+        if (cancelled) return;
+        const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+        if (cancelled) return;
+        if (profiles.length > 0) setDriverProfile(profiles[0]);
+        const pending = await base44.entities.MoveRequest.filter({ status: 'pending' }, '-created_date', 50);
+        if (cancelled) return;
+        setJobs(pending);
+      } catch {}
+      if (!cancelled) setLoading(false);
+    };
+    loadInitial();
+    return () => { cancelled = true };
   }, []);
 
   const handleAccept = async (job) => {

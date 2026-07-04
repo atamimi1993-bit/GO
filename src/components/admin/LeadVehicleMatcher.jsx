@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Truck, Loader2, X, MapPin, User, Star, Award, CheckCircle2, Car } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { formatCurrency } from '@/lib/pricing';
+import useFocusTrap from '@/hooks/useFocusTrap';
 
 const VEHICLE_LABELS = {
   car: 'Car', suv: 'SUV', pickup: 'Pickup', van: 'Van', truck: 'Truck',
@@ -18,6 +19,8 @@ export default function LeadVehicleMatcher({ lead, onAssigned }) {
   const [pairings, setPairings] = useState([]);
   const [assigningId, setAssigningId] = useState(null);
   const { toast } = useToast();
+  const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, open);
 
   const loadMatches = useCallback(async () => {
     setLoading(true);
@@ -81,6 +84,7 @@ export default function LeadVehicleMatcher({ lead, onAssigned }) {
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50" onClick={() => setOpen(false)} role="presentation">
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="lead-vehicle-matcher-title"

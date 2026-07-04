@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
@@ -103,6 +103,7 @@ export default function MoveDetail() {
   const [driverProfile, setDriverProfile] = useState(null);
   const [sendingCert, setSendingCert] = useState(false);
   const { toast } = useToast();
+  const mountedRef = useRef(true);
 
   const handleSendCertificate = async () => {
     setSendingCert(true);
@@ -202,6 +203,7 @@ export default function MoveDetail() {
       base44.auth.me().catch(() => null),
       base44.entities.Contract.filter({ move_request_id: id, contract_type: 'customer_service' }).catch(() => []),
     ]);
+    if (!mountedRef.current) return;
     setMove(m);
     setItems(it);
     setCurrentUser(u);
@@ -209,13 +211,19 @@ export default function MoveDetail() {
     if (u?.email) {
       try {
         const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+        if (!mountedRef.current) return;
         setDriverProfile(profiles[0] || null);
-      } catch { setDriverProfile(null); }
+      } catch {
+        if (!mountedRef.current) return;
+        setDriverProfile(null);
+      }
     }
   }, [id]);
 
   useEffect(() => {
-    load().finally(() => setLoading(false));
+    mountedRef.current = true;
+    load().finally(() => { if (mountedRef.current) setLoading(false); });
+    return () => { mountedRef.current = false; };
   }, [load]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;

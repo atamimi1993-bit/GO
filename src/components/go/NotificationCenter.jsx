@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Check, X, Info, CheckCircle2, AlertTriangle, Package } from 'lucide-react';
+import useFocusTrap from '@/hooks/useFocusTrap';
 
 export default function NotificationCenter({ user }) {
   const [open, setOpen] = useState(false);
@@ -11,6 +12,8 @@ export default function NotificationCenter({ user }) {
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+  useFocusTrap(dropdownRef, open);
 
   const load = useCallback(async () => {
     if (!user?.email) return;
@@ -109,7 +112,13 @@ export default function NotificationCenter({ user }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-4 top-16 z-50 w-80 max-w-[calc(100vw-2rem)] bg-card border rounded-2xl shadow-xl overflow-hidden">
+          <div
+            ref={dropdownRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Notifications"
+            className="absolute right-4 top-16 z-50 w-80 max-w-[calc(100vw-2rem)] bg-card border rounded-2xl shadow-xl overflow-hidden"
+          >
             <div className="flex items-center justify-between p-3 border-b">
               <h3 className="font-display font-bold text-sm">Notifications</h3>
               {unread > 0 && (

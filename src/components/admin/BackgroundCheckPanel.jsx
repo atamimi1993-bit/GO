@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ShieldCheck, ShieldAlert, Clock, FileSearch, Eye, Scan, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import useFocusTrap from '@/hooks/useFocusTrap';
 
 export default function BackgroundCheckPanel({ drivers }) {
   const [processing, setProcessing] = useState(null);
@@ -11,6 +12,8 @@ export default function BackgroundCheckPanel({ drivers }) {
   const [filter, setFilter] = useState('all');
   const [reportDriver, setReportDriver] = useState(null);
   const { toast } = useToast();
+  const modalRef = useRef(null);
+  useFocusTrap(modalRef, !!reportDriver);
 
   useEffect(() => { setLocalDrivers(drivers || []); }, [drivers]);
 
@@ -161,7 +164,14 @@ export default function BackgroundCheckPanel({ drivers }) {
       {/* Report Viewer Modal */}
       {selectedDriver && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setReportDriver(null)}>
-          <div className="bg-card border rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+          <div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Screening Report"
+            className="bg-card border rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between p-4 border-b">
               <div>
                 <h3 className="font-display font-bold text-sm">Screening Report</h3>
