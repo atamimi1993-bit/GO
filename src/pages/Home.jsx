@@ -5,6 +5,7 @@ import Logo from '@/components/go/Logo';
 import { ArrowRight, Package, Truck, Shield, DollarSign, Star, MapPin, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import AdBanner from '@/components/go/AdBanner';
 import HomeStats from '@/components/go/HomeStats';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -21,6 +22,9 @@ export default function Home() {
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['currentUser'] }); }}>
     <div className="space-y-16">
+      {/* Promotional Ad Banner */}
+      <AdBanner />
+
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900 rounded-3xl overflow-hidden px-8 py-16 md:py-24 text-white">
         <div className="absolute inset-0 opacity-10">

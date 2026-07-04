@@ -1,0 +1,45 @@
+{
+  "description": "Auto-generates promotional ads, promo codes, and leads every 2 weeks. Deactivates old campaigns and creates fresh content.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "biweekly_ad_generation",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "generate_ads": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "generate-ads",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Generate ads & leads",
+            "description": "Create new promo ads, codes, and leads"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 14,
+      "interval_unit": "days",
+      "interval_anchor": "2026-07-04T09:00:00Z",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Biweekly Ad Generation"
+}

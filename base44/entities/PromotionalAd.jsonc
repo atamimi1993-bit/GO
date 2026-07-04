@@ -1,0 +1,62 @@
+{
+  "name": "PromotionalAd",
+  "type": "object",
+  "properties": {
+    "headline": {
+      "type": "string"
+    },
+    "subtext": {
+      "type": "string"
+    },
+    "cta_text": {
+      "type": "string"
+    },
+    "cta_link": {
+      "type": "string",
+      "default": "/new-move"
+    },
+    "ad_type": {
+      "type": "string",
+      "enum": [
+        "promo",
+        "banner",
+        "spotlight"
+      ],
+      "default": "promo"
+    },
+    "promo_code": {
+      "type": "string"
+    },
+    "discount_percent": {
+      "type": "number",
+      "default": 0
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "bg_color": {
+      "type": "string",
+      "default": "emerald"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "campaign_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "campaign_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "leads_generated": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "headline",
+    "ad_type"
+  ]
+}
