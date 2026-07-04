@@ -96,6 +96,9 @@
     "media_urls": {
       "type": "string"
     },
+    "access_media_urls": {
+      "type": "string"
+    },
     "base_cost": {
       "type": "number",
       "default": 0

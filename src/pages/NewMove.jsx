@@ -10,6 +10,7 @@ const CustomerInfoStep = lazy(() => import('@/components/go/move-steps/CustomerI
 const MoveDetailsStep = lazy(() => import('@/components/go/move-steps/MoveDetailsStep'));
 const InventoryStep = lazy(() => import('@/components/go/move-steps/InventoryStep'));
 const PhotoVideoStep = lazy(() => import('@/components/go/move-steps/PhotoVideoStep'));
+const AccessMediaStep = lazy(() => import('@/components/go/move-steps/AccessMediaStep'));
 const TimingStep = lazy(() => import('@/components/go/move-steps/TimingStep'));
 const EstimateStep = lazy(() => import('@/components/go/move-steps/EstimateStep'));
 const ContractSign = lazy(() => import('@/components/go/ContractSign'));
@@ -42,6 +43,7 @@ export default function NewMove() {
   });
   const [items, setItems] = useState([]);
   const [media, setMedia] = useState([]);
+  const [accessMedia, setAccessMedia] = useState([]);
   const [mediaAnalysis, setMediaAnalysis] = useState(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
@@ -88,6 +90,8 @@ export default function NewMove() {
 
   const handleAddMedia = (m) => setMedia(prev => [...prev, m]);
   const handleRemoveMedia = (idx) => setMedia(media.filter((_, i) => i !== idx));
+  const handleAddAccessMedia = (m) => setAccessMedia(prev => [...prev, m]);
+  const handleRemoveAccessMedia = (idx) => setAccessMedia(accessMedia.filter((_, i) => i !== idx));
 
   const bulkyItemCount = items.filter(i => i.special_handling || i.weight_lbs >= BULKY_WEIGHT_THRESHOLD).reduce((sum, i) => sum + i.quantity, 0);
 
@@ -186,6 +190,7 @@ export default function NewMove() {
         needs_storage: form.needs_storage,
         notes: form.notes,
         media_urls: JSON.stringify(media.map(m => ({ url: m.url, type: m.type }))),
+        access_media_urls: JSON.stringify(accessMedia.map(m => ({ url: m.url, type: m.type }))),
         base_cost: pricing.baseCost,
         fuel_cost: pricing.fuelCost,
         tolls: Number(form.tolls) || 0,
@@ -269,6 +274,7 @@ export default function NewMove() {
             liveEstimate={liveEstimate}
           />
           <PhotoVideoStep media={media} onAddMedia={handleAddMedia} onRemoveMedia={handleRemoveMedia} onAnalysis={setMediaAnalysis} />
+          <AccessMediaStep accessMedia={accessMedia} onAddMedia={handleAddAccessMedia} onRemoveMedia={handleRemoveAccessMedia} />
         </div>
       )}
 

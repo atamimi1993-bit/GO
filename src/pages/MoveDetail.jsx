@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield, Wallet, CalendarClock } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield, Wallet, CalendarClock, Video } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import RouteLogForm from '@/components/go/RouteLogForm';
@@ -253,6 +253,38 @@ export default function MoveDetail() {
           )}
         </div>
       )}
+
+      {/* Access media — front area / loading photos */}
+      {(() => {
+        const accessMedia = (() => {
+          try { return JSON.parse(move.access_media_urls || '[]'); } catch { return []; }
+        })();
+        if (!accessMedia.length) return null;
+        return (
+          <div className="bg-card border rounded-2xl overflow-hidden mb-4">
+            <div className="px-5 py-3 bg-muted border-b font-medium text-sm flex items-center gap-2">
+              <MapPin size={14} className="text-emerald-600" /> Access & Loading Area
+            </div>
+            <div className="p-4">
+              <p className="text-xs text-muted-foreground mb-3">Photos and videos of the front area, parking, and loading path provided by the customer.</p>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {accessMedia.map((m, i) => (
+                  <a key={i} href={m.url} target="_blank" rel="noopener noreferrer" className="relative aspect-square rounded-lg overflow-hidden border bg-muted block">
+                    {m.type === 'video' ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-muted">
+                        <Video size={20} className="text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground mt-1">Video</span>
+                      </div>
+                    ) : (
+                      <img src={m.url} alt={`Access ${i + 1}`} className="w-full h-full object-cover" />
+                    )}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Items */}
       {items.length > 0 && (
