@@ -108,6 +108,17 @@ Deno.serve(async (req) => {
       return Response.json({ sent: false, error: err.message }, { status: 500 });
     }
 
+    // When the move is confirmed (accepted), automatically send the insurance certificate
+    if (move.status === 'accepted') {
+      try {
+        await base44.asServiceRole.functions.invoke('send-insurance-certificate', {
+          move_request_id: move.id,
+        });
+      } catch (certErr) {
+        console.error('Failed to send insurance certificate:', certErr.message);
+      }
+    }
+
     return Response.json({ sent: true, to: move.customer_email, status: move.status });
   } catch (error) {
     console.error('notify-customer-status error:', error);

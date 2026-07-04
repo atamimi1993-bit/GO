@@ -97,7 +97,19 @@ export default function MoveDetail() {
   const [usePaymentPlan, setUsePaymentPlan] = useState(false);
   const [payingBalance, setPayingBalance] = useState(false);
   const [driverProfile, setDriverProfile] = useState(null);
+  const [sendingCert, setSendingCert] = useState(false);
   const { toast } = useToast();
+
+  const handleSendCertificate = async () => {
+    setSendingCert(true);
+    try {
+      const res = await base44.functions.invoke('send-insurance-certificate', { move_request_id: move.id });
+      toast({ title: 'Certificate sent!', description: `Insurance certificate emailed to ${move.customer_email || 'customer'}.` });
+    } catch (err) {
+      toast({ title: 'Could not send certificate', description: err.message, variant: 'destructive' });
+    }
+    setSendingCert(false);
+  };
 
   const handleConfirmDelivery = async () => {
     try {
@@ -523,6 +535,20 @@ export default function MoveDetail() {
           <div className="flex items-center gap-2 mt-3 text-xs text-primary">
             <Shield size={14} /> Insurance coverage included for this move
           </div>
+          {['accepted', 'in_progress', 'completed'].includes(move.status) && currentUser?.role === 'admin' && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full mt-3 min-h-[44px]"
+              onClick={handleSendCertificate}
+              disabled={sendingCert}
+              aria-label="Send insurance certificate to customer"
+            >
+              {sendingCert
+                ? <><Loader2 size={14} className="animate-spin mr-1" /> Sending...</>
+                : <><Shield size={14} className="mr-1" /> Resend Insurance Certificate</>}
+            </Button>
+          )}
         </div>
       )}
 
