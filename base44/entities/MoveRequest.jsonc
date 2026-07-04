@@ -112,6 +112,13 @@
     },
     "notes": {
       "type": "string"
+    },
+    "stripe_session_id": {
+      "type": "string"
+    },
+    "paid": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

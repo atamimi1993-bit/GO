@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO } from 'date-fns';
 
 const MoveTracker = lazy(() => import('@/components/go/MoveTracker'));
@@ -26,6 +27,32 @@ export default function MoveDetail() {
   const [move, setMove] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [paying, setPaying] = useState(false);
+  const { toast } = useToast();
+
+  const handlePay = async () => {
+    if (window.self !== window.top) {
+      alert('Checkout is only available from the published app, not the editor preview.');
+      return;
+    }
+    try {
+      setPaying(true);
+      const res = await base44.functions.invoke('create-move-checkout', { move_request_id: id });
+      window.location.href = res.data.url;
+    } catch {
+      toast({ title: 'Payment error', description: 'Could not start checkout. Please try again.', variant: 'destructive' });
+      setPaying(false);
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') === 'success') {
+      toast({ title: 'Payment successful!', description: 'Your move has been paid.' });
+    } else if (params.get('payment') === 'cancelled') {
+      toast({ title: 'Payment cancelled', description: 'You can pay later from this page.' });
+    }
+  }, [toast]);
 
   const load = useCallback(async () => {
     const [m, it] = await Promise.all([
@@ -123,6 +150,22 @@ export default function MoveDetail() {
 
       {/* Price */}
       <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} />
+
+      {!move.paid && move.status !== 'cancelled' && (
+        <Button
+          onClick={handlePay}
+          disabled={paying}
+          className="w-full mt-4 bg-emerald-500 hover:bg-emerald-600"
+        >
+          {paying ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</> : <><CreditCard size={16} className="mr-1" /> Pay ${move.total_price?.toFixed(2)}</>}
+        </Button>
+      )}
+
+      {move.paid && (
+        <div className="flex items-center gap-2 mt-4 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
+          <CheckCircle2 size={16} /> Payment complete
+        </div>
+      )}
 
       {move.notes && (
         <div className="bg-card border rounded-2xl p-5 mt-4">
