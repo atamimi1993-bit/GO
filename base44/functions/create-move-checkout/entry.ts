@@ -251,12 +251,20 @@ Deno.serve(async (req) => {
         const driver = await base44.asServiceRole.entities.DriverProfile.get(move.assigned_driver_id);
         if (driver?.stripe_account_id && driver?.stripe_payouts_enabled) {
           let appFeePortion;
+          const ratio = chargeAmount / (move.total_price || chargeAmount);
           if (move.app_fee && move.app_fee > 0) {
-            // app_fee is the platform's full take — for split payments, charge proportionally
-            const ratio = chargeAmount / (move.total_price || chargeAmount);
-            appFeePortion = move.app_fee * ratio;
+            // Platform keeps: app_fee + materials_fee + tax_amount (all proportional to payment)
+            // Driver receives: driver_payout + fuel + tolls (passthrough hard costs)
+            // Tax is collected by platform for remittance, NOT split as driver revenue
+            // Materials fee is 100% platform profit (upsell, not split with driver)
+            appFeePortion = (move.app_fee + (move.materials_fee || 0) + (move.tax_amount || 0)) * ratio;
           } else {
-            appFeePortion = chargeAmount * 0.25;
+            // Fallback: platform keeps 25% of service portion + 100% of tax/materials
+            appFeePortion = (chargeAmount * 0.25) + ((move.tax_amount || 0) + (move.materials_fee || 0)) * ratio;
+          }
+          // Insurance is 100% platform profit — added as separate line item, not proportional
+          if (hasInsurance) {
+            appFeePortion += INSURANCE_FEE;
           }
           const appFeeCents = isZeroDecimal
             ? Math.round(appFeePortion)

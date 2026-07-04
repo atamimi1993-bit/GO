@@ -32,7 +32,7 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
     ...(pricing.extraServiceFee ? [{ label: `Extra services${pricing.extraHelper ? ' (helper)' : ''}${pricing.elevatorService ? ' (elevator)' : ''}`, value: pricing.extraServiceFee }] : []),
     ...(pricing.surgeMultiplier > 1 ? [{ label: `Dynamic pricing (${surgeLabel}, ×${pricing.surgeMultiplier})`, value: pricing.surgeAdjustedSubtotal - pricing.operationalSubtotal }] : []),
     ...(pricing.loyaltyDiscount ? [{ label: 'Loyalty discount (returning customer)', value: -pricing.loyaltyDiscount, highlight: true }] : []),
-    ...(pricing.customerSavings > 0 ? [{ label: `Customer savings (10% below market)`, value: -pricing.customerSavings, highlight: true }] : []),
+    { label: 'Subtotal (pre-tax)', value: pricing.totalPrice - pricing.taxAmount, bold: true },
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
   ];
 
@@ -46,9 +46,9 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
       </div>
       <div className="space-y-2">
         {lines.map((line, i) => (
-          <div key={i} className="flex justify-between text-sm">
-            <span className={line.highlight ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>{line.label}</span>
-            <span className={`font-medium ${line.highlight ? "text-emerald-600 dark:text-emerald-400" : ""}`}>{fmt(line.value)}</span>
+          <div key={i} className={`flex justify-between text-sm ${line.bold ? "border-t pt-2 font-semibold" : ""}`}>
+            <span className={line.highlight ? "text-emerald-600 dark:text-emerald-400 font-medium" : line.bold ? "font-semibold" : "text-muted-foreground"}>{line.label}</span>
+            <span className={`font-medium ${line.highlight ? "text-emerald-600 dark:text-emerald-400" : line.bold ? "font-bold" : ""}`}>{fmt(line.value)}</span>
           </div>
         ))}
         {pricing.minimumJobFee ? (
