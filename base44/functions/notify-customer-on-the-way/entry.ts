@@ -91,6 +91,21 @@ Deno.serve(async (req) => {
       return Response.json({ sent: false, error: err.message }, { status: 500 });
     }
 
+    // In-app push notification so the customer sees it immediately
+    try {
+      await base44.asServiceRole.entities.AppNotification.create({
+        user_email: move.customer_email,
+        title: 'Your driver is on the way! 🚚',
+        body: `${driverName} has started heading to your pickup location. Tap to track their live location.`,
+        type: 'job',
+        read: false,
+        link: move.id ? `/move/${move.id}` : null,
+        icon: 'truck',
+      });
+    } catch (notifErr) {
+      console.error('Failed to create in-app on-the-way notification:', notifErr.message);
+    }
+
     return Response.json({ sent: true, to: move.customer_email });
   } catch (error) {
     console.error('notify-customer-on-the-way error:', error);
