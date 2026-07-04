@@ -1,0 +1,38 @@
+{
+  "name": "Referral",
+  "type": "object",
+  "properties": {
+    "referral_code": {
+      "type": "string"
+    },
+    "referrer_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "referred_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "move_request_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "rewarded"
+      ],
+      "default": "pending"
+    },
+    "bonus_points": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "referral_code",
+    "referrer_email",
+    "referred_email"
+  ]
+}

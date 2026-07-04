@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User, Mail, Phone } from 'lucide-react';
+import { User, Mail, Phone, Gift } from 'lucide-react';
 
 export default function CustomerInfoStep({ form, setForm }) {
   return (
@@ -36,6 +36,16 @@ export default function CustomerInfoStep({ form, setForm }) {
             onChange={e => setForm({ ...form, customer_phone: e.target.value })}
             placeholder="+1 (555) 123-4567"
           />
+        </div>
+        <div className="pt-2 border-t">
+          <Label className="flex items-center gap-2"><Gift size={14} /> Referral Code (Optional)</Label>
+          <Input
+            value={form.referral_code || ''}
+            onChange={e => setForm({ ...form, referral_code: e.target.value.toUpperCase().trim() })}
+            placeholder="GO-XXXXXXXX"
+            className="uppercase tracking-wider"
+          />
+          <p className="text-xs text-muted-foreground mt-1">Referred by a friend? Enter their code to earn bonus rewards.</p>
         </div>
       </div>
     </div>

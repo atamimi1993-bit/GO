@@ -16,6 +16,9 @@
     },
     "last_awarded_move_id": {
       "type": "string"
+    },
+    "referral_code": {
+      "type": "string"
     }
   },
   "required": [

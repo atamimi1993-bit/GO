@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import PullToRefresh from '@/components/go/PullToRefresh';
 import DriverPaymentInfo from '@/components/go/DriverPaymentInfo';
 import LoyaltyCard from '@/components/go/LoyaltyCard';
+import ReferralCard from '@/components/go/ReferralCard';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ export default function Profile() {
       </div>
 
       <LoyaltyCard />
+      <ReferralCard />
       <DriverPaymentInfo />
     </div>
     </PullToRefresh>

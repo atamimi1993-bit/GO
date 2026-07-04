@@ -34,6 +34,7 @@ export default function NewMove() {
     pickup_state: '', job_type: 'residential', tolls: '',
     notes: '', needs_storage: false,
     customer_name: '', customer_email: '', customer_phone: '',
+    referral_code: '',
   });
   const [items, setItems] = useState([]);
   const [media, setMedia] = useState([]);
@@ -70,6 +71,9 @@ export default function NewMove() {
     base44.auth.me().then(u => {
       setForm(f => ({ ...f, customer_name: u.full_name || '', customer_email: u.email || '' }));
     }).catch(() => {});
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get('ref');
+    if (refCode) setForm(f => ({ ...f, referral_code: refCode.toUpperCase() }));
   }, []);
 
   const handleAddItem = (item) => setItems(prev => [...prev, item]);
@@ -179,6 +183,7 @@ export default function NewMove() {
         driver_payout: pricing.driverPayout,
         liability_signed: true,
         liability_signed_date: new Date().toISOString(),
+        referral_code: form.referral_code || undefined,
         status: 'pending',
       };
       navigate('/my-moves', { state: { optimisticMove: { ...moveData, _optimistic: true } } });
