@@ -131,14 +131,12 @@ export default function Admin() {
           <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
         </div>
 
+        {/* Quick access links */}
+        <AdminQuickLinks />
+
         {/* Move status tracker */}
         <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
           <MoveStatusTracker />
-        </Suspense>
-
-        {/* Quick access links */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
-          <AdminQuickLinks />
         </Suspense>
 
         {/* Global operations map */}
