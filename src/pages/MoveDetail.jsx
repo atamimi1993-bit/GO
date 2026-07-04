@@ -94,7 +94,6 @@ export default function MoveDetail() {
   const [contract, setContract] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [promoData, setPromoData] = useState(null);
-  const [usePaymentPlan, setUsePaymentPlan] = useState(false);
   const [payingBalance, setPayingBalance] = useState(false);
   const [driverProfile, setDriverProfile] = useState(null);
   const [sendingCert, setSendingCert] = useState(false);
@@ -146,7 +145,6 @@ export default function MoveDetail() {
       const res = await base44.functions.invoke('create-move-checkout', {
         move_request_id: id,
         promo_code: promoData?.promo?.code || undefined,
-        payment_plan: usePaymentPlan,
       });
       window.location.href = res.data.url;
     } catch {
@@ -379,27 +377,23 @@ export default function MoveDetail() {
         <PriceConfirmation move={move} onConfirmed={load} />
       )}
 
-      {/* Payment plan — installments tracked, show next installment due */}
+      {/* Delivery payment — second half due upon delivery */}
       {!move.paid && move.deposit_paid && move.balance_due > 0 && move.status !== 'cancelled' && (
         <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 mt-2 space-y-3">
           <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-medium">
-            <CalendarClock size={16} /> Payment Plan — {move.installments_paid || 0} of 3 installments paid
+            <Wallet size={16} /> Pickup paid — delivery payment due
           </div>
           {/* Progress bar */}
           <div className="flex gap-1.5">
-            {[1, 2, 3].map((n) => (
-              <div
-                key={n}
-                className={`flex-1 h-2 rounded-full ${(move.installments_paid || 0) >= n ? 'bg-blue-500' : 'bg-muted'}`}
-              />
-            ))}
+            <div className="flex-1 h-2 rounded-full bg-blue-500" />
+            <div className="flex-1 h-2 rounded-full bg-muted" />
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Installment Amount</span>
-            <span className="font-medium">{curr.symbol}{(move.installment_amount || move.deposit_amount || 0).toFixed(curr.decimals)}</span>
+            <span className="text-muted-foreground">Pickup Payment</span>
+            <span className="font-medium text-emerald-600 dark:text-emerald-400">{curr.symbol}{(move.deposit_amount || 0).toFixed(curr.decimals)} ✓</span>
           </div>
           <div className="flex justify-between text-sm font-bold pt-1 border-t border-blue-500/20">
-            <span>Remaining Balance</span>
+            <span>Delivery Payment Due</span>
             <span className="text-blue-600 dark:text-blue-400">{curr.symbol}{(move.balance_due || 0).toFixed(curr.decimals)}</span>
           </div>
           <Button
@@ -409,13 +403,13 @@ export default function MoveDetail() {
           >
             {payingBalance
               ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting...</>
-              : <><CreditCard size={16} className="mr-1" /> Pay Installment {((move.installments_paid || 0) + 1)} of 3 — {curr.symbol}{(move.installment_amount || move.deposit_amount || 0).toFixed(curr.decimals)}</>}
+              : <><CreditCard size={16} className="mr-1" /> Pay at Delivery — {curr.symbol}{(move.balance_due || 0).toFixed(curr.decimals)}</>}
           </Button>
           <PaymentMethods />
         </div>
       )}
 
-      {/* Standard checkout — not yet paid and no deposit outstanding */}
+      {/* Pickup deposit — 50% due at pickup */}
       {!move.paid && !move.deposit_paid && move.status !== 'cancelled' && (
         <>
           <PromoCodeInput move={move} onApplied={setPromoData} />
@@ -436,46 +430,30 @@ export default function MoveDetail() {
             </div>
           )}
 
-          {/* Payment plan toggle */}
-          {(() => {
-            const chargeTotal = promoData?.discounted_total || move.total_price || 0;
-            return (
-              <button
-                type="button"
-                onClick={() => setUsePaymentPlan(!usePaymentPlan)}
-                aria-label="Toggle payment plan: pay in 3 installments"
-                aria-pressed={usePaymentPlan}
-                className={`w-full mt-2 flex items-center gap-3 rounded-xl border p-3 text-left transition-colors ${usePaymentPlan ? 'border-blue-500 bg-blue-500/5' : 'border-border hover:bg-muted'}`}
-              >
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${usePaymentPlan ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-muted text-muted-foreground'}`}>
-                  <Wallet size={18} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">Pay in 3 installments</p>
-                  <p className="text-xs text-muted-foreground">
-                    {curr.symbol}{(chargeTotal / 3).toFixed(curr.decimals)} now · {curr.symbol}{(chargeTotal / 3).toFixed(curr.decimals)} × 2 later
-                  </p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${usePaymentPlan ? 'border-blue-500' : 'border-muted-foreground/30'}`}>
-                  {usePaymentPlan && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
-                </div>
-              </button>
-            );
-          })()}
+          {/* Split payment info */}
+          <div className="mt-2 rounded-xl border border-border p-3 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <Wallet size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium">Pay in 2 — pickup & delivery</p>
+              <p className="text-xs text-muted-foreground">
+                {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 2).toFixed(curr.decimals)} at pickup · {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 2).toFixed(curr.decimals)} at delivery
+              </p>
+            </div>
+          </div>
 
           <Button
             onClick={handlePay}
             disabled={paying}
-            className={`w-full mt-2 ${usePaymentPlan ? 'bg-blue-600 hover:bg-blue-700' : 'bg-emerald-500 hover:bg-emerald-600'}`}
+            className="w-full mt-2 bg-emerald-500 hover:bg-emerald-600"
           >
             {paying
               ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</>
-              : usePaymentPlan
-                ? <><Wallet size={16} className="mr-1" /> Pay Installment 1 of 3 — {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 3).toFixed(curr.decimals)}</>
-                : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{(promoData?.discounted_total || move.total_price || 0).toFixed(curr.decimals)}</>}
-                </Button>
-                <PaymentMethods />
-                </>
+              : <><CreditCard size={16} className="mr-1" /> Pay at Pickup — {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 2).toFixed(curr.decimals)}</>}
+          </Button>
+          <PaymentMethods />
+        </>
       )}
 
       {move.paid && (

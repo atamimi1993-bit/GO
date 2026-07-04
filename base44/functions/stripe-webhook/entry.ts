@@ -78,6 +78,17 @@ Deno.serve(async (req) => {
           } catch (e) {
             console.error('Driver cancellation notification failed:', e.message);
           }
+        } else if (paymentType === 'pickup') {
+          await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
+            deposit_paid: true,
+          });
+          console.log('Pickup payment completed for move ' + moveRequestId);
+        } else if (paymentType === 'delivery') {
+          await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
+            paid: true,
+            balance_due: 0,
+          });
+          console.log('Delivery payment completed for move ' + moveRequestId);
         } else if (paymentType === 'tip') {
           const tipAmount = session.amount_total ? session.amount_total / 100 : 0;
           await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {

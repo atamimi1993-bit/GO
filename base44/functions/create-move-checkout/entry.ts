@@ -107,36 +107,28 @@ Deno.serve(async (req) => {
     const currencyCode = (move.currency || 'USD').toUpperCase();
     const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.includes(currencyCode);
 
-    // Determine charge amount: full, installment (1/3), or next installment
+    // Determine charge amount: pickup deposit (50%) or delivery balance (50%)
     let chargeAmount;
-    let paymentType = 'full';
-    const installmentAmount = Math.round(discountedTotal / 3 * 100) / 100;
+    let paymentType = 'pickup';
+    const splitAmount = Math.round(discountedTotal / 2 * 100) / 100;
 
-    if (pay_balance && move.installment_amount > 0) {
-      // Next installment on an active payment plan
-      chargeAmount = move.installment_amount;
-      paymentType = 'installment';
-    } else if (pay_balance && move.balance_due > 0) {
-      // Legacy: pay remaining balance in one lump sum
+    if (pay_balance && move.balance_due > 0) {
+      // Delivery payment — remaining 50% balance
       chargeAmount = move.balance_due;
-      paymentType = 'balance';
-    } else if (payment_plan) {
-      // First installment (1/3 of total)
-      chargeAmount = installmentAmount;
-      paymentType = 'installment';
+      paymentType = 'delivery';
     } else {
-      chargeAmount = discountedTotal;
+      // Pickup deposit — 50% of total
+      chargeAmount = splitAmount;
+      paymentType = 'pickup';
     }
 
     const unitAmount = isZeroDecimal
       ? Math.round(chargeAmount)
       : Math.round(chargeAmount * 100);
 
-    const productLabel = paymentType === 'installment'
-      ? `GO Move Service — Installment ${(move.installments_paid || 0) + 1} of 3`
-      : paymentType === 'balance'
-        ? 'GO Move Service — Remaining Balance'
-        : 'GO Move Service';
+    const productLabel = paymentType === 'delivery'
+      ? 'GO Move Service — Delivery Payment'
+      : 'GO Move Service — Pickup Deposit';
 
     const sessionParams = {
       payment_method_types: ['card', 'link', 'cashapp', 'afterpay_clearpay', 'klarna'],
@@ -173,7 +165,7 @@ Deno.serve(async (req) => {
         if (driver?.stripe_account_id && driver?.stripe_payouts_enabled) {
           let appFeePortion;
           if (move.app_fee && move.app_fee > 0) {
-            appFeePortion = paymentType === 'installment' ? move.app_fee / 3 : move.app_fee;
+            appFeePortion = move.app_fee / 2;
           } else {
             appFeePortion = chargeAmount * 0.25;
           }
@@ -197,12 +189,10 @@ Deno.serve(async (req) => {
       stripe_session_id: session.id,
     };
 
-    // Store payment plan details when the first installment is charged
-    if (payment_plan && paymentType === 'installment') {
+    // Store split payment details when pickup deposit is charged
+    if (paymentType === 'pickup') {
       updateData.payment_plan = true;
       updateData.deposit_amount = chargeAmount;
-      updateData.installment_amount = installmentAmount;
-      updateData.installments_paid = 0;
       updateData.balance_due = Math.round((discountedTotal - chargeAmount) * 100) / 100;
     }
 
