@@ -6,6 +6,7 @@ import StatCard from '@/components/admin/StatCard';
 import DriverPerformance from '@/components/admin/DriverPerformance';
 import BulkPayoutPanel from '@/components/admin/BulkPayoutPanel';
 import MoveCalendar from '@/components/admin/MoveCalendar';
+import EarningsCharts from '@/components/admin/EarningsCharts';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
@@ -114,6 +115,9 @@ export default function Admin() {
 
         {/* Move calendar */}
         <MoveCalendar scrollRef={scrollRef} />
+
+        {/* Performance charts */}
+        <EarningsCharts />
 
         {/* Driver performance */}
         <DriverPerformance />
