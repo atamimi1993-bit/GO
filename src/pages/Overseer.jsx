@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import ReactMarkdown from 'react-markdown';
 import { ShieldCheck, Send, Loader2, Bot, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import SuggestionBox from '@/components/go/SuggestionBox';
 
 const QUICK_PROMPTS = [
   'Run a full system scan and report any issues',
@@ -156,6 +157,13 @@ export default function Overseer() {
     }
   };
 
+  const handleSuggestion = async ({ title, body, type }) => {
+    const label = type === 'idea' ? '💡 Idea' : '🔄 Update';
+    const content = `${label}: ${title}\n\n${body}\n\nPlease review this ${type} and consider implementing or investigating it.`;
+    if (!conversation) throw new Error('No conversation loaded');
+    await base44.agents.addMessage(conversation, { role: 'user', content });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">
@@ -187,6 +195,10 @@ export default function Overseer() {
         <Button variant="ghost" size="icon" onClick={loadConversation} title="Refresh">
           <RefreshCw size={18} />
         </Button>
+      </div>
+
+      <div className="px-1 pb-3">
+        <SuggestionBox onSubmit={handleSuggestion} />
       </div>
 
       <div className="flex-1 overflow-y-auto px-1 pb-2" ref={scrollRef}>
