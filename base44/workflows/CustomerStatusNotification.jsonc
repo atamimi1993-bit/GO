@@ -1,0 +1,40 @@
+{
+  "name": "Customer Status Notification",
+  "description": "When a MoveRequest status changes (e.g. accepted, in_progress, completed), email the customer with move details and current status.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "MoveRequest",
+      "events": [
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.changed_fields | index(\"status\") != null }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "customer_status_notification",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "notify_customer": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "notify-customer-status",
+            "args": {
+              "move_request_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Email customer about status change",
+            "description": "Send move status update with details"
+          }
+        }
+      }
+    ]
+  }
+}
