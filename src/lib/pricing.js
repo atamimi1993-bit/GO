@@ -130,7 +130,7 @@ const COUNTRY_LIST = Object.entries(COUNTRY_CONFIG)
   .sort((a, b) => a.name.localeCompare(b.name));
 
 const APP_FEE_RATE = 0.25;
-const DRIVER_FEE_RATE = 0.05;
+const DRIVER_SHARE_RATE = 0.15;
 const MI_TO_KM = 1.60934;
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
@@ -159,13 +159,13 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
   const taxAmount = subtotal * taxRate;
 
-  // App fee (10%) and driver fee (5%) (in USD)
+  // App fee (25%) (in USD)
   const appFee = subtotal * APP_FEE_RATE;
-  const driverFee = subtotal * DRIVER_FEE_RATE;
+  const driverFee = 0;
 
-  // Total and driver payout (in USD)
-  const totalPrice = subtotal + taxAmount + appFee + driverFee;
-  const driverPayout = subtotal + driverFee;
+  // Total and driver payout (in USD) — drivers earn 15% of the total job price
+  const totalPrice = subtotal + taxAmount + appFee;
+  const driverPayout = totalPrice * DRIVER_SHARE_RATE;
 
   // Currency conversion
   const currencyCode = currency || country?.currency || 'USD';
