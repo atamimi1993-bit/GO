@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import StatCard from '@/components/admin/StatCard';
 import DriverPerformance from '@/components/admin/DriverPerformance';
 import BulkPayoutPanel from '@/components/admin/BulkPayoutPanel';
+import MoveCalendar from '@/components/admin/MoveCalendar';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
@@ -110,6 +111,9 @@ export default function Admin() {
           <StatCard icon={AlertCircle} label="Cancelled" value={movesByStatus.cancelled} accent="red" />
           <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
         </div>
+
+        {/* Move calendar */}
+        <MoveCalendar scrollRef={scrollRef} />
 
         {/* Driver performance */}
         <DriverPerformance />
