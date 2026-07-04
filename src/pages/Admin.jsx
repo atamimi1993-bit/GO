@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import StatCard from '@/components/admin/StatCard';
 const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
 const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
+const MoveStatusTracker = lazy(() => import('@/components/admin/MoveStatusTracker'));
 const BulkPayoutPanel = lazy(() => import('@/components/admin/BulkPayoutPanel'));
 const MoveCalendar = lazy(() => import('@/components/admin/MoveCalendar'));
 const EarningsCharts = lazy(() => import('@/components/admin/EarningsCharts'));
@@ -132,6 +133,11 @@ export default function Admin() {
 
         {/* Quick access links */}
         <AdminQuickLinks />
+
+        {/* Move status tracker */}
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <MoveStatusTracker />
+        </Suspense>
 
         {/* Global operations map */}
         <div className="bg-card border rounded-2xl p-5 mb-6">
