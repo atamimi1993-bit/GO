@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Navigation, Package, Loader2, MapPin } from 'lucide-react';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import TrackingCard from '@/components/go/TrackingCard';
+import LiveTrackingMap from '@/components/go/LiveTrackingMap';
 
 export default function TrackingHub() {
   const { scrollRef } = useOutletContext();
@@ -60,7 +61,10 @@ export default function TrackingHub() {
           ) : (
             <div className="space-y-3">
               {activeMoves.map((move) => (
-                <TrackingCard key={move.id} move={move} />
+                <div key={move.id} className="space-y-3">
+                  <LiveTrackingMap move={move} />
+                  <TrackingCard move={move} />
+                </div>
               ))}
             </div>
           )}
