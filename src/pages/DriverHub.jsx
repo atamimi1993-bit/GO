@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DriverTrackingControls from '@/components/go/DriverTrackingControls';
 import DriverLeaderboardCard from '@/components/go/DriverLeaderboardCard';
+import ExpenseSubmission from '@/components/go/ExpenseSubmission';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield } from 'lucide-react';
@@ -166,6 +167,9 @@ export default function DriverHub() {
           </div>
         </div>
       )}
+
+      {/* Expense receipts */}
+      <ExpenseSubmission driverProfile={profile} />
 
       {/* Driver leaderboard */}
       <DriverLeaderboardCard currentDriverId={profile.id} />

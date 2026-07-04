@@ -11,6 +11,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
 import MarketingPanel from '@/components/admin/MarketingPanel';
+import ExpenseReviewPanel from '@/components/admin/ExpenseReviewPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -125,6 +126,9 @@ export default function Admin() {
 
         {/* Marketing & promotions */}
         <MarketingPanel />
+
+        {/* Driver expense receipts */}
+        <ExpenseReviewPanel />
 
         {/* Bulk payout processing */}
         <BulkPayoutPanel scrollRef={scrollRef} />

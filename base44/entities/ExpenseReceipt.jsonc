@@ -1,0 +1,65 @@
+{
+  "name": "ExpenseReceipt",
+  "type": "object",
+  "properties": {
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "driver_name": {
+      "type": "string"
+    },
+    "move_request_id": {
+      "type": "string"
+    },
+    "expense_type": {
+      "type": "string",
+      "enum": [
+        "gas",
+        "tolls",
+        "maintenance",
+        "other"
+      ],
+      "default": "gas"
+    },
+    "amount": {
+      "type": "number",
+      "default": 0
+    },
+    "receipt_photo_url": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "denied",
+        "estimated"
+      ],
+      "default": "pending"
+    },
+    "approved_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "estimated_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "use_estimate": {
+      "type": "boolean",
+      "default": false
+    },
+    "admin_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "driver_profile_id",
+    "expense_type",
+    "amount"
+  ]
+}
