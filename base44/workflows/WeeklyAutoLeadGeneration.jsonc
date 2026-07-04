@@ -1,0 +1,45 @@
+{
+  "description": "Every week, automatically search 20 major US markets for people and businesses likely to need moving services, and save them as new leads.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_auto_lead_generation",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "find_leads": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "auto-find-leads",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Search markets for leads",
+            "description": "Find moving leads across 20 major US cities"
+          }
+        }
+      }
+    ]
+  },
+  "name": "Weekly Auto Lead Generation"
+}
