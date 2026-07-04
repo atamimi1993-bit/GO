@@ -18,7 +18,6 @@ const navItems = [
   { label: 'Driver Hub', path: '/driver-hub', icon: Truck },
   { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
-  { label: 'Assistant', path: '/support', icon: Bot },
   { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
   { label: 'Drivers', path: '/driver-dashboard', icon: Truck, adminOnly: true },
   { label: 'Freight', path: '/freight-dashboard', icon: Container, cdlOrAdmin: true },
