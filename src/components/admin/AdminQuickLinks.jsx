@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Navigation, DollarSign, Trophy, TrendingUp, Truck, Container, BarChart3, Bot } from 'lucide-react';
+import { Package, Navigation, DollarSign, Trophy, TrendingUp, Truck, Container, BarChart3, Bot, Flame } from 'lucide-react';
 
 const LINKS = [
   { label: 'My Moves', path: '/my-moves', icon: Package, desc: 'View and manage all move requests', accent: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
   { label: 'Tracking', path: '/tracking', icon: Navigation, desc: 'Live tracking hub for active moves', accent: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' },
   { label: 'Revenue', path: '/revenue', icon: DollarSign, desc: 'Platform revenue and customer reviews', accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
+  { label: 'Demand Heatmap', path: '/demand', icon: Flame, desc: 'Where move demand is concentrated — focus driver recruitment here', accent: 'bg-orange-500/10 text-orange-600 dark:text-orange-400' },
   { label: 'Leaderboard', path: '/leaderboard', icon: Trophy, desc: 'Driver and customer rankings', accent: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
   { label: 'Growth', path: '/growth', icon: BarChart3, desc: 'Weekly earnings, moves, and driver growth charts', accent: 'bg-teal-500/10 text-teal-600 dark:text-teal-400' },
   { label: 'Financials', path: '/financials', icon: TrendingUp, desc: 'Financial dashboard and analytics', accent: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },

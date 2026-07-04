@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     // Whitelist of allowed actions to prevent unexpected code paths
     const ALLOWED_ACTIONS = [
       'overview', 'approve_driver', 'reject_driver', 'update_lead_status',
-      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials', 'metrics_overview', 'background_checks', 'moves_by_city',
+      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials', 'metrics_overview', 'background_checks', 'moves_by_city', 'demand_by_area',
     ];
     if (!ALLOWED_ACTIONS.includes(action)) {
       return Response.json({ error: 'Invalid action' }, { status: 400 });
@@ -185,6 +185,88 @@ Deno.serve(async (req) => {
       const sorted = Object.values(cities).sort((a, b) => b.completed_moves - a.completed_moves).slice(0, 15);
       const totalCompleted = sorted.reduce((s, c) => s + c.completed_moves, 0);
       return Response.json({ cities: sorted, totalCompleted });
+    }
+
+    // Demand by area — all move statuses grouped by city, cross-referenced with driver coverage
+    if (action === 'demand_by_area') {
+      const [allMoves, allDrivers] = await Promise.all([
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
+      ]);
+
+      const extractCity = (address) => {
+        if (!address) return null;
+        const parts = address.split(',').map((p) => p.trim()).filter(Boolean);
+        if (parts.length >= 3) return parts[1];
+        if (parts.length === 2) {
+          const cleaned = parts[1].replace(/\s*[A-Z]{2}\s*\d{5}.*$/, '').trim();
+          return cleaned || parts[1];
+        }
+        return null;
+      };
+
+      // Build a set of lowercase city names each approved driver covers
+      const driverCities = {};
+      for (const d of allDrivers) {
+        if (d.status !== 'approved') continue;
+        const area = (d.service_area || '').trim();
+        if (!area) continue;
+        for (const part of area.split(/[,/]/)) {
+          const city = part.trim().toLowerCase();
+          if (city) {
+            if (!driverCities[city]) driverCities[city] = 0;
+            driverCities[city]++;
+          }
+        }
+      }
+
+      const areas = {};
+      for (const m of allMoves) {
+        if (m.status === 'cancelled') continue;
+        const city = extractCity(m.pickup_address);
+        if (!city) continue;
+        const key = city;
+        if (!areas[key]) {
+          areas[key] = {
+            city: key,
+            total_demand: 0,
+            pending: 0,
+            quoted: 0,
+            accepted: 0,
+            in_progress: 0,
+            completed: 0,
+            revenue_potential: 0,
+            collected_revenue: 0,
+          };
+        }
+        areas[key].total_demand++;
+        if (areas[key][m.status] !== undefined) areas[key][m.status]++;
+        if (m.status === 'completed') {
+          areas[key].collected_revenue += m.total_price || 0;
+        } else {
+          areas[key].revenue_potential += m.total_price || 0;
+        }
+      }
+
+      const result = Object.values(areas).map((a) => {
+        const driverCount = driverCities[a.city.toLowerCase()] || 0;
+        const activeDemand = a.pending + a.quoted + a.accepted + a.in_progress;
+        return {
+          ...a,
+          driver_count: driverCount,
+          active_demand: activeDemand,
+          coverage_gap: activeDemand > 0 && driverCount === 0,
+        };
+      }).sort((a, b) => b.total_demand - a.total_demand).slice(0, 20);
+
+      const totals = {
+        totalAreas: result.length,
+        totalDemand: result.reduce((s, a) => s + a.total_demand, 0),
+        coverageGaps: result.filter((a) => a.coverage_gap).length,
+        unservicedDemand: result.filter((a) => a.coverage_gap).reduce((s, a) => s + a.active_demand, 0),
+      };
+
+      return Response.json({ areas: result, totals });
     }
 
     // Per-driver performance: total earnings + active jobs

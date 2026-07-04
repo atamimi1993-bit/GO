@@ -60,6 +60,7 @@ const DriverUpgrade = lazy(() => import('@/pages/DriverUpgrade'));
 const DriverExpenses = lazy(() => import('@/pages/DriverExpenses'));
 const LeadMarketplace = lazy(() => import('@/pages/LeadMarketplace'));
 const BatchRouteDashboard = lazy(() => import('@/pages/BatchRouteDashboard'));
+const DemandHeatmap = lazy(() => import('@/pages/DemandHeatmap'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -164,6 +165,7 @@ const AuthenticatedApp = () => {
             <Route path="/financials" element={<PageTransition><FinancialDashboard /></PageTransition>} />
             <Route path="/metrics" element={<PageTransition><MetricsDashboard /></PageTransition>} />
             <Route path="/growth" element={<PageTransition><GrowthDashboard /></PageTransition>} />
+            <Route path="/demand" element={<PageTransition><DemandHeatmap /></PageTransition>} />
           </Route>
         </Route>
       </Route>
