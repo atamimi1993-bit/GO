@@ -195,18 +195,18 @@ export default function MoveDetail() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('payment') === 'success') {
       toast({ title: 'Payment successful!', description: 'Your move has been paid.' });
-    } else if (params.get('payment') === 'cancelled') {
-      toast({ title: 'Payment cancelled', description: 'You can pay later from this page.' });
+    } else if (params.get('payment') === 'failed' || params.get('payment') === 'cancelled') {
+      toast({ title: 'Payment failed', description: 'Your payment could not be processed. Please try again.', variant: 'destructive' });
     }
     if (params.get('cancellation') === 'success') {
       toast({ title: 'Move cancelled', description: 'The $250 cancellation fee has been paid.' });
-    } else if (params.get('cancellation') === 'cancelled') {
-      toast({ title: 'Cancellation incomplete', description: 'The move was not cancelled.' });
+    } else if (params.get('cancellation') === 'failed' || params.get('cancellation') === 'cancelled') {
+      toast({ title: 'Cancellation payment failed', description: 'The cancellation fee could not be processed. Please try again.', variant: 'destructive' });
     }
     if (params.get('tip') === 'success') {
       toast({ title: 'Tip sent!', description: 'Thank you for your generosity.' });
-    } else if (params.get('tip') === 'cancelled') {
-      toast({ title: 'Tip cancelled', description: 'No charge was made.' });
+    } else if (params.get('tip') === 'failed' || params.get('tip') === 'cancelled') {
+      toast({ title: 'Tip payment failed', description: 'Your tip could not be processed. Please try again.', variant: 'destructive' });
     }
   }, [toast]);
 

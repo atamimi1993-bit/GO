@@ -36,6 +36,72 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
+    // Handle async payment failures (bank transfers, etc.) — notify customer
+    if (event.type === 'checkout.session.async_payment_failed' || event.type === 'checkout.session.expired') {
+      const failedSession = event.data.object;
+      const fMeta = failedSession.metadata || {};
+
+      let customerEmail = null;
+      let customerName = null;
+      let paymentContext = 'payment';
+      let linkUrl = null;
+
+      if (fMeta.move_request_id) {
+        try {
+          const move = await base44.asServiceRole.entities.MoveRequest.get(fMeta.move_request_id);
+          customerEmail = move?.customer_email;
+          customerName = move?.customer_name;
+          paymentContext = fMeta.payment_type === 'cancellation_fee' ? 'cancellation fee payment'
+            : fMeta.payment_type === 'tip' ? 'tip payment'
+            : fMeta.payment_type === 'installment' ? 'installment payment'
+            : 'move payment';
+          linkUrl = '/move/' + fMeta.move_request_id;
+        } catch (e) {
+          console.error('Failed to fetch move for failure notification:', e.message);
+        }
+      } else if (fMeta.driver_email) {
+        customerEmail = fMeta.driver_email;
+        customerName = fMeta.driver_name;
+        paymentContext = fMeta.type === 'driver_subscription' ? 'driver subscription' : 'lead purchase';
+      } else if (fMeta.business_email) {
+        customerEmail = fMeta.business_email;
+        customerName = fMeta.business_name;
+        paymentContext = 'business subscription';
+        linkUrl = '/business-account';
+      } else if (fMeta.advertiser_email) {
+        customerEmail = fMeta.advertiser_email;
+        customerName = fMeta.advertiser_name;
+        paymentContext = 'ad space subscription';
+      }
+
+      if (customerEmail) {
+        // Send in-app notification
+        try {
+          await base44.asServiceRole.entities.AppNotification.create({
+            user_email: customerEmail,
+            title: 'Payment Failed',
+            body: `Your ${paymentContext} could not be processed. Please try again.`,
+            type: 'alert',
+            link: linkUrl,
+          });
+        } catch (e) {
+          console.error('Failed to create failure notification:', e.message);
+        }
+
+        // Send email
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: customerEmail,
+            subject: 'Payment Failed — Please Try Again',
+            body: `Hi ${customerName || 'there'},\n\nWe were unable to process your ${paymentContext}. This can happen if your card was declined, has insufficient funds, or has expired.\n\nPlease try again at your earliest convenience. If you continue to experience issues, please contact our support team.\n\nThank you,\nThe GO Team`,
+          });
+          console.log('Payment failure notification sent to ' + customerEmail + ' for ' + paymentContext);
+        } catch (e) {
+          console.error('Failed to send failure email:', e.message);
+        }
+      }
+    }
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const moveRequestId = session.metadata?.move_request_id;

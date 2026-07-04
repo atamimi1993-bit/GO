@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       }],
       mode: 'payment',
       success_url: `${origin}/move/${moveRequestId}?tip=success`,
-      cancel_url: `${origin}/move/${moveRequestId}?tip=cancelled`,
+      cancel_url: `${origin}/move/${moveRequestId}?tip=failed`,
       metadata: {
         move_request_id: moveRequestId,
         payment_type: 'tip',

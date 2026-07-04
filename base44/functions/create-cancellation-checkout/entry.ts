@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
       }],
       mode: 'payment',
       success_url: origin + '/move/' + move.id + '?cancellation=success',
-      cancel_url: origin + '/move/' + move.id + '?cancellation=cancelled',
+      cancel_url: origin + '/move/' + move.id + '?cancellation=failed',
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         move_request_id: move.id,
