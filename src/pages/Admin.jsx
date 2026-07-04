@@ -181,6 +181,11 @@ export default function Admin() {
           <AdminQuickLinks />
         </Suspense>
 
+        {/* Driver leaderboard — ranked by completed moves & customer rating */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <DriverTopPerformers />
+        </Suspense>
+
         {/* Growth summary — monthly revenue, completed moves, driver payouts */}
         <Suspense fallback={<SectionSkeleton />}>
           <GrowthSummary />
@@ -236,9 +241,6 @@ export default function Admin() {
               </Suspense>
               <Suspense fallback={<SectionSkeleton />}>
                 <DriverPerformance />
-              </Suspense>
-              <Suspense fallback={<SectionSkeleton />}>
-                <DriverTopPerformers />
               </Suspense>
             </>
           )}
