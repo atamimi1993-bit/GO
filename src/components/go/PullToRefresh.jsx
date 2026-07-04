@@ -102,6 +102,8 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
     >
       {(pullDistance > 0 || refreshing) && (
         <div
+          role="status"
+          aria-label={refreshing ? 'Refreshing content' : 'Pull to refresh'}
           className="left-0 right-0 flex items-center justify-center pointer-events-none"
           style={{ position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', zIndex: 100, transform: `translateY(${pullDistance}px)` }}
         >

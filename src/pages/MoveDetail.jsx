@@ -97,6 +97,7 @@ export default function MoveDetail() {
   const handleConfirmDelivery = async () => {
     try {
       setConfirming(true);
+      setMove(prev => ({ ...prev, status: 'completed' }));
       await base44.entities.MoveRequest.update(move.id, { status: 'completed' });
       try {
         await base44.functions.invoke('send-move-invoice', { move_request_id: move.id });
@@ -107,6 +108,7 @@ export default function MoveDetail() {
       toast({ title: 'Delivery confirmed!', description: 'Your move summary and invoice have been emailed to you.' });
       await load();
     } catch (err) {
+      setMove(prev => ({ ...prev, status: 'in_progress' }));
       toast({ title: 'Could not confirm delivery', description: err.message || 'Please try again.', variant: 'destructive' });
     }
     setConfirming(false);

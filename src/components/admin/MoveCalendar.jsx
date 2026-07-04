@@ -181,6 +181,8 @@ export default function MoveCalendar({ scrollRef }) {
                 <button
                   key={day.toISOString()}
                   onClick={() => setSelectedDay(day)}
+                  aria-label={`${format(day, 'EEEE, MMMM d')}, ${dayMoves.length} move${dayMoves.length !== 1 ? 's' : ''}, ${getDayStatus(day) === 'full' ? 'fully booked' : getDayStatus(day) === 'partial' ? 'partially booked' : 'open'}`}
+                  aria-pressed={isSelected}
                   className={`relative min-h-[80px] p-1.5 rounded-lg border text-left transition-colors hover:bg-muted/50 ${cellBorder} ${!inMonth ? 'opacity-40' : ''} ${isToday ? 'ring-1 ring-primary' : ''}`}
                 >
                   <div className="flex items-center justify-between">
@@ -228,6 +230,7 @@ export default function MoveCalendar({ scrollRef }) {
                 <div key={dateKey}>
                   <button
                     onClick={() => setSelectedDay(date)}
+                    aria-label={format(date, 'EEEE, MMM d')}
                     className="w-full text-left mb-2 min-h-[44px] flex items-center"
                   >
                     <h3 className="text-sm font-semibold text-muted-foreground">

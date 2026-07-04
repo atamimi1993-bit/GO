@@ -142,7 +142,7 @@ Return ONLY a JSON array of items.`;
                   )}
                   <button
                     onClick={() => removeFile(i)}
-                    className="absolute top-0.5 right-0.5 bg-black/60 rounded-full p-0.5 text-white"
+                    className="absolute top-0 right-0 bg-black/60 rounded-full min-h-[32px] min-w-[32px] flex items-center justify-center text-white"
                     aria-label="Remove file"
                   >
                     <X size={12} />

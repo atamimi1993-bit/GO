@@ -89,8 +89,8 @@ export default function AdBanner() {
       {/* Dismiss button */}
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center transition-colors"
-        aria-label="Dismiss ad"
+        className="absolute top-2 right-2 z-20 min-h-[44px] min-w-[44px] rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center transition-colors"
+        aria-label="Dismiss advertisement"
       >
         <X size={14} className="text-white" />
       </button>
