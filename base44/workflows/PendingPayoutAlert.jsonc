@@ -1,0 +1,45 @@
+{
+  "description": "Every 6 hours, scans for DriverPayout records stuck in pending status for over 24 hours and alerts admins so unpaid driver earnings are resolved before the weekly platform payout sweep.",
+  "name": "Pending Payout Alert",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "pending_payout_alert",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "scan_payouts": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "check-pending-payouts",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Scan stale pending payouts",
+            "description": "Alert admins on payouts pending >24h"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 6,
+      "interval_unit": "hours",
+      "interval_anchor": "2026-07-04T09:00:00Z",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}

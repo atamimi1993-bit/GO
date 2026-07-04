@@ -246,6 +246,64 @@ async function assignDriver(base44, move, bestDriver, premierFallback = false) {
     console.error('Failed to notify dispatched driver:', err.message);
   }
 
+  // Alert admins if the assigned driver hasn't completed Stripe Connect onboarding.
+  // Without Connect, the driver can't receive their payout — this prevents the
+  // "customer charged, driver never paid" scenario from going unnoticed.
+  if (!bestDriver.stripe_account_id || !bestDriver.stripe_payouts_enabled) {
+    try {
+      const admins = await base44.asServiceRole.entities.User.filter({ role: 'admin' });
+      const payout = move.driver_payout || move.driver_fee || 0;
+      const fmtAmt = (v) => `$${(v || 0).toFixed(2)}`;
+      const connectStatus = !bestDriver.stripe_account_id
+        ? 'no Stripe Connect account created'
+        : 'Stripe Connect onboarding not complete';
+      const title = `⚠️ Driver without Stripe Connect assigned: ${bestDriver.full_name}`;
+      const body = `Job assigned to ${bestDriver.full_name} (${bestDriver.email}) but they have ${connectStatus}. Driver payout of ${fmtAmt(payout)} cannot be routed until Connect onboarding is complete. Move: ${move.pickup_address || 'Pickup'} → ${move.dropoff_address || 'Dropoff'}.`;
+
+      for (const admin of admins) {
+        if (!admin.email) continue;
+        // In-app notification
+        try {
+          await base44.asServiceRole.entities.AppNotification.create({
+            user_email: admin.email,
+            title,
+            body,
+            type: 'alert',
+            read: false,
+            link: '/admin',
+            icon: 'alert-triangle',
+          });
+        } catch (e) {
+          console.error('Failed to create connect-missing app notification:', e.message);
+        }
+        // Email
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: admin.email,
+            subject: title,
+            body: [
+              '<div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#1f2937;">',
+              '<h2 style="color:#dc2626;">⚠️ Driver Without Stripe Connect Assigned</h2>',
+              `<p>A job was just assigned to <strong>${bestDriver.full_name}</strong> (${bestDriver.email}), but they have <strong>${connectStatus}</strong>.</p>`,
+              '<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:16px;margin:20px 0;">',
+              `<p style="margin:4px 0 0;"><strong>Driver payout at risk:</strong> ${fmtAmt(payout)}</p>`,
+              `<p style="margin:4px 0 0;"><strong>Move:</strong> ${move.pickup_address || 'Pickup'} → ${move.dropoff_address || 'Dropoff'}</p>`,
+              `<p style="margin:4px 0 0;"><strong>Move date:</strong> ${move.move_date || 'TBD'}</p>`,
+              '</div>',
+              '<p style="color:#dc2626;font-weight:600;">The customer will be charged correctly, but the driver\'s payout cannot be routed until they complete Stripe Connect onboarding (identity verification + bank details).</p>',
+              '<p style="color:#6b7280;font-size:14px;">Contact the driver to complete Connect onboarding before the job completes. Otherwise, the driver\'s unpaid cut will sit as a "pending" DriverPayout record and could be swept into the platform bank account on the weekly payout cycle.</p>',
+              '</div>',
+            ].join('\n'),
+          });
+        } catch (e) {
+          console.error('Failed to send connect-missing email:', e.message);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to alert admins about missing Connect:', e.message);
+    }
+  }
+
   return Response.json({
     dispatched: true,
     driver: { id: bestDriver.id, name: bestDriver.full_name, email: bestDriver.email },
