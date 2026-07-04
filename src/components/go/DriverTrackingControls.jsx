@@ -33,6 +33,7 @@ export default function DriverTrackingControls({ driverProfile }) {
   const [lastPing, setLastPing] = useState(null);
   const intervalRef = useRef(null);
   const notifiedOnTheWayRef = useRef(false);
+  const notifiedDropoffRef = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -84,6 +85,19 @@ export default function DriverTrackingControls({ driverProfile }) {
             milestone,
           });
           setLastPing(ping);
+
+          // Notify customer when driver starts heading to dropoff (first time only)
+          if (milestone === 'en_route_to_dropoff' && !notifiedDropoffRef.current) {
+            notifiedDropoffRef.current = true;
+            base44.functions.invoke('notify-customer-en-route-dropoff', {
+              move_request_id: activeMove.id,
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+            })
+              .then(() => toast({ title: 'Customer notified', description: 'The customer knows you\u2019re heading to drop-off!' }))
+              .catch(() => {});
+          }
+
           if (milestone === 'delivered') {
             await base44.entities.MoveRequest.update(activeMove.id, { status: 'completed' });
             setActiveMove({ ...activeMove, status: 'completed' });
@@ -118,12 +132,32 @@ export default function DriverTrackingControls({ driverProfile }) {
         setAcceptedMove(null);
         setActiveMove({ ...move, status: 'in_progress' });
 
-        // Send "on the way" notification to the customer (first time only)
+        // Send "on the way" notification to the customer with driver's location for ETA (first time only)
         if (!notifiedOnTheWayRef.current) {
           notifiedOnTheWayRef.current = true;
-          base44.functions.invoke('notify-customer-on-the-way', { move_request_id: move.id })
-            .then(() => toast({ title: 'Customer notified', description: 'The customer knows you\u2019re on the way!' }))
-            .catch(() => {});
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                base44.functions.invoke('notify-customer-on-the-way', {
+                  move_request_id: move.id,
+                  lat: pos.coords.latitude,
+                  lng: pos.coords.longitude,
+                })
+                  .then(() => toast({ title: 'Customer notified', description: 'The customer knows you\u2019re on the way!' }))
+                  .catch(() => {});
+              },
+              () => {
+                base44.functions.invoke('notify-customer-on-the-way', { move_request_id: move.id })
+                  .then(() => toast({ title: 'Customer notified', description: 'The customer knows you\u2019re on the way!' }))
+                  .catch(() => {});
+              },
+              { enableHighAccuracy: true, timeout: 10000 }
+            );
+          } else {
+            base44.functions.invoke('notify-customer-on-the-way', { move_request_id: move.id })
+              .then(() => toast({ title: 'Customer notified', description: 'The customer knows you\u2019re on the way!' }))
+              .catch(() => {});
+          }
         }
       } catch (err) {
         toast({ title: 'Could not start move', description: err.message, variant: 'destructive' });

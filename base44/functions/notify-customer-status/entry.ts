@@ -30,6 +30,11 @@ Deno.serve(async (req) => {
     }
 
     const STATUS_INFO = {
+      pending: {
+        subject: `Your move request is being processed: ${move.pickup_address || 'Pickup'}`,
+        headline: 'Your request is being processed!',
+        message: 'We\'ve received your move request and our team is reviewing the details. You\'ll receive a quote and further updates as your move progresses.',
+      },
       quoted: {
         subject: `Your move quote is ready: ${move.pickup_address || 'Pickup'}`,
         headline: 'Your quote is ready!',

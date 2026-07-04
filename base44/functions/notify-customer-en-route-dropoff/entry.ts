@@ -42,17 +42,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'You are not assigned to this move' }, { status: 403 });
     }
 
-    // Idempotency: if an en_route_to_pickup ping already exists, the customer
-    // was already notified — skip to prevent duplicate emails on restarts.
+    // Idempotency: if an en_route_to_dropoff notification ping already exists,
+    // the customer was already notified — skip to prevent duplicate emails.
     const existingPings = await base44.asServiceRole.entities.LocationPing.filter({
       move_request_id: move_request_id,
-      milestone: 'en_route_to_pickup',
+      milestone: 'en_route_to_dropoff',
     });
     if (existingPings.length > 0) {
-      return Response.json({ skipped: true, reason: 'Customer already notified — on the way ping exists' });
+      return Response.json({ skipped: true, reason: 'Customer already notified — en route to dropoff ping exists' });
     }
 
-    // Fetch latest ping (any milestone) as fallback for driver coordinates
+    // Fetch latest ping as fallback for driver coordinates
     let lastPingForEta = null;
     try {
       const recentPings = await base44.asServiceRole.entities.LocationPing.filter(
@@ -69,7 +69,6 @@ Deno.serve(async (req) => {
     const greeting = move.customer_name ? `Hi ${move.customer_name.split(' ')[0]},` : 'Hello,';
 
     // --- ETA calculation (best-effort) ---
-    // Use driver coords from the request body, or fall back to the latest ping.
     let driverLat = body.lat;
     let driverLng = body.lng;
     if ((!driverLat || !driverLng) && lastPingForEta) {
@@ -78,12 +77,11 @@ Deno.serve(async (req) => {
     }
 
     let etaText = '';
-    let etaMins = null;
-    if (driverLat && driverLng && move.pickup_address) {
+    if (driverLat && driverLng && move.dropoff_address) {
       try {
-        // Geocode the pickup address via Nominatim (free, no API key)
+        // Geocode the dropoff address via Nominatim (free, no API key)
         const geoResp = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(move.pickup_address)}&format=json&limit=1`,
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(move.dropoff_address)}&format=json&limit=1`,
           { headers: { 'User-Agent': 'GO-Movers/1.0' } }
         );
         const geoData = await geoResp.json();
@@ -96,7 +94,7 @@ Deno.serve(async (req) => {
           );
           const routeData = await routeResp.json();
           if (routeData && routeData.routes && routeData.routes.length > 0) {
-            etaMins = Math.round(routeData.routes[0].duration / 60);
+            const etaMins = Math.round(routeData.routes[0].duration / 60);
             const distMeters = routeData.routes[0].distance;
             const distMiles = (distMeters / 1609.34).toFixed(1);
             if (etaMins < 1) {
@@ -125,8 +123,8 @@ Deno.serve(async (req) => {
     const htmlBody = [
       `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;color:#1f2937;">`,
       `<p>${greeting}</p>`,
-      `<h2 style="margin:8px 0 4px;color:#16a34a;">Your driver is on the way! 🚚</h2>`,
-      `<p style="color:#4b5563;">Great news — <strong>${driverName}</strong> has started heading to your pickup location. You can track their live location in real time from your dashboard.</p>`,
+      `<h2 style="margin:8px 0 4px;color:#16a34a;">Your items are on the way to drop-off! 📦🚚</h2>`,
+      `<p style="color:#4b5563;">Great news — <strong>${driverName}</strong> has picked up your items and is now heading to your drop-off location. You can track their live location in real time from your dashboard.</p>`,
       etaBanner,
       `<table style="width:100%;border-collapse:collapse;margin:20px 0;">${detailRows
         .map(
@@ -138,14 +136,14 @@ Deno.serve(async (req) => {
       `</div>`,
     ].join('\n');
 
-    const plainBody = `${greeting}\n\nYour driver is on the way! 🚚\n${driverName} has started heading to your pickup location.${etaText ? '\n' + etaText : ''}\nTrack their live location from your dashboard.\n\n${detailRows
+    const plainBody = `${greeting}\n\nYour items are on the way to drop-off! 📦🚚\n${driverName} has picked up your items and is heading to your drop-off location.${etaText ? '\n' + etaText : ''}\nTrack their live location from your dashboard.\n\n${detailRows
       .map(([label, value]) => `${label}: ${value}`)
       .join('\n')}`;
 
     try {
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: move.customer_email,
-        subject: `Your driver is on the way! 🚚 — ${move.pickup_address || 'Pickup'}`,
+        subject: `Your items are on the way to drop-off! 📦 — ${move.dropoff_address || 'Delivery'}`,
         body: htmlBody,
       });
     } catch (err) {
@@ -153,24 +151,24 @@ Deno.serve(async (req) => {
       return Response.json({ sent: false, error: err.message }, { status: 500 });
     }
 
-    // In-app push notification so the customer sees it immediately
+    // In-app push notification
     try {
       await base44.asServiceRole.entities.AppNotification.create({
         user_email: move.customer_email,
-        title: 'Your driver is on the way! 🚚',
-        body: `${driverName} has started heading to your pickup location. Tap to track their live location.`,
+        title: 'Your items are on the way to drop-off! 📦',
+        body: `${driverName} has picked up your items and is heading to your drop-off location. Tap to track their live location.`,
         type: 'job',
         read: false,
         link: move.id ? `/move/${move.id}` : null,
         icon: 'truck',
       });
     } catch (notifErr) {
-      console.error('Failed to create in-app on-the-way notification:', notifErr.message);
+      console.error('Failed to create in-app dropoff notification:', notifErr.message);
     }
 
     return Response.json({ sent: true, to: move.customer_email });
   } catch (error) {
-    console.error('notify-customer-on-the-way error:', error);
+    console.error('notify-customer-en-route-dropoff error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
