@@ -3,7 +3,8 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { HelpCircle, User, Truck, BookOpen, Loader2 } from 'lucide-react';
+import { HelpCircle, User, Truck, BookOpen, Bot, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 const DEFAULT_FAQ = {
@@ -25,6 +26,12 @@ const DEFAULT_FAQ = {
     { title: 'What is GO?', content: 'GO is a marketplace that connects people who need to move their belongings with verified, independent drivers who have trucks of all sizes. Think of it as a rideshare for moving.' },
     { title: 'Is GO available in my area?', content: 'GO operates across all 50 US states. Driver availability varies by location — the more drivers in your area, the faster your job gets accepted.' },
     { title: 'How does GO make money?', content: 'GO charges a 10% app fee on each move, which is included in your quote. This covers platform operations, dispute resolution, and customer support.' },
+  ],
+  assistants: [
+    { title: 'What is the GO Assistant?', content: 'The GO Assistant is an AI-powered support agent available 24/7. It can help you book moves, answer pricing questions, look up your move status, find storage facilities, and guide drivers through job acceptance, payouts, and truck registration.' },
+    { title: 'How do I chat with the assistant?', content: 'Go to the Support page from the main menu and tap "Start a Conversation." You can ask anything about your moves, pricing, storage, or driver-related questions — the assistant will look up your account details and guide you.' },
+    { title: 'What can the assistant help with?', content: 'For customers: booking moves, pricing breakdowns, move status tracking, and storage recommendations. For drivers: registration questions, profile status, available jobs, payout tracking, and truck registration.' },
+    { title: 'Can the assistant make changes to my account?', content: 'The assistant can look up your move requests, driver profile, trucks, payouts, and storage facilities. It cannot make changes or process payments — for those actions, it will guide you to the right page in the app.' },
   ],
 };
 
@@ -58,14 +65,26 @@ export default function HelpCenter() {
       </div>
 
       <Tabs defaultValue="customer">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="customer" className="flex items-center gap-1"><User size={14} /> Customers</TabsTrigger>
           <TabsTrigger value="driver" className="flex items-center gap-1"><Truck size={14} /> Drivers</TabsTrigger>
           <TabsTrigger value="general" className="flex items-center gap-1"><BookOpen size={14} /> General</TabsTrigger>
+          <TabsTrigger value="assistants" className="flex items-center gap-1"><Bot size={14} /> Assistants</TabsTrigger>
         </TabsList>
 
-        {['customer', 'driver', 'general'].map(cat => (
+        {['customer', 'driver', 'general', 'assistants'].map(cat => (
           <TabsContent key={cat} value={cat}>
+            {cat === 'assistants' && (
+              <Link to="/support" className="flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 mb-3 hover:bg-emerald-500/10 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                  <Bot className="text-emerald-600 dark:text-emerald-400" size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Chat with the GO Assistant</p>
+                  <p className="text-xs text-muted-foreground">Get instant answers about your moves, pricing, and more</p>
+                </div>
+              </Link>
+            )}
             <Accordion type="single" collapsible className="bg-card border rounded-2xl overflow-hidden">
               {getArticles(cat).map((article, i) => (
                 <AccordionItem key={article.id || i} value={`${cat}-${i}`}>

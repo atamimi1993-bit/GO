@@ -13,7 +13,8 @@
       "enum": [
         "customer",
         "driver",
-        "general"
+        "general",
+        "assistants"
       ]
     },
     "order": {
