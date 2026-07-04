@@ -1,0 +1,40 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "driver_new_move_alert",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "notify_drivers": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "notify-drivers-new-move",
+            "args": {
+              "move_request_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Email matching drivers",
+            "description": "Send move details to local drivers"
+          }
+        }
+      }
+    ]
+  },
+  "name": "Driver New Move Alert",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "MoveRequest"
+    }
+  },
+  "description": "When a new MoveRequest is created, email approved drivers whose service area matches the pickup state with move date and pickup details."
+}
