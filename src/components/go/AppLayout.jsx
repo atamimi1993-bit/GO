@@ -16,6 +16,7 @@ const navItems = [
   { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Rentals', path: '/rentals', icon: Car },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
+  { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
   { label: 'Drivers', path: '/driver-dashboard', icon: Truck, adminOnly: true },
   { label: 'Freight', path: '/freight-dashboard', icon: Container, cdlOrAdmin: true },
 ];
@@ -51,14 +52,6 @@ export default function AppLayout() {
     return parts[0] || 'Customer';
   })();
 
-  const roleLink = (() => {
-    if (!user) return '/profile';
-    if (user.role === 'admin') return '/admin';
-    if (driverProfile?.cdl_certified) return '/freight-dashboard';
-    if (driverProfile) return '/driver-hub';
-    return '/profile';
-  })();
-
   return (
     <div className="h-dvh flex flex-col bg-background">
       {/* Top nav */}
@@ -91,9 +84,9 @@ export default function AppLayout() {
 
           {/* Right: Role label + profile + logout */}
           <div className="flex items-center gap-2 shrink-0">
-            <Link to={roleLink} className="text-sm font-semibold text-foreground hover:text-primary transition-colors truncate max-w-[120px] sm:max-w-[160px]">
+            <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-[160px]">
               {roleLabel}
-            </Link>
+            </span>
             <Link to="/profile">
               <Button variant="ghost" size="icon" aria-label="My Profile" className="min-h-[44px] min-w-[44px]">
                 <User size={20} />
