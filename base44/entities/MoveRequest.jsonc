@@ -15,6 +15,9 @@
     "pickup_address": {
       "type": "string"
     },
+    "pickup_state": {
+      "type": "string"
+    },
     "dropoff_address": {
       "type": "string"
     },

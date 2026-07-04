@@ -13,7 +13,7 @@ import QuickAddItems from '@/components/go/QuickAddItems';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import LiabilityAgreement from '@/components/go/LiabilityAgreement';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { calculateMovePrice, recommendTruckSize, formatCurrency, TRUCK_SIZE_LABELS, COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES } from '@/lib/pricing';
+import { calculateMovePrice, recommendTruckSize, formatCurrency, TRUCK_SIZE_LABELS, COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES } from '@/lib/pricing';
 
 const JOB_TYPES = [
   { value: 'residential', label: 'Residential Move' },
@@ -35,7 +35,7 @@ export default function NewMove() {
   const [form, setForm] = useState({
     pickup_address: '', dropoff_address: '', move_date: '', move_time: '',
     distance_miles: '', country_code: 'US', currency: 'USD', distance_unit: 'mi',
-    job_type: 'residential',
+    pickup_state: '', job_type: 'residential',
     notes: '', needs_storage: false,
     customer_name: '', customer_email: '', customer_phone: '',
   });
@@ -74,6 +74,7 @@ export default function NewMove() {
         totalWeightLbs: totalWeight,
         distanceMiles: Number(form.distance_miles),
         truckSize: recommendTruckSize(totalWeight),
+        stateCode: form.pickup_state,
         countryCode: form.country_code,
         currency: form.currency,
         distanceUnit: form.distance_unit,
@@ -125,6 +126,7 @@ export default function NewMove() {
       totalWeightLbs: totalWeight,
       distanceMiles: Number(form.distance_miles),
       truckSize: rec,
+      stateCode: form.pickup_state,
       countryCode: form.country_code,
       currency: form.currency,
       distanceUnit: form.distance_unit,
@@ -141,6 +143,7 @@ export default function NewMove() {
         customer_email: form.customer_email,
         customer_phone: form.customer_phone,
         pickup_address: form.pickup_address,
+        pickup_state: form.pickup_state,
         dropoff_address: form.dropoff_address,
         move_date: form.move_date,
         move_time: form.move_time,
@@ -248,6 +251,17 @@ export default function NewMove() {
               <Label className="flex items-center gap-2"><MapPin size={14} /> Pickup Address</Label>
               <Input value={form.pickup_address} onChange={e => setForm({ ...form, pickup_address: e.target.value })} placeholder="123 Main St, City, Country" />
             </div>
+            {form.country_code === 'US' && (
+              <div>
+                <Label>Pickup State (for tax calculation)</Label>
+                <MobileSelect
+                  value={form.pickup_state}
+                  onValueChange={v => setForm({ ...form, pickup_state: v })}
+                  options={US_STATES.map(s => ({ value: s.code, label: `${s.code} — ${s.name}` }))}
+                  placeholder="Select your state"
+                />
+              </div>
+            )}
             <div>
               <Label className="flex items-center gap-2"><MapPin size={14} /> Drop-off Address</Label>
               <Input value={form.dropoff_address} onChange={e => setForm({ ...form, dropoff_address: e.target.value })} placeholder="456 Oak Ave, City, Country" />

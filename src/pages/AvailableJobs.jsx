@@ -50,6 +50,7 @@ export default function AvailableJobs() {
           totalWeightLbs: job.total_weight_lbs,
           distanceMiles: job.distance_miles,
           truckSize: job.truck_size_needed || truck.size_category,
+          stateCode: job.pickup_state,
           countryCode: job.country_code,
           currency: job.currency,
           distanceUnit: job.distance_unit,
