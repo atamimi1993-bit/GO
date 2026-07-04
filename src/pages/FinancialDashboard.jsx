@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { formatCurrency } from '@/lib/pricing';
 import { DollarSign, Percent, Wallet, Loader2, Lock, TrendingUp, Ban } from 'lucide-react';
+import ExportToSheetsButton from '@/components/admin/ExportToSheetsButton';
 
 const FinancialAreaChart = lazy(() => import('@/components/admin/FinancialAreaChart'));
 
@@ -103,6 +104,9 @@ export default function FinancialDashboard() {
         <p className="text-muted-foreground text-sm mb-6">
           Platform earnings, app fee revenue, and driver payouts over time.
         </p>
+
+        {/* Export to Google Sheets */}
+        <ExportToSheetsButton />
 
         {/* Stat tiles */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">

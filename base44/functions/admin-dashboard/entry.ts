@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     // Whitelist of allowed actions to prevent unexpected code paths
     const ALLOWED_ACTIONS = [
       'overview', 'approve_driver', 'reject_driver', 'update_lead_status',
-      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth',
+      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials',
     ];
     if (!ALLOWED_ACTIONS.includes(action)) {
       return Response.json({ error: 'Invalid action' }, { status: 400 });
@@ -266,6 +266,62 @@ Deno.serve(async (req) => {
         cancellationRevenue: series.reduce((s, r) => s + r.cancellation_revenue, 0),
       };
       return Response.json({ series, totals });
+    }
+
+    // Export all moves with financial details for spreadsheet use
+    if (action === 'export_financials') {
+      const [allMoves, allPayouts, drivers] = await Promise.all([
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverPayout.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
+      ]);
+      const driverMap = {};
+      for (const d of drivers) driverMap[d.id] = d;
+
+      const movesExport = allMoves.map((m) => {
+        const driver = m.assigned_driver_id ? driverMap[m.assigned_driver_id] : null;
+        const movePayouts = allPayouts.filter((p) => p.move_request_id === m.id);
+        const driverPayoutTotal = movePayouts.reduce((s, p) => s + (p.amount || 0), 0);
+        return {
+          move_id: m.id,
+          created_date: m.created_date,
+          move_date: m.move_date || '',
+          status: m.status,
+          job_type: m.job_type || '',
+          customer_name: m.customer_name || '',
+          customer_email: m.customer_email || '',
+          pickup_address: m.pickup_address || '',
+          dropoff_address: m.dropoff_address || '',
+          distance_miles: m.distance_miles || 0,
+          total_weight_lbs: m.total_weight_lbs || 0,
+          service_level: m.service_level || '',
+          truck_size_needed: m.truck_size_needed || '',
+          assigned_driver: driver?.full_name || '',
+          driver_company: driver?.company_name || '',
+          base_cost: m.base_cost || 0,
+          fuel_cost: m.fuel_cost || 0,
+          tolls: m.tolls || 0,
+          bulky_item_fee: m.bulky_item_fee || 0,
+          materials_fee: m.materials_fee || 0,
+          carrying_fee: m.carrying_fee || 0,
+          extra_service_fee: m.extra_service_fee || 0,
+          tax_amount: m.tax_amount || 0,
+          app_fee: m.app_fee || 0,
+          total_price: m.total_price || 0,
+          driver_payout: m.driver_payout || driverPayoutTotal,
+          payment_option: m.payment_option || '',
+          paid: m.paid || false,
+          deposit_paid: m.deposit_paid || false,
+          tip_amount: m.tip_amount || 0,
+          discount_amount: m.discount_amount || 0,
+          promo_code: m.promo_code || '',
+          cancellation_fee: m.cancellation_fee || 0,
+          needs_storage: m.needs_storage || false,
+          storage_days: m.storage_days || 0,
+        };
+      });
+
+      return Response.json({ moves: movesExport, count: movesExport.length });
     }
 
     // Weekly growth — 12-week time series of earnings, active moves, and driver signups
