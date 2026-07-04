@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Loader2, Search, Truck, Car } from 'lucide-react';
+import { Plus, Loader2, Search, Truck, Car, MapPin } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import RentalCard from '@/components/rental/RentalCard';
+import { useUserState } from '@/hooks/useUserState';
 
 export default function Rentals() {
   const { scrollRef } = useOutletContext();
@@ -15,6 +16,16 @@ export default function Rentals() {
   const [loading, setLoading] = useState(true);
   const [vehicleType, setVehicleType] = useState('all');
   const [search, setSearch] = useState('');
+  const { userState } = useUserState();
+  const [stateFilter, setStateFilter] = useState(null);
+  const stateInitRef = useRef(false);
+
+  useEffect(() => {
+    if (userState && !stateInitRef.current) {
+      stateInitRef.current = true;
+      setStateFilter(userState);
+    }
+  }, [userState]);
 
   const load = useCallback(async () => {
     try {
@@ -29,8 +40,14 @@ export default function Rentals() {
 
   useEffect(() => { load(); }, [load]);
 
+  const availableStates = [...new Set([
+    ...rentals.map((r) => r.state).filter(Boolean),
+    ...(userState ? [userState] : []),
+  ])].sort();
+
   const filtered = rentals.filter((r) => {
     if (vehicleType !== 'all' && r.vehicle_type !== vehicleType) return false;
+    if (stateFilter && (r.state || '').toUpperCase() !== stateFilter.toUpperCase()) return false;
     if (search) {
       const q = search.toLowerCase();
       const haystack = `${r.make} ${r.model} ${r.city} ${r.state} ${r.description || ''}`.toLowerCase();
@@ -50,6 +67,14 @@ export default function Rentals() {
             </Button>
           </Link>
         </div>
+
+        {/* Location indicator */}
+        {stateFilter && (
+          <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
+            <MapPin size={14} className="text-emerald-500 shrink-0" />
+            Showing vehicles in <span className="font-medium text-foreground">{stateFilter}</span>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-2 mb-4">
@@ -81,6 +106,15 @@ export default function Rentals() {
               <SelectItem value="rv">RVs</SelectItem>
               <SelectItem value="motorcycle">Motorcycles</SelectItem>
               <SelectItem value="bus">Buses</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={stateFilter || 'all'} onValueChange={(v) => setStateFilter(v === 'all' ? null : v)}>
+            <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All States</SelectItem>
+              {availableStates.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>

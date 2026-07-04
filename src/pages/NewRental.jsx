@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Loader2, Camera, X } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
+import { useUserState } from '@/hooks/useUserState';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function NewRental() {
@@ -36,6 +37,12 @@ export default function NewRental() {
     fuel_type: 'gasoline',
     features: '',
   });
+
+  const { userState } = useUserState();
+
+  useEffect(() => {
+    if (userState) setForm(f => f.state ? f : { ...f, state: userState });
+  }, [userState]);
 
   useEffect(() => {
     base44.auth.me().then(u => {
