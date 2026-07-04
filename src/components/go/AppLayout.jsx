@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, ShieldCheck, Container, Navigation, DollarSign, Trophy, TrendingUp, Car } from 'lucide-react';
+import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, ShieldCheck, Container, Navigation, DollarSign, Trophy, TrendingUp, Car, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/AuthContext';
@@ -11,11 +11,12 @@ import BottomTabBar from '@/components/go/BottomTabBar';
 
 const navItems = [
   { label: 'Home', path: '/', icon: Home },
-  { label: 'My Moves', path: '/my-moves', icon: Package },
-  { label: 'Tracking', path: '/tracking', icon: Navigation },
-  { label: 'Revenue', path: '/revenue', icon: DollarSign, driverOrAdmin: true },
-  { label: 'Leaderboard', path: '/leaderboard', icon: Trophy },
-  { label: 'Driver Hub', path: '/driver-hub', icon: Truck },
+  { label: 'My Moves', path: '/my-moves', icon: Package, adminOnly: true },
+  { label: 'Tracking', path: '/tracking', icon: Navigation, adminOnly: true },
+  { label: 'Revenue', path: '/revenue', icon: DollarSign, adminOnly: true },
+  { label: 'Leaderboard', path: '/leaderboard', icon: Trophy, adminOnly: true },
+  { label: 'Driver Hub', path: '/driver-hub', icon: Truck, driverOnly: true },
+  { label: 'My Report', path: '/driver-report', icon: FileText, driverOnly: true },
   { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Rentals', path: '/rentals', icon: Car },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
@@ -37,8 +38,8 @@ export default function AppLayout() {
   });
   const visibleNavItems = navItems.filter(item => {
     if (item.adminOnly) return user?.role === 'admin';
+    if (item.driverOnly) return user?.role !== 'admin' && !!driverProfile;
     if (item.cdlOrAdmin) return user?.role === 'admin' || driverProfile?.cdl_certified;
-    if (item.driverOrAdmin) return user?.role === 'admin' || !!driverProfile;
     return true;
   });
 

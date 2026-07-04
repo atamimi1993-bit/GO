@@ -1,14 +1,32 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTabHistory } from '@/lib/TabHistoryContext';
-import { Home, Package, Truck, Warehouse, HelpCircle, Navigation } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { Home, Package, Truck, Warehouse, HelpCircle, Navigation, FileText, ShieldCheck, Plus } from 'lucide-react';
 
-const tabs = [
+const adminTabs = [
   { label: 'Home', path: '/', icon: Home },
   { label: 'Moves', path: '/my-moves', icon: Package },
   { label: 'Track', path: '/tracking', icon: Navigation },
+  { label: 'Admin', path: '/admin', icon: ShieldCheck },
+  { label: 'Help', path: '/help', icon: HelpCircle },
+];
+
+const driverTabs = [
+  { label: 'Home', path: '/', icon: Home },
   { label: 'Driver', path: '/driver-hub', icon: Truck },
+  { label: 'Report', path: '/driver-report', icon: FileText },
   { label: 'Storage', path: '/storage', icon: Warehouse },
+  { label: 'Help', path: '/help', icon: HelpCircle },
+];
+
+const customerTabs = [
+  { label: 'Home', path: '/', icon: Home },
+  { label: 'New Move', path: '/new-move', icon: Plus },
+  { label: 'Storage', path: '/storage', icon: Warehouse },
+  { label: 'Rentals', path: '/rentals', icon: Truck },
   { label: 'Help', path: '/help', icon: HelpCircle },
 ];
 
@@ -16,6 +34,20 @@ export default function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { getTargetPath } = useTabHistory();
+  const { user } = useAuth();
+
+  const { data: driverProfile } = useQuery({
+    queryKey: ['myDriverProfile', user?.id],
+    queryFn: () => base44.entities.DriverProfile.filter({ email: user.email }).then(r => r[0] || null),
+    enabled: !!user?.email && user?.role !== 'admin',
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const tabs = user?.role === 'admin'
+    ? adminTabs
+    : driverProfile
+      ? driverTabs
+      : customerTabs;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border flex select-none" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>

@@ -11,6 +11,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
 const MarketingPanel = lazy(() => import('@/components/admin/MarketingPanel'));
+const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'));
 const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
 const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApprovalPanel'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
@@ -127,6 +128,9 @@ export default function Admin() {
           <StatCard icon={AlertCircle} label="Cancelled" value={movesByStatus.cancelled} accent="red" />
           <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
         </div>
+
+        {/* Quick access links */}
+        <AdminQuickLinks />
 
         {/* Global operations map */}
         <div className="bg-card border rounded-2xl p-5 mb-6">

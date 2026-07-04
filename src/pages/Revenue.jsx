@@ -36,10 +36,9 @@ export default function Revenue() {
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
-  const isDriver = !!driverProfile;
   const isAdmin = user?.role === 'admin';
 
-  if (!isDriver && !isAdmin) {
+  if (!isAdmin) {
     return (
       <div className="text-center py-20">
         <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
@@ -47,7 +46,7 @@ export default function Revenue() {
         </div>
         <h2 className="font-display font-bold text-lg mb-1">Access Restricted</h2>
         <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-          Revenue and earnings information is only available to drivers and administrators.
+          Revenue and earnings information is only available to administrators.
         </p>
       </div>
     );
@@ -69,20 +68,14 @@ export default function Revenue() {
   // Average platform rating
   const avgRating = ratings.length > 0 ? ratings.reduce((s, r) => s + (r.stars || 0), 0) / ratings.length : 0;
 
-  // Moves needing ratings
+  // Moves needing ratings (admin sees all customer-to-driver pending)
   const ratedMoveIds = new Set(ratings.map((r) => `${r.move_request_id}_${r.direction}_${r.rater_id}`));
   const movesNeedingRating = completedMoves.filter((m) => {
-    if (isDriver) {
-      return m.assigned_driver_id === driverProfile.id && !ratedMoveIds.has(`${m.id}_driver_to_customer_${user.id}`);
-    }
-    return m.created_by_id === user.id && !ratedMoveIds.has(`${m.id}_customer_to_driver_${user.id}`);
+    return m.created_by_id && !ratedMoveIds.has(`${m.id}_customer_to_driver_${m.created_by_id}`);
   });
 
-  // Recent ratings (for this user)
-  const myRatings = ratings.filter((r) => {
-    if (isDriver) return r.direction === 'driver_to_customer' && r.rater_id === user.id;
-    return r.direction === 'customer_to_driver' && r.ratee_id === driverProfile?.id || r.rater_id === user.id;
-  }).slice(0, 5);
+  // Recent ratings
+  const myRatings = ratings.slice(0, 5);
 
   const stats = [
     { label: 'Total Revenue', value: formatCurrency(totalRevenue), icon: DollarSign, accent: 'text-emerald-600' },
@@ -96,7 +89,7 @@ export default function Revenue() {
       <div className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-display font-bold mb-1">Revenue & Reviews</h1>
         <p className="text-muted-foreground text-sm mb-6">
-          {isDriver ? 'Track your earnings and rate your customers.' : 'Track your spending and rate your drivers.'}
+          Track platform revenue and customer reviews.
         </p>
 
         {/* Stats */}
@@ -151,17 +144,17 @@ export default function Revenue() {
                         </p>
                       </div>
                       <span className="text-xs font-medium text-yellow-700 dark:text-yellow-300">
-                        {isDriver ? `Customer: ${m.customer_name || 'N/A'}` : `Driver: ${m.assigned_driver_name || 'N/A'}`}
+                        {`Driver: ${m.assigned_driver_name || 'N/A'}`}
                       </span>
                     </div>
                   </div>
                   <RatingForm
                     move={m}
-                    direction={isDriver ? 'driver_to_customer' : 'customer_to_driver'}
+                    direction="customer_to_driver"
                     raterId={user.id}
-                    raterName={isDriver ? driverProfile.full_name : (user.full_name || user.email)}
-                    rateeId={isDriver ? (m.created_by_id || '') : (m.assigned_driver_id || '')}
-                    rateeName={isDriver ? (m.customer_name || 'Customer') : (m.assigned_driver_name || 'Driver')}
+                    raterName={user.full_name || user.email}
+                    rateeId={m.assigned_driver_id || ''}
+                    rateeName={m.assigned_driver_name || 'Driver'}
                     onSubmitted={() => setRefreshKey((k) => k + 1)}
                   />
                 </div>

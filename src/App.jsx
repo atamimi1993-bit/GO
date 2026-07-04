@@ -41,6 +41,7 @@ const FinancialDashboard = lazy(() => import('@/pages/FinancialDashboard'));
 const Rentals = lazy(() => import('@/pages/Rentals'));
 const RentalDetail = lazy(() => import('@/pages/RentalDetail'));
 const NewRental = lazy(() => import('@/pages/NewRental'));
+const DriverReport = lazy(() => import('@/pages/DriverReport'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -118,6 +119,7 @@ const AuthenticatedApp = () => {
           <Route path="/rentals" element={<PageTransition><Rentals /></PageTransition>} />
           <Route path="/rentals/new" element={<PageTransition><NewRental /></PageTransition>} />
           <Route path="/rentals/:id" element={<PageTransition><RentalDetail /></PageTransition>} />
+          <Route path="/driver-report" element={<PageTransition><DriverReport /></PageTransition>} />
         </Route>
       </Route>
 
