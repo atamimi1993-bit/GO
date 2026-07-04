@@ -26,6 +26,7 @@ const DriverRegister = lazy(() => import('@/pages/DriverRegister'));
 const AvailableJobs = lazy(() => import('@/pages/AvailableJobs'));
 const MyTrucks = lazy(() => import('@/pages/MyTrucks'));
 const MyPayouts = lazy(() => import('@/pages/MyPayouts'));
+const BusinessPortal = lazy(() => import('@/pages/BusinessPortal'));
 const Storage = lazy(() => import('@/pages/Storage'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const Profile = lazy(() => import('@/pages/Profile'));
@@ -91,6 +92,7 @@ const AuthenticatedApp = () => {
           <Route path="/driver-hub" element={<PageTransition><DriverHub /></PageTransition>} />
           <Route path="/driver-register" element={<PageTransition><DriverRegister /></PageTransition>} />
           <Route path="/available-jobs" element={<PageTransition><AvailableJobs /></PageTransition>} />
+          <Route path="/business" element={<PageTransition><BusinessPortal /></PageTransition>} />
           <Route path="/my-trucks" element={<PageTransition><MyTrucks /></PageTransition>} />
           <Route path="/my-payouts" element={<PageTransition><MyPayouts /></PageTransition>} />
           <Route path="/storage" element={<PageTransition><Storage /></PageTransition>} />
