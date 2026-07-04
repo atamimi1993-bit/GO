@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { ArrowRight, Package, Truck, Shield, DollarSign, Star, MapPin, CreditCard, Zap } from 'lucide-react';
+import { ArrowRight, Package, Truck, Shield, DollarSign, Star, MapPin, CreditCard, Zap, History, Bookmark, Headphones } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import AdBanner from '@/components/go/AdBanner';
@@ -60,6 +60,32 @@ export default function Home() {
               Become a Driver <Truck className="ml-2" size={20} />
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Quick Access for Customers */}
+      <section>
+        <h2 className="text-xl font-display font-bold mb-4">Quick Access</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {[
+            { label: 'New Move', icon: Package, path: '/new-move', accent: 'bg-emerald-500/10 text-emerald-600' },
+            { label: 'Quick Delivery', icon: Zap, path: '/quick-delivery', accent: 'bg-amber-500/10 text-amber-600' },
+            { label: 'Delivery History', icon: History, path: '/delivery-history', accent: 'bg-indigo-500/10 text-indigo-600' },
+            { label: 'Saved Addresses', icon: Bookmark, path: '/saved-addresses', accent: 'bg-purple-500/10 text-purple-600' },
+            { label: 'Storage', icon: MapPin, path: '/storage', accent: 'bg-blue-500/10 text-blue-600' },
+            { label: 'Support', icon: Headphones, path: '/support', accent: 'bg-rose-500/10 text-rose-600' },
+          ].map((item) => (
+            <Link
+              key={item.label}
+              to={item.path}
+              className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-md transition-all"
+            >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.accent}`}>
+                <item.icon size={22} />
+              </div>
+              <span className="text-xs font-medium text-center">{item.label}</span>
+            </Link>
+          ))}
         </div>
       </section>
 
