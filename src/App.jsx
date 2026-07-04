@@ -30,6 +30,7 @@ const Storage = lazy(() => import('@/pages/Storage'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Support = lazy(() => import('@/pages/Support'));
+const Admin = lazy(() => import('@/pages/Admin'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -95,6 +96,7 @@ const AuthenticatedApp = () => {
           <Route path="/storage" element={<PageTransition><Storage /></PageTransition>} />
           <Route path="/help" element={<PageTransition><HelpCenter /></PageTransition>} />
           <Route path="/support" element={<PageTransition><Support /></PageTransition>} />
+          <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
         </Route>
       </Route>

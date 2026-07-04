@@ -2,9 +2,10 @@ import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, Bot } from 'lucide-react';
+import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, Bot, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAuth } from '@/lib/AuthContext';
 import BottomTabBar from '@/components/go/BottomTabBar';
 
 const navItems = [
@@ -14,11 +15,14 @@ const navItems = [
   { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
   { label: 'Assistant', path: '/support', icon: Bot },
+  { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
 ];
 
 export default function AppLayout() {
   const location = useLocation();
   const mainRef = useRef(null);
+  const { user } = useAuth();
+  const visibleNavItems = navItems.filter(item => !item.adminOnly || user?.role === 'admin');
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,7 +35,7 @@ export default function AppLayout() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {navItems.map(item => (
+            {visibleNavItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
