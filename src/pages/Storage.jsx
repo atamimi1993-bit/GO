@@ -54,7 +54,7 @@ export default function Storage() {
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {filtered.map(f => (
-            <div key={f.id} className="select-none bg-card border rounded-2xl p-5 hover:shadow-md transition-shadow">
+            <div key={f.id} className="bg-card border rounded-2xl p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-display font-bold">{f.name}</h3>
                 {f.climate_controlled && (

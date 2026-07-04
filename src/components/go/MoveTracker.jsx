@@ -54,12 +54,16 @@ export default function MoveTracker({ moveId }) {
       </div>
 
       {latestPing && latestPing.lat ? (
+        <>
         <div role="region" aria-label="Live driver tracking map" tabIndex={0} className="h-64 w-full">
           <MapContainer
             center={[latestPing.lat, latestPing.lng]}
             zoom={13}
             className="h-full w-full"
             scrollWheelZoom={false}
+            dragging={false}
+            touchZoom={false}
+            doubleClickZoom={false}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -77,6 +81,17 @@ export default function MoveTracker({ moveId }) {
             </CircleMarker>
           </MapContainer>
         </div>
+        <div className="px-5 pt-3">
+          <a
+            href={"https://www.google.com/maps?q=" + latestPing.lat + "," + latestPing.lng}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700"
+          >
+            <MapPin size={14} /> Open in Maps
+          </a>
+        </div>
+        </>
       ) : (
         <div className="h-32 flex items-center justify-center text-sm text-muted-foreground">
           Tracking will appear here once the driver starts the move.

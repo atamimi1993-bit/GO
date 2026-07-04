@@ -82,17 +82,17 @@ export default function DriverRegister() {
 
       <form onSubmit={handleSubmit} className="bg-card border rounded-2xl p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><Label>Full Name *</Label><Input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} /></div>
-          <div><Label>Email *</Label><Input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
+          <div><Label htmlFor="full_name">Full Name *</Label><Input id="full_name" value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} /></div>
+          <div><Label htmlFor="email">Email *</Label><Input id="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div><Label>Phone *</Label><Input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="(555) 123-4567" /></div>
-          <div><Label>Company (optional)</Label><Input value={form.company_name} onChange={e => setForm({ ...form, company_name: e.target.value })} /></div>
+          <div><Label htmlFor="phone">Phone *</Label><Input id="phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="(555) 123-4567" /></div>
+          <div><Label htmlFor="company">Company (optional)</Label><Input id="company" value={form.company_name} onChange={e => setForm({ ...form, company_name: e.target.value })} /></div>
         </div>
-        <div><Label>Service Area *</Label><Input value={form.service_area} onChange={e => setForm({ ...form, service_area: e.target.value })} placeholder="e.g. Los Angeles, CA" /></div>
+        <div><Label htmlFor="service_area">Service Area *</Label><Input id="service_area" value={form.service_area} onChange={e => setForm({ ...form, service_area: e.target.value })} placeholder="e.g. Los Angeles, CA" /></div>
         <div className="grid grid-cols-2 gap-4">
-          <div><Label>License Number *</Label><Input value={form.license_number} onChange={e => setForm({ ...form, license_number: e.target.value })} /></div>
-          <div><Label>License Expiry *</Label><Input type="date" value={form.license_expiry} onChange={e => setForm({ ...form, license_expiry: e.target.value })} /></div>
+          <div><Label htmlFor="license_number">License Number *</Label><Input id="license_number" value={form.license_number} onChange={e => setForm({ ...form, license_number: e.target.value })} /></div>
+          <div><Label htmlFor="license_expiry">License Expiry *</Label><Input id="license_expiry" type="date" value={form.license_expiry} onChange={e => setForm({ ...form, license_expiry: e.target.value })} /></div>
         </div>
 
         <div className="border-t pt-4 space-y-4">
