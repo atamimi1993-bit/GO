@@ -16,6 +16,15 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const action = body?.action || 'overview';
 
+    // Whitelist of allowed actions to prevent unexpected code paths
+    const ALLOWED_ACTIONS = [
+      'overview', 'approve_driver', 'reject_driver', 'update_lead_status',
+      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials',
+    ];
+    if (!ALLOWED_ACTIONS.includes(action)) {
+      return Response.json({ error: 'Invalid action' }, { status: 400 });
+    }
+
     // Approve / reject driver applications
     if (action === 'approve_driver' || action === 'reject_driver') {
       const { driver_id } = body;

@@ -13,11 +13,19 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'No stripe-signature header' }, { status: 400 });
     }
 
-    const event = await stripe.webhooks.constructEventAsync(
-      body,
-      signature,
-      Deno.env.get('STRIPE_WEBHOOK_SECRET')
-    );
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+    if (!webhookSecret) {
+      console.error('STRIPE_WEBHOOK_SECRET is not configured');
+      return Response.json({ error: 'Webhook secret not configured' }, { status: 500 });
+    }
+
+    let event;
+    try {
+      event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+    } catch (verifyErr) {
+      console.error('Stripe signature verification failed:', verifyErr.message);
+      return Response.json({ error: 'Invalid signature' }, { status: 400 });
+    }
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;

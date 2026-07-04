@@ -3,6 +3,14 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    let user;
+    try {
+      user = await base44.auth.me();
+    } catch (authErr) {
+      console.error('notify-admin-damage auth failed:', authErr.message);
+      return Response.json({ error: 'Authentication required' }, { status: 401 });
+    }
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
     const { damage_report_id } = body;
