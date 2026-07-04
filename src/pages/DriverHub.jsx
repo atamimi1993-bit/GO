@@ -20,7 +20,7 @@ import DriverAvailabilityCalendar from '@/components/go/DriverAvailabilityCalend
 const StripeConnectCard = lazy(() => import('@/components/go/StripeConnectCard'));
 const BackgroundCheckStatus = lazy(() => import('@/components/go/BackgroundCheckStatus'));
 const ContinuousTracker = lazy(() => import('@/components/go/ContinuousTracker'));
-import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation, Receipt } from 'lucide-react';
+import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation, Receipt, Route } from 'lucide-react';
 import DriverDisputeCenter from '@/components/go/DriverDisputeCenter';
 
 export default function DriverHub() {
@@ -169,6 +169,22 @@ export default function DriverHub() {
 
       {/* Availability calendar — block off unavailable dates */}
       <DriverAvailabilityCalendar driverProfile={profile} />
+
+      {/* Batch route dashboard link */}
+      {profile.status === 'approved' && (
+        <Link to="/batch-routes" className="block mb-4">
+          <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-2xl p-4 flex items-center gap-3 shadow-lg hover:scale-[1.01] transition-transform">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+              <Route size={24} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-sm">Batch Route Dashboard</p>
+              <p className="text-xs text-violet-100">View multi-stop routes with optimized map paths</p>
+            </div>
+            <Navigation size={16} className="text-white/70 shrink-0" />
+          </div>
+        </Link>
+      )}
 
       <div className="flex gap-3 mb-6">
         <Link to="/available-jobs" className="flex-1">
