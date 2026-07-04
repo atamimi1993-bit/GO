@@ -17,6 +17,7 @@ const MarketingPanel = lazy(() => import('@/components/admin/MarketingPanel'));
 const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'));
 const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
 const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApprovalPanel'));
+const InstantPayoutCard = lazy(() => import('@/components/admin/InstantPayoutCard'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 import { Button } from '@/components/ui/button';
@@ -226,6 +227,11 @@ export default function Admin() {
         {/* Driver expense receipts */}
         <Suspense fallback={<SectionSkeleton />}>
           <ExpenseReviewPanel />
+        </Suspense>
+
+        {/* Instant platform payout */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <InstantPayoutCard />
         </Suspense>
 
         {/* Bulk payout processing */}
