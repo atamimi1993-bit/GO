@@ -32,6 +32,7 @@ export default function DriverTrackingControls({ driverProfile }) {
   const [tracking, setTracking] = useState(false);
   const [lastPing, setLastPing] = useState(null);
   const intervalRef = useRef(null);
+  const notifiedOnTheWayRef = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -116,6 +117,14 @@ export default function DriverTrackingControls({ driverProfile }) {
         await base44.entities.MoveRequest.update(move.id, { status: 'in_progress' });
         setAcceptedMove(null);
         setActiveMove({ ...move, status: 'in_progress' });
+
+        // Send "on the way" notification to the customer (first time only)
+        if (!notifiedOnTheWayRef.current) {
+          notifiedOnTheWayRef.current = true;
+          base44.functions.invoke('notify-customer-on-the-way', { move_request_id: move.id })
+            .then(() => toast({ title: 'Customer notified', description: 'The customer knows you\u2019re on the way!' }))
+            .catch(() => {});
+        }
       } catch (err) {
         toast({ title: 'Could not start move', description: err.message, variant: 'destructive' });
         return;
