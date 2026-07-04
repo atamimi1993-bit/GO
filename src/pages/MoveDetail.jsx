@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import { useToast } from '@/components/ui/use-toast';
@@ -79,6 +79,7 @@ export default function MoveDetail() {
   const [paying, setPaying] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [invoiceSent, setInvoiceSent] = useState(false);
+  const [contract, setContract] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const { toast } = useToast();
 
@@ -125,14 +126,16 @@ export default function MoveDetail() {
   }, [toast]);
 
   const load = useCallback(async () => {
-    const [m, it, u] = await Promise.all([
+    const [m, it, u, contracts] = await Promise.all([
       base44.entities.MoveRequest.get(id),
       base44.entities.MoveItem.filter({ move_request_id: id }),
       base44.auth.me().catch(() => null),
+      base44.entities.Contract.filter({ move_request_id: id, contract_type: 'customer_service' }).catch(() => []),
     ]);
     setMove(m);
     setItems(it);
     setCurrentUser(u);
+    setContract(contracts?.[0] || null);
   }, [id]);
 
   useEffect(() => {
@@ -273,6 +276,30 @@ export default function MoveDetail() {
           <p className="text-xs text-muted-foreground text-center mt-2">
             Confirm that your items have been delivered. We'll email you a summary and final invoice.
           </p>
+        </div>
+      )}
+
+      {/* Signed contract */}
+      {contract && (
+        <div className="bg-card border rounded-2xl p-5 mt-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <FileText className="text-primary" size={18} />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-sm">Signed Service Agreement</h3>
+              <p className="text-xs text-muted-foreground">Contract on file</p>
+            </div>
+          </div>
+          <div className="bg-muted rounded-xl p-3 space-y-1 text-sm">
+            <div className="flex justify-between"><span className="text-muted-foreground">Signed by</span><span className="font-medium">{contract.signature_name}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Email</span><span className="font-medium">{contract.party_email}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Date</span><span className="font-medium">{format(parseISO(contract.signed_at), 'MMM d, yyyy')}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Version</span><span className="font-medium">{contract.terms_version}</span></div>
+          </div>
+          <div className="flex items-center gap-2 mt-3 text-xs text-primary">
+            <Shield size={14} /> Insurance coverage included for this move
+          </div>
         </div>
       )}
 

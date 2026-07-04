@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DriverTrackingControls from '@/components/go/DriverTrackingControls';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield } from 'lucide-react';
 
 export default function DriverHub() {
   const { scrollRef } = useOutletContext();
@@ -14,13 +14,21 @@ export default function DriverHub() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [contract, setContract] = useState(null);
 
   const load = useCallback(async () => {
     try {
       const u = await base44.auth.me();
       setUser(u);
       const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
-      if (profiles.length > 0) setProfile(profiles[0]);
+      if (profiles.length > 0) {
+        setProfile(profiles[0]);
+        const contracts = await base44.entities.Contract.filter({
+          driver_profile_id: profiles[0].id,
+          contract_type: 'driver_service',
+        }).catch(() => []);
+        setContract(contracts?.[0] || null);
+      }
     } catch {}
     setLoading(false);
   }, []);
@@ -133,6 +141,29 @@ export default function DriverHub() {
           </Button>
         </Link>
       </div>
+
+      {/* Signed contract */}
+      {contract && (
+        <div className="bg-card border rounded-2xl p-5 mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <FileText className="text-primary" size={18} />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-sm">Driver Service Agreement</h3>
+              <p className="text-xs text-muted-foreground">Signed contract on file</p>
+            </div>
+          </div>
+          <div className="bg-muted rounded-xl p-3 space-y-1 text-sm">
+            <div className="flex justify-between"><span className="text-muted-foreground">Signed by</span><span className="font-medium">{contract.signature_name}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Date</span><span className="font-medium">{new Date(contract.signed_at).toLocaleDateString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Version</span><span className="font-medium">{contract.terms_version}</span></div>
+          </div>
+          <div className="flex items-center gap-2 mt-3 text-xs text-primary">
+            <Shield size={14} /> Insurance coverage provided by GO for all your assigned moves
+          </div>
+        </div>
+      )}
 
       {profile.status === 'approved' && (
         <DriverTrackingControls driverProfile={profile} />

@@ -1,0 +1,57 @@
+{
+  "name": "Contract",
+  "type": "object",
+  "properties": {
+    "party_name": {
+      "type": "string"
+    },
+    "party_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "party_phone": {
+      "type": "string"
+    },
+    "contract_type": {
+      "type": "string",
+      "enum": [
+        "customer_service",
+        "driver_service"
+      ],
+      "default": "customer_service"
+    },
+    "move_request_id": {
+      "type": "string"
+    },
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "terms_version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "signature_name": {
+      "type": "string"
+    },
+    "signed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "voided"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "party_name",
+    "party_email",
+    "contract_type"
+  ]
+}

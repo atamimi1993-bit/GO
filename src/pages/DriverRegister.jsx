@@ -5,15 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Upload, Loader2 } from 'lucide-react';
+import { ArrowLeft, Upload, Loader2, FileText } from 'lucide-react';
 import MobileSelect from '@/components/go/MobileSelect';
 import { Switch } from '@/components/ui/switch';
+import ContractSign from '@/components/go/ContractSign';
 
 export default function DriverRegister() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState({});
+  const [step, setStep] = useState('form');
+  const [signedContract, setSignedContract] = useState(null);
   const [form, setForm] = useState({
     full_name: '', email: '', phone: '', license_number: '', license_expiry: '',
     service_area: '', company_name: '',
@@ -46,11 +49,19 @@ export default function DriverRegister() {
       toast({ title: 'Please fill in all required fields', variant: 'destructive' });
       return;
     }
+    setStep('contract');
+  };
+
+  const handleContractSigned = async (contractRecord) => {
+    setSignedContract(contractRecord);
     setSaving(true);
     navigate('/driver-hub', { state: { pendingApplication: true } });
     try {
-      await base44.entities.DriverProfile.create(form);
-      toast({ title: 'Application submitted!', description: 'Your profile is under review.' });
+      const driver = await base44.entities.DriverProfile.create(form);
+      if (contractRecord?.id) {
+        await base44.entities.Contract.update(contractRecord.id, { driver_profile_id: driver.id });
+      }
+      toast({ title: 'Application submitted!', description: 'Your profile and signed contract are under review.' });
     } catch {
       toast({ title: 'Submission failed', description: 'Please try again from Driver Hub.', variant: 'destructive' });
     }
@@ -77,9 +88,11 @@ export default function DriverRegister() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <button onClick={() => navigate(-1)} aria-label="Go back" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
+      <button onClick={() => step === 'contract' ? setStep('form') : navigate(-1)} aria-label="Go back" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
         <ArrowLeft size={16} /> Back
       </button>
+      {step === 'form' ? (
+        <>
       <h1 className="text-2xl font-display font-bold mb-1">Driver Registration</h1>
       <p className="text-muted-foreground text-sm mb-6">Fill in your details and upload required documents.</p>
 
@@ -127,9 +140,30 @@ export default function DriverRegister() {
         </div>
 
         <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600" disabled={saving}>
-          {saving ? <><Loader2 size={16} className="animate-spin mr-1" /> Submitting...</> : 'Submit Application'}
+          {saving ? <><Loader2 size={16} className="animate-spin mr-1" /> Submitting...</> : 'Continue to Contract'}
         </Button>
       </form>
+        </>
+      ) : (
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-2xl font-display font-bold mb-1">Driver Service Agreement</h1>
+            <p className="text-muted-foreground text-sm mb-6">Please review and sign the contract to complete your registration.</p>
+          </div>
+          <ContractSign
+            contractType="driver_service"
+            partyName={form.full_name}
+            partyEmail={form.email}
+            partyPhone={form.phone}
+            onSigned={handleContractSigned}
+          />
+          {saving && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 size={16} className="animate-spin" /> Submitting your application...
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

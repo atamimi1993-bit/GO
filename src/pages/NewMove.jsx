@@ -12,6 +12,7 @@ import ItemForm from '@/components/go/ItemForm';
 import QuickAddItems from '@/components/go/QuickAddItems';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import LiabilityAgreement from '@/components/go/LiabilityAgreement';
+import ContractSign from '@/components/go/ContractSign';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { calculateMovePrice, recommendTruckSize, formatCurrency, TRUCK_SIZE_LABELS, COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES } from '@/lib/pricing';
 
@@ -137,7 +138,7 @@ export default function NewMove() {
     setPricing(price);
   };
 
-  const handleSign = async () => {
+  const handleSign = async (contractRecord) => {
     setSaving(true);
     try {
       const moveData = {
@@ -178,6 +179,9 @@ export default function NewMove() {
         await base44.entities.MoveItem.bulkCreate(
           items.map(item => ({ ...item, move_request_id: move.id }))
         );
+      }
+      if (contractRecord?.id) {
+        await base44.entities.Contract.update(contractRecord.id, { move_request_id: move.id });
       }
       toast({ title: 'Move booked!', description: 'A driver will accept your job shortly.' });
       navigate('/my-moves');
@@ -471,7 +475,13 @@ export default function NewMove() {
             <h2 className="text-2xl font-display font-bold mb-1">Sign Agreement</h2>
             <p className="text-muted-foreground text-sm">Review and sign before we submit your move request.</p>
           </div>
-          <LiabilityAgreement onSign={handleSign} />
+          <ContractSign
+            contractType="customer_service"
+            partyName={form.customer_name}
+            partyEmail={form.customer_email}
+            partyPhone={form.customer_phone}
+            onSigned={() => handleSign()}
+          />
           {saving && (
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Loader2 size={16} className="animate-spin" /> Submitting your move...
