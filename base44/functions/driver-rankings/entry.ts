@@ -4,8 +4,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Public endpoint — no auth required. Only returns public-safe data
-    // (no earnings, no bank details, no contact info).
+    // Admin-only — prevents unauthorized users from triggering ranking computation
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') return Response.json({ error: 'Admin access required' }, { status: 403 });
 
     // Fetch all approved drivers
     const drivers = await base44.asServiceRole.entities.DriverProfile.filter(
