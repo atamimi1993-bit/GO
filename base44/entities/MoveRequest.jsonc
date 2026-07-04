@@ -404,6 +404,38 @@
     },
     "recurring_delivery_id": {
       "type": "string"
+    },
+    "customer_tier": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "premier"
+      ],
+      "default": "standard"
+    },
+    "premier_multiplier": {
+      "type": "number",
+      "default": 1
+    },
+    "arrival_window_minutes": {
+      "type": "number",
+      "default": 0
+    },
+    "arrival_window_deadline": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "arrival_verified_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "arrival_window_missed": {
+      "type": "boolean",
+      "default": false
+    },
+    "premier_fallback_used": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

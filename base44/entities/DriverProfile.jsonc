@@ -146,6 +146,14 @@
     },
     "background_check_report": {
       "type": "string"
+    },
+    "premier_eligible": {
+      "type": "boolean",
+      "default": false
+    },
+    "premier_eligible_updated_at": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [

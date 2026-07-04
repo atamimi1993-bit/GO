@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle2, XCircle, MapPin, Package, DollarSign, Clock, Truck, Zap, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, MapPin, Package, DollarSign, Clock, Truck, Zap, AlertCircle, Crown } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { formatCurrency } from '@/lib/pricing';
 
@@ -109,6 +109,11 @@ export default function DispatchJobOffer({ driverProfile, onResponded }) {
         <div className="bg-emerald-500 text-white px-4 py-2.5 flex items-center gap-2">
           <Zap size={18} className="shrink-0" />
           <span className="font-bold text-sm">New Job Dispatched!</span>
+          {pendingOffer.customer_tier === 'premier' && (
+            <span className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-300 text-amber-950">
+              <Crown size={10} strokeWidth={2.5} /> Premier
+            </span>
+          )}
           {!isExpired && (
             <div className="ml-auto flex items-center gap-1.5">
               <Clock size={14} className="shrink-0" />

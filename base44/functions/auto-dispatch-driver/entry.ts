@@ -104,6 +104,15 @@ Deno.serve(async (req) => {
   }
 });
 
+// Premier routing — for premier jobs, prefer premier-eligible drivers.
+// Falls back to standard drivers only if no premier driver is available (flagged).
+function pickPremierPreferred(rankedPool, isPremier) {
+  if (!isPremier) return { driver: rankedPool[0], fallback: false };
+  const premierPool = rankedPool.filter((d) => d.premier_eligible === true);
+  if (premierPool.length > 0) return { driver: premierPool[0], fallback: false };
+  return { driver: rankedPool[0], fallback: true };
+}
+
 async function selectAndAssignDriver(base44, move, candidates) {
   // Check CDL requirement
   const needsCDL = move.job_type === 'freight' ||
@@ -139,7 +148,8 @@ async function selectAndAssignDriver(base44, move, candidates) {
       return (b.total_jobs || 0) - (a.total_jobs || 0);
     });
 
-    return await assignDriver(base44, move, courierPool[0]);
+    const courierPick = pickPremierPreferred(courierPool, move.customer_tier === 'premier');
+    return await assignDriver(base44, move, courierPick.driver, courierPick.fallback);
   }
 
   // Non-courier: check truck size — query trucks for all candidate drivers
@@ -178,12 +188,22 @@ async function selectAndAssignDriver(base44, move, candidates) {
     return (b.total_jobs || 0) - (a.total_jobs || 0);
   });
 
-  const bestDriver = withTrucks[0];
+  const truckPick = pickPremierPreferred(withTrucks, move.customer_tier === 'premier');
 
-  return await assignDriver(base44, move, bestDriver);
+  return await assignDriver(base44, move, truckPick.driver, truckPick.fallback);
 }
 
-async function assignDriver(base44, move, bestDriver) {
+async function assignDriver(base44, move, bestDriver, premierFallback = false) {
+  // For premier jobs, lock in the arrival window deadline (move time + 15 min)
+  let arrivalWindowDeadline = null;
+  if (move.customer_tier === 'premier' && move.move_date) {
+    const timePart = move.move_time || '09:00';
+    const moveDateTime = new Date(move.move_date + 'T' + timePart + ':00');
+    if (!isNaN(moveDateTime.getTime())) {
+      arrivalWindowDeadline = new Date(moveDateTime.getTime() + 15 * 60 * 1000).toISOString();
+    }
+  }
+
   // Assign driver
   await base44.asServiceRole.entities.MoveRequest.update(move.id, {
     assigned_driver_id: bestDriver.id,
@@ -191,6 +211,8 @@ async function assignDriver(base44, move, bestDriver) {
     status: 'accepted',
     driver_rate_confirmed: false,
     dispatched_at: new Date().toISOString(),
+    premier_fallback_used: premierFallback,
+    ...(arrivalWindowDeadline ? { arrival_window_deadline: arrivalWindowDeadline } : {}),
   });
 
   // Notify driver by email

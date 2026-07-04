@@ -185,6 +185,14 @@ const CUSTOMER_DISCOUNT_RATE = 0.12;
 // Platform minimum — GO always earns at least this per job, even after discounts
 const PLATFORM_MINIMUM_FEE = 20;
 
+// ─── GO Premier Tier ──────────────────────────────────────────────────────────
+// Premium jobs carry higher service value (better crew, tighter SLAs, full coverage).
+// Split structure stays identical — premier multiplier applies to service value BEFORE
+// the 65/35 split, so premier drivers earn more real dollars per job.
+const PREMIER_MULTIPLIER = 1.30;
+const PREMIER_ARRIVAL_WINDOW_MINUTES = 15;  // vs 30-45 for standard
+const PREMIER_PRIORITY_BOOKING_HOURS = 48;  // premier customers book 48h early
+
 const MI_TO_KM = 1.60934;
 
 // Bulky item surcharge — flat fee per item flagged as bulky (special handling or 75+ lbs)
@@ -376,7 +384,7 @@ export function calculateCourierPrice({ distanceMiles, deliveryCategory = 'other
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
-export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0, extraHelper = false, elevatorService = false, pendingMovesCount = 0, moveDate, isReturningCustomer = false, laborHours }) {
+export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0,   extraHelper = false, elevatorService = false, pendingMovesCount = 0, moveDate, isReturningCustomer = false, laborHours, customerTier = 'standard' }) {
   const truck = TRUCK_CONFIG[truckSize] || TRUCK_CONFIG.medium;
 
   // Convert metric inputs to imperial for internal calculation
@@ -432,9 +440,14 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Extra service add-ons — customer-selected optional services
   const extraServiceFee = (extraHelper ? EXTRA_HELPER_FEE : 0) + (elevatorService ? ELEVATOR_SERVICE_FEE : 0);
 
-  // ─── SERVICE VALUE (what the moving service is worth — the basis for the 75/25 split) ───
+  // ─── SERVICE VALUE (what the moving service is worth — the basis for the 65/35 split) ───
   // Excludes hard costs (fuel, tolls — passthrough) and upsells (materials — 100% platform)
-  const serviceValue = baseCost + bulkyItemFee + carryingFee + extraServiceFee;
+  const rawServiceValue = baseCost + bulkyItemFee + carryingFee + extraServiceFee;
+
+  // Premier tier multiplier — premium jobs carry higher service value (better crew, tighter SLAs).
+  // Applied BEFORE surge and BEFORE the split — premier drivers earn 65% of a bigger number.
+  const premierMultiplier = customerTier === 'premier' ? PREMIER_MULTIPLIER : 1;
+  const serviceValue = rawServiceValue * premierMultiplier;
 
   // Apply surge / dynamic pricing — multiplies service value during peak demand
   const surge = calculateSurgeMultiplier(new Date(), pendingMovesCount);
@@ -553,6 +566,9 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
     loyaltyDiscount: convert(loyaltyDiscount),
     minimumJobFee: minimumJobApplied ? MINIMUM_JOB_FEE : 0,
     // Three-way split fields
+    customerTier: customerTier || 'standard',
+    isPremier: customerTier === 'premier',
+    premierMultiplier: customerTier === 'premier' ? PREMIER_MULTIPLIER : 1,
     serviceValue: convert(finalServiceValue),
     operationalSubtotal: convert(serviceValue + hardCosts),
     surgeAdjustedSubtotal: convert(surgeAdjustedServiceValue + hardCosts),
@@ -850,6 +866,9 @@ export const PRICING_CONFIG = {
   BOOKING_FEE,
   PLATFORM_MINIMUM_FEE,
   MARKET_RATE_MULTIPLIER,
+  PREMIER_MULTIPLIER,
+  PREMIER_ARRIVAL_WINDOW_MINUTES,
+  PREMIER_PRIORITY_BOOKING_HOURS,
 };
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS, LABOR_RATES, MINIMUM_JOB_FEE, APP_FEE_RATE, DRIVER_SHARE, PLATFORM_SHARE, MARKET_RATE_MULTIPLIER, CUSTOMER_DISCOUNT_RATE, PLATFORM_MINIMUM_FEE, RESERVE_POOL_PCT, CARD_PROCESSING_PCT, CARD_PROCESSING_FLAT, BOOKING_FEE };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS, LABOR_RATES, MINIMUM_JOB_FEE, APP_FEE_RATE, DRIVER_SHARE, PLATFORM_SHARE, MARKET_RATE_MULTIPLIER, CUSTOMER_DISCOUNT_RATE, PLATFORM_MINIMUM_FEE, RESERVE_POOL_PCT, CARD_PROCESSING_PCT, CARD_PROCESSING_FLAT, BOOKING_FEE, PREMIER_MULTIPLIER, PREMIER_ARRIVAL_WINDOW_MINUTES, PREMIER_PRIORITY_BOOKING_HOURS };
