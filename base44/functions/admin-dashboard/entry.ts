@@ -190,6 +190,7 @@ Deno.serve(async (req) => {
       ]);
 
       const completedMoves = allMoves.filter((m) => m.status === 'completed' && (m.total_price || 0) > 0);
+      const cancelledMoves = allMoves.filter((m) => m.status === 'cancelled' && (m.cancellation_fee || 0) > 0 && m.cancellation_fee_paid);
       const validPayouts = allPayouts.filter((p) => (p.amount || 0) > 0);
 
       const monthKey = (iso) => {
@@ -204,7 +205,7 @@ Deno.serve(async (req) => {
       const ensureMonth = (key) => {
         if (!key) return;
         if (!months[key]) {
-          months[key] = { month: key, platform_earnings: 0, app_fee_income: 0, driver_payouts: 0 };
+          months[key] = { month: key, platform_earnings: 0, app_fee_income: 0, driver_payouts: 0, cancellation_revenue: 0 };
         }
       };
 
@@ -214,6 +215,13 @@ Deno.serve(async (req) => {
         ensureMonth(key);
         months[key].platform_earnings += m.total_price || 0;
         months[key].app_fee_income += m.app_fee || (m.total_price || 0) * 0.25;
+      }
+
+      for (const c of cancelledMoves) {
+        const key = monthKey(c.move_date || c.created_date);
+        if (!key) continue;
+        ensureMonth(key);
+        months[key].cancellation_revenue += c.cancellation_fee || 0;
       }
 
       for (const p of validPayouts) {
@@ -228,6 +236,7 @@ Deno.serve(async (req) => {
         platformEarnings: series.reduce((s, r) => s + r.platform_earnings, 0),
         appFeeIncome: series.reduce((s, r) => s + r.app_fee_income, 0),
         driverPayouts: series.reduce((s, r) => s + r.driver_payouts, 0),
+        cancellationRevenue: series.reduce((s, r) => s + r.cancellation_revenue, 0),
       };
       return Response.json({ series, totals });
     }

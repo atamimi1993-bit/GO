@@ -56,6 +56,11 @@ Deno.serve(async (req) => {
             cancellation_fee_paid: true,
           });
           console.log('Marked move ' + moveRequestId + ' as cancelled with fee paid');
+          try {
+            await base44.asServiceRole.functions.invoke('notify-driver-cancellation', { move_request_id: moveRequestId });
+          } catch (e) {
+            console.error('Driver cancellation notification failed:', e.message);
+          }
         } else if (paymentType === 'tip') {
           const tipAmount = session.amount_total ? session.amount_total / 100 : 0;
           await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {

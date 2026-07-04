@@ -23,6 +23,11 @@ export default function CancelMoveButton({ move, onCancelled }) {
       try {
         setLoading(true);
         await base44.entities.MoveRequest.update(move.id, { status: 'cancelled' });
+        if (move.assigned_driver_id) {
+          try {
+            await base44.functions.invoke('notify-driver-cancellation', { move_request_id: move.id });
+          } catch {}
+        }
         toast({ title: 'Move cancelled', description: 'Your move has been cancelled.' });
         onCancelled?.();
         setOpen(false);

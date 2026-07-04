@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { formatCurrency } from '@/lib/pricing';
-import { DollarSign, Percent, Wallet, Loader2, Lock, TrendingUp } from 'lucide-react';
+import { DollarSign, Percent, Wallet, Loader2, Lock, TrendingUp, Ban } from 'lucide-react';
 
 const FinancialAreaChart = lazy(() => import('@/components/admin/FinancialAreaChart'));
 
@@ -62,6 +62,7 @@ export default function FinancialDashboard() {
     'Platform Earnings': Math.round(row.platform_earnings || 0),
     'App Fee (25%)': Math.round(row.app_fee_income || 0),
     'Driver Payouts': Math.round(row.driver_payouts || 0),
+    'Cancellation Fees': Math.round(row.cancellation_revenue || 0),
   }));
 
   const stats = [
@@ -86,6 +87,13 @@ export default function FinancialDashboard() {
       accent: 'text-purple-600',
       bg: 'bg-purple-500/5 border-purple-500/20',
     },
+    {
+      label: 'Cancellation Fee Revenue',
+      value: fmt(totals.cancellationRevenue),
+      icon: Ban,
+      accent: 'text-red-600',
+      bg: 'bg-red-500/5 border-red-500/20',
+    },
   ];
 
   return (
@@ -97,7 +105,7 @@ export default function FinancialDashboard() {
         </p>
 
         {/* Stat tiles */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           {stats.map((s, i) => (
             <div key={i} className={`border rounded-2xl p-4 flex items-center gap-3 ${s.bg}`}>
               <div className="w-10 h-10 rounded-xl bg-background/60 flex items-center justify-center shrink-0">
