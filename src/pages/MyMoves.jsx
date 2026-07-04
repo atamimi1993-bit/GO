@@ -3,12 +3,10 @@ import { Link, useLocation, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Package, MapPin, Calendar, Loader2, Navigation } from 'lucide-react';
+import { Plus, Package, MapPin, Calendar, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
-import TrackingCard from '@/components/go/TrackingCard';
-import LiveTrackingMap from '@/components/go/LiveTrackingMap';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
@@ -69,35 +67,6 @@ export default function MyMoves() {
         </Link>
       </div>
 
-      {/* In Transit — live tracking for active moves */}
-      {(() => {
-        const activeMoves = moves.filter(m => ['accepted', 'in_progress'].includes(m.status));
-        return (
-          <div className="mb-6">
-            <h2 className="font-display font-bold text-sm uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
-              <Navigation size={14} className="text-emerald-500" /> In Transit ({activeMoves.length})
-            </h2>
-            {activeMoves.length === 0 ? (
-              <div className="text-center py-8 bg-card border rounded-2xl">
-                <Navigation className="mx-auto text-muted-foreground mb-2" size={28} />
-                <p className="text-sm text-muted-foreground">No active shipments to track right now.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {activeMoves.map(move => (
-                  <div key={move.id} className="space-y-3">
-                    <LiveTrackingMap move={move} />
-                    <TrackingCard move={move} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })()}
-
-      {/* All moves */}
-      <h2 className="font-display font-bold text-sm uppercase tracking-wide text-muted-foreground mb-3">All Moves ({moves.length})</h2>
       {moves.length === 0 ? (
         <div className="text-center py-20 bg-card border rounded-2xl">
           <Package className="mx-auto text-muted-foreground mb-3" size={48} />
