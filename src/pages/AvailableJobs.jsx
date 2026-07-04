@@ -4,11 +4,12 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck, ShieldCheck, AlertCircle, Clock, Weight } from 'lucide-react';
+import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck, ShieldCheck, AlertCircle, Clock, Weight, CheckCircle2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency, calculateMovePrice } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
+import DriverNavigationCard from '@/components/go/DriverNavigationCard';
 
 export default function AvailableJobs() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function AvailableJobs() {
   const [accepting, setAccepting] = useState(null);
   const [declining, setDeclining] = useState(null);
   const [driverProfile, setDriverProfile] = useState(null);
+  const [acceptedJob, setAcceptedJob] = useState(null);
   const { toast } = useToast();
 
   const load = async () => {
@@ -85,6 +87,7 @@ export default function AvailableJobs() {
         status: 'pending',
       });
       toast({ title: 'Job accepted!', description: "You've been assigned to this move." });
+      setAcceptedJob({ ...job, status: 'accepted', assigned_driver_id: driverProfile.id, assigned_driver_name: driverProfile.full_name, ...updatedPricing });
     } catch {
       // Restore job on failure
       setJobs(prev => [job, ...prev]);
@@ -145,6 +148,19 @@ export default function AvailableJobs() {
     <div>
       <PageHeader title="Available Jobs" isRoot={false} />
       <p className="text-muted-foreground text-sm mb-6">Accept a move to get started.</p>
+
+      {acceptedJob && (
+        <div className="mb-6">
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-4 flex items-center gap-3">
+            <CheckCircle2 className="text-emerald-600 dark:text-emerald-400" size={20} />
+            <div>
+              <p className="font-medium text-sm text-emerald-700 dark:text-emerald-300">Job Accepted!</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-300">Follow the route below to get started.</p>
+            </div>
+          </div>
+          <DriverNavigationCard job={acceptedJob} />
+        </div>
+      )}
 
       {jobs.length === 0 ? (
         <div className="text-center py-20 bg-card border rounded-2xl">

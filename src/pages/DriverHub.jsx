@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import DriverTrackingControls from '@/components/go/DriverTrackingControls';
 import DriverLeaderboardCard from '@/components/go/DriverLeaderboardCard';
 import ExpenseSubmission from '@/components/go/ExpenseSubmission';
+import DriverNavigationCard from '@/components/go/DriverNavigationCard';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
-import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield } from 'lucide-react';
+import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
 
 export default function DriverHub() {
   const { scrollRef } = useOutletContext();
@@ -18,6 +19,7 @@ export default function DriverHub() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [contract, setContract] = useState(null);
+  const [activeJobs, setActiveJobs] = useState([]);
 
   const load = useCallback(async () => {
     try {
@@ -31,6 +33,11 @@ export default function DriverHub() {
           contract_type: 'driver_service',
         }).catch(() => []);
         setContract(contracts?.[0] || null);
+        const jobs = await base44.entities.MoveRequest.filter({
+          assigned_driver_id: profiles[0].id,
+          status: { $in: ['accepted', 'in_progress'] },
+        }, '-created_date', 10).catch(() => []);
+        setActiveJobs(jobs);
       }
     } catch {}
     setLoading(false);
@@ -164,6 +171,21 @@ export default function DriverHub() {
           </div>
           <div className="flex items-center gap-2 mt-3 text-xs text-primary">
             <Shield size={14} /> Insurance coverage provided by GO for all your assigned moves
+          </div>
+        </div>
+      )}
+
+      {/* Active jobs with navigation */}
+      {activeJobs.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Navigation size={18} className="text-emerald-600" />
+            <h2 className="font-display font-bold text-lg">Active Jobs</h2>
+          </div>
+          <div className="space-y-4">
+            {activeJobs.map(job => (
+              <DriverNavigationCard key={job.id} job={job} />
+            ))}
           </div>
         </div>
       )}
