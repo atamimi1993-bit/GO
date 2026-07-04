@@ -11,6 +11,13 @@ const ZERO_DECIMAL_CURRENCIES = [
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+
+    // Reject unauthenticated callers — checkout endpoints must still require a session
+    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
+    if (!isAuth) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const { move_request_id, promo_code, validate_only, payment_plan, pay_balance } = body;
 

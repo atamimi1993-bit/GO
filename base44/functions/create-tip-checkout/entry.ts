@@ -6,6 +6,12 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
+    // Reject unauthenticated callers — checkout endpoints must still require a session
+    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
+    if (!isAuth) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const moveRequestId = body.move_request_id;
     const tipAmount = parseFloat(body.tip_amount);
