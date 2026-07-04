@@ -1,0 +1,17 @@
+{
+  "name": "GO — Move Anything, Anywhere",
+  "short_name": "GO",
+  "description": "Book verified drivers with trucks of all sizes. Get instant pricing, real-time GPS tracking, and secure payments for residential moves, freight, and corporate logistics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/6a4845f345408deb1d8dbea8/15bbbb036_generated_image.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
