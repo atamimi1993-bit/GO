@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import { useToast } from '@/components/ui/use-toast';
@@ -77,8 +77,28 @@ export default function MoveDetail() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [invoiceSent, setInvoiceSent] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { toast } = useToast();
+
+  const handleConfirmDelivery = async () => {
+    try {
+      setConfirming(true);
+      await base44.entities.MoveRequest.update(move.id, { status: 'completed' });
+      try {
+        await base44.functions.invoke('send-move-invoice', { move_request_id: move.id });
+        setInvoiceSent(true);
+      } catch (err) {
+        console.error('Invoice email failed:', err);
+      }
+      toast({ title: 'Delivery confirmed!', description: 'Your move summary and invoice have been emailed to you.' });
+      await load();
+    } catch (err) {
+      toast({ title: 'Could not confirm delivery', description: err.message || 'Please try again.', variant: 'destructive' });
+    }
+    setConfirming(false);
+  };
 
   const handlePay = async () => {
     if (window.self !== window.top) {
@@ -230,6 +250,36 @@ export default function MoveDetail() {
         <div className="bg-card border rounded-2xl p-5 mt-4">
           <h3 className="font-display font-bold text-sm mb-1">Notes</h3>
           <p className="text-sm text-muted-foreground select-text">{move.notes}</p>
+        </div>
+      )}
+
+      {/* Customer confirms delivery — transitions in_progress to completed */}
+      {move.status === 'in_progress' && (
+        <div className="mt-4">
+          {invoiceSent && (
+            <div className="flex items-center gap-2 mb-2 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
+              <MailCheck size={16} /> Invoice emailed to {move.customer_email || 'your email'}
+            </div>
+          )}
+          <Button
+            onClick={handleConfirmDelivery}
+            disabled={confirming}
+            className="w-full bg-emerald-500 hover:bg-emerald-600"
+          >
+            {confirming
+              ? <><Loader2 size={16} className="animate-spin mr-1" /> Confirming...</>
+              : <><ClipboardCheck size={16} className="mr-1" /> Confirm Delivery Complete</>}
+          </Button>
+          <p className="text-xs text-muted-foreground text-center mt-2">
+            Confirm that your items have been delivered. We'll email you a summary and final invoice.
+          </p>
+        </div>
+      )}
+
+      {/* Invoice sent confirmation on completed moves */}
+      {move.status === 'completed' && invoiceSent && (
+        <div className="flex items-center gap-2 mt-4 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
+          <MailCheck size={16} /> Move summary and invoice emailed to {move.customer_email || 'your email'}
         </div>
       )}
 
