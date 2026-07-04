@@ -38,56 +38,58 @@ export default function AppLayout() {
     return true;
   });
 
+  const roleLabel = (() => {
+    if (!user) return '';
+    if (user.role === 'admin') return 'Admin';
+    if (driverProfile) {
+      return driverProfile.cdl_certified ? 'Freight Driver' : 'Driver';
+    }
+    const fullName = user.full_name || '';
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+    }
+    return parts[0] || 'Customer';
+  })();
+
   return (
     <div className="h-dvh flex flex-col bg-background">
       {/* Top nav */}
       <header className="shrink-0 bg-card border-b border-border sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <Logo size="sm" />
-          </Link>
-
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {visibleNavItems.map(item => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`select-none px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location.pathname === item.path
-                    ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <item.icon size={16} />
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex md:hidden items-center gap-2">
-            <Link to="/profile">
-              <Button variant="ghost" size="icon" aria-label="My Account" className="min-h-[44px] min-w-[44px]">
-                <User size={20} />
-              </Button>
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
+          {/* Left: Logo + nav tabs */}
+          <div className="flex items-center gap-1 min-w-0">
+            <Link to="/" className="flex items-center shrink-0">
+              <Logo size="sm" />
             </Link>
-            <Button
-              variant="ghost"
-              onClick={() => base44.auth.logout('/')}
-              className="min-h-[44px] px-3 text-muted-foreground"
-              aria-label="Sign out"
-            >
-              <LogOut size={18} />
-              <span className="text-xs">Sign out</span>
-            </Button>
+            <nav className="hidden md:flex items-center gap-1 ml-2 overflow-x-auto">
+              {visibleNavItems.map(item => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`select-none px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                    location.pathname === item.path
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <item.icon size={16} />
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+            </nav>
           </div>
 
-          <div className="hidden md:flex items-center gap-2">
+          {/* Right: Role label + profile + logout */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-[160px]">
+              {roleLabel}
+            </span>
             <Link to="/profile">
-              <Button variant="ghost" size="sm">
-                <User size={16} className="mr-1" /> Account
+              <Button variant="ghost" size="icon" aria-label="My Profile" className="min-h-[44px] min-w-[44px]">
+                <User size={20} />
               </Button>
             </Link>
             <TooltipProvider>
@@ -95,13 +97,12 @@ export default function AppLayout() {
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="sm"
                     onClick={() => base44.auth.logout('/')}
-                    className="text-muted-foreground"
+                    className="min-h-[44px] px-3 text-muted-foreground"
                     aria-label="Sign out"
                   >
-                    <LogOut size={16} />
-                    <span className="sr-only">Sign out</span>
+                    <LogOut size={18} />
+                    <span className="hidden sm:inline text-xs">Sign out</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Sign out</TooltipContent>
