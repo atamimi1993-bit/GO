@@ -12,6 +12,7 @@ const DriverRecruiter = lazy(() => import('@/components/admin/DriverRecruiter'))
 const DriverCoach = lazy(() => import('@/components/admin/DriverCoach'));
 const BackgroundCheckPanel = lazy(() => import('@/components/admin/BackgroundCheckPanel'));
 const LeadContactAssistant = lazy(() => import('@/components/admin/LeadContactAssistant'));
+const LeadFinderAgent = lazy(() => import('@/components/admin/LeadFinderAgent'));
 const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApprovalPanel'));
 const DamageClaimsPanel = lazy(() => import('@/components/admin/DamageClaimsPanel'));
 
@@ -54,6 +55,11 @@ export default function DriversLeadsTab({ data, processingId, onDriverAction, on
       {/* Damage claims */}
       <Suspense fallback={<SectionSkeleton />}>
         <DamageClaimsPanel />
+      </Suspense>
+
+      {/* AI Lead Finder — finds new leads via web search */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <LeadFinderAgent />
       </Suspense>
 
       {/* AI Lead Contact Assistant */}
