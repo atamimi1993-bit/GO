@@ -82,6 +82,9 @@ export default function MoveTracker({ moveId }) {
             </CircleMarker>
           </MapContainer>
         </div>
+        <div aria-live="polite" className="sr-only">
+          {latestPing ? `Driver is at coordinates ${latestPing.lat.toFixed(4)}, ${latestPing.lng.toFixed(4)}. Last updated ${format(new Date(latestPing.created_date), 'MMM d, h:mm a')}.` : 'No driver location available yet.'}
+        </div>
         <div className="px-5 pt-3">
           <a
             href={"https://www.google.com/maps?q=" + latestPing.lat + "," + latestPing.lng}

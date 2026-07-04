@@ -172,7 +172,9 @@ export default function Support() {
                 )}
               </div>
               <div className="border-t border-border p-3 flex items-center gap-2">
+                <label htmlFor="chat-input" className="sr-only">Type your message</label>
                 <Input
+                  id="chat-input"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKey}
@@ -181,8 +183,9 @@ export default function Support() {
                   className="flex-1"
                   aria-label="Type your message"
                 />
+                <span aria-live="polite" className="sr-only">{sending ? 'Sending message...' : ''}</span>
                 <Button onClick={handleSend} disabled={sending || creating || !input.trim()} className="bg-emerald-500 hover:bg-emerald-600" size="icon" aria-label="Send message">
-                  {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {sending ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}
                 </Button>
               </div>
             </>

@@ -38,6 +38,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
     if (disabledRef.current || !pullingRef.current || refreshingRef.current) return;
     const diff = e.touches[0].clientY - startY.current;
     if (diff > 5) {
+      e.preventDefault(); // Prevent native bounce during custom pull
       const newPull = Math.min(diff * 0.5, MAX_PULL);
       pullDistanceRef.current = newPull;
       setPullDistance(newPull);
@@ -71,7 +72,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
     const node = (scrollRef && scrollRef.current) ? scrollRef.current : wrapperRef.current;
     if (!node) return;
     node.addEventListener('touchstart', handleTouchStart, { passive: true });
-    node.addEventListener('touchmove', handleTouchMove, { passive: true });
+    node.addEventListener('touchmove', handleTouchMove, { passive: false });
     node.addEventListener('touchend', handleTouchEnd, { passive: true });
     return () => {
       node.removeEventListener('touchstart', handleTouchStart);
