@@ -35,8 +35,16 @@ export default function FinancialAreaChart({ chartData }) {
     );
   }
 
+  const summary = chartData.map((d) => {
+    const label = MONTH_LABEL(d.month);
+    const earnings = fmt(d['Platform Earnings']);
+    const fee = fmt(d['App Fee (25%)']);
+    const payouts = fmt(d['Driver Payouts']);
+    return label + ' — Platform Earnings ' + earnings + ', App Fee ' + fee + ', Driver Payouts ' + payouts;
+  }).join('; ');
+
   return (
-    <div className="w-full h-72">
+    <div className="w-full h-72" role="img" aria-label="Area chart showing monthly platform earnings, app fees, and driver payouts">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
           <defs>
@@ -91,6 +99,7 @@ export default function FinancialAreaChart({ chartData }) {
           />
         </AreaChart>
       </ResponsiveContainer>
+      <p className="sr-only">Monthly financial breakdown: {summary}.</p>
     </div>
   );
 }

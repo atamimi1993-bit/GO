@@ -110,6 +110,11 @@ export default function EarningsCharts() {
     );
   };
 
+  const earningsSummary = chartData.map((d) => d.fullName + ' ' + fmt(d.earnings)).join(', ');
+  const jobVolumeSummary = chartData.map((d) => d.fullName + ' has ' + d.active + ' active and ' + d.completed + ' completed jobs').join(', ');
+  const jobStatusSummary = jobStatusData.map((d) => d.name + ' ' + d.value).join(', ');
+  const payoutSummary = earningsBreakdown.map((d) => d.name + ' ' + fmt(d.value)).join(', ');
+
   return (
     <div className="bg-card border rounded-2xl p-5 mb-6">
       <div className="flex items-center gap-2 mb-5">
@@ -157,7 +162,7 @@ export default function EarningsCharts() {
         {chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">No earnings data yet.</p>
         ) : (
-          <div className="w-full h-64 min-w-[300px] overflow-x-auto">
+          <div className="w-full h-64 min-w-[300px] overflow-x-auto" role="img" aria-label="Bar chart showing earnings by driver">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -167,6 +172,7 @@ export default function EarningsCharts() {
                 <Bar dataKey="earnings" name="Earnings" fill={CHART_COLORS.earnings} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            <p className="sr-only">Earnings by driver: {earningsSummary}.</p>
           </div>
         )}
       </div>
@@ -179,7 +185,7 @@ export default function EarningsCharts() {
         {chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">No job data yet.</p>
         ) : (
-          <div className="w-full h-64 min-w-[300px] overflow-x-auto">
+          <div className="w-full h-64 min-w-[300px] overflow-x-auto" role="img" aria-label="Stacked bar chart showing active and completed jobs by driver">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -191,6 +197,7 @@ export default function EarningsCharts() {
                 <Bar dataKey="completed" name="Completed" stackId="jobs" fill={CHART_COLORS.completed} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            <p className="sr-only">Job volumes by driver: {jobVolumeSummary}.</p>
           </div>
         )}
       </div>
@@ -203,7 +210,7 @@ export default function EarningsCharts() {
           {jobStatusData.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">No jobs yet.</p>
           ) : (
-            <div className="w-full h-48">
+            <div className="w-full h-48" role="img" aria-label="Pie chart showing job status distribution">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={jobStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label={({ name, value }) => `${name}: ${value}`}>
@@ -214,6 +221,7 @@ export default function EarningsCharts() {
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
+              <p className="sr-only">Job status distribution: {jobStatusSummary}.</p>
             </div>
           )}
         </div>
@@ -224,7 +232,7 @@ export default function EarningsCharts() {
           {earningsBreakdown.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">No payout data yet.</p>
           ) : (
-            <div className="w-full h-48">
+            <div className="w-full h-48" role="img" aria-label="Pie chart showing payout breakdown between paid out and pending">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={earningsBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label={({ name, value }) => `${name}: ${fmt(value)}`}>
@@ -235,6 +243,7 @@ export default function EarningsCharts() {
                   <Tooltip formatter={(v) => fmt(v)} />
                 </PieChart>
               </ResponsiveContainer>
+              <p className="sr-only">Payout breakdown: {payoutSummary}.</p>
             </div>
           )}
         </div>

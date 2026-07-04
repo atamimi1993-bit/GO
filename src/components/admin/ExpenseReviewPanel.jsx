@@ -170,15 +170,15 @@ export default function ExpenseReviewPanel() {
                       </div>
                       <div className="flex gap-2">
                         {!r.use_estimate && r.status !== 'estimated' && (
-                          <Button size="sm" variant="outline" onClick={() => handleEstimate(r)} disabled={processingId === r.id}>
+                          <Button size="sm" className="min-h-[44px]" variant="outline" onClick={() => handleEstimate(r)} disabled={processingId === r.id}>
                             <Calculator size={12} className="mr-1" /> Estimate
                           </Button>
                         )}
-                        <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600" onClick={() => handleApprove(r)} disabled={processingId === r.id}>
+                        <Button size="sm" className="min-h-[44px] bg-emerald-500 hover:bg-emerald-600" onClick={() => handleApprove(r)} disabled={processingId === r.id}>
                           {processingId === r.id ? <Loader2 size={12} className="animate-spin mr-1" /> : <CheckCircle2 size={12} className="mr-1" />}
                           Approve
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => handleDeny(r)} disabled={processingId === r.id}>
+                        <Button size="sm" className="min-h-[44px]" variant="outline" onClick={() => handleDeny(r)} disabled={processingId === r.id}>
                           <XCircle size={12} className="mr-1" /> Deny
                         </Button>
                       </div>

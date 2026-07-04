@@ -124,6 +124,7 @@ export default function PayoutExportButton() {
     <Button
       size="sm"
       variant="outline"
+      className="min-h-[44px]"
       onClick={handleExport}
       disabled={exporting}
       aria-label="Export monthly payout summary as CSV"

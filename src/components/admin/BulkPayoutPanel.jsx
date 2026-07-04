@@ -157,12 +157,12 @@ export default function BulkPayoutPanel({ scrollRef }) {
           </div>
           <div className="flex gap-2 flex-wrap">
             <PayoutExportButton />
-            <Button size="sm" variant="outline" onClick={selected.size === data.payouts.length ? clearAll : selectAll}>
+            <Button size="sm" className="min-h-[44px]" variant="outline" onClick={selected.size === data.payouts.length ? clearAll : selectAll}>
               {selected.size === data.payouts.length ? 'Clear All' : 'Select All'}
             </Button>
             <Button
               size="sm"
-              className="bg-amber-500 hover:bg-amber-600"
+              className="min-h-[44px] bg-amber-500 hover:bg-amber-600"
               disabled={selected.size === 0 || processing}
               onClick={handleBulkPayout}
             >
@@ -246,7 +246,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
           })}
         </div>
         {driverGroups.length > MAX_GROUPS && !showAll && (
-          <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => setShowAll(true)}>
+          <Button variant="outline" size="sm" className="w-full mt-2 min-h-[44px]" onClick={() => setShowAll(true)}>
             Show all {driverGroups.length} drivers
           </Button>
         )}

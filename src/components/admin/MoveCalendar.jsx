@@ -120,14 +120,14 @@ export default function MoveCalendar({ scrollRef }) {
           <h2 className="font-display font-bold text-lg">Move Calendar</h2>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={handleToday}>Today</Button>
-          <Button size="icon" variant="outline" className="h-8 w-8" onClick={handlePrev}>
+          <Button size="sm" variant="outline" className="min-h-[44px]" onClick={handleToday}>Today</Button>
+          <Button size="icon" variant="outline" className="min-h-[44px] min-w-[44px]" onClick={handlePrev}>
             <ChevronLeft size={16} />
           </Button>
           <span className="text-sm font-medium min-w-[120px] text-center">
             {format(currentMonth, 'MMMM yyyy')}
           </span>
-          <Button size="icon" variant="outline" className="h-8 w-8" onClick={handleNext}>
+          <Button size="icon" variant="outline" className="min-h-[44px] min-w-[44px]" onClick={handleNext}>
             <ChevronRight size={16} />
           </Button>
         </div>

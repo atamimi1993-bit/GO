@@ -118,7 +118,7 @@ export default function MarketingPanel() {
 
         {/* Send action */}
         <div className="mt-auto">
-          <Button size="sm" className="w-full bg-purple-500 hover:bg-purple-600" aria-label={`Send ${ad.headline} campaign`} onClick={() => sendPromoEmail(ad)} disabled={sending === ad.id}>
+          <Button size="sm" className="w-full min-h-[44px] bg-purple-500 hover:bg-purple-600" aria-label={`Send ${ad.headline} campaign`} onClick={() => sendPromoEmail(ad)} disabled={sending === ad.id}>
             {sending === ad.id ? <Loader2 size={14} className="animate-spin mr-1" /> : <Mail size={14} className="mr-1" />}
             Broadcast
           </Button>
@@ -139,7 +139,7 @@ export default function MarketingPanel() {
             <p className="text-xs text-muted-foreground">Auto-generated ad campaigns. Customer ads refresh every 2 weeks, driver ads every month.</p>
           </div>
         </div>
-        <Button size="sm" variant="outline" onClick={load} aria-label="Refresh campaigns">
+        <Button size="sm" className="min-h-[44px]" variant="outline" onClick={load} aria-label="Refresh campaigns">
           <RefreshCw size={14} className="mr-1" /> Refresh
         </Button>
       </div>

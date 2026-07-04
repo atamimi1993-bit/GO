@@ -79,6 +79,7 @@ export default function LeadList({ leads, onUpdateStatus }) {
               {NEXT_STATUS[lead.status] && (
                 <Button
                   size="sm"
+                  className="min-h-[44px]"
                   variant="outline"
                   onClick={() => onUpdateStatus(lead.id, NEXT_STATUS[lead.status])}
                 >
@@ -88,6 +89,7 @@ export default function LeadList({ leads, onUpdateStatus }) {
               {lead.status !== 'dismissed' && lead.status !== 'converted' && (
                 <Button
                   size="sm"
+                  className="min-h-[44px]"
                   variant="ghost"
                   onClick={() => onUpdateStatus(lead.id, 'dismissed')}
                 >

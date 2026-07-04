@@ -146,7 +146,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
               {progress.totalFound} leads found · {progress.totalCreated} saved so far
             </p>
             {searching && (
-              <Button size="sm" variant="outline" onClick={stopWorldwide}>
+              <Button size="sm" className="min-h-[44px]" variant="outline" onClick={stopWorldwide}>
                 Stop
               </Button>
             )}
@@ -154,7 +154,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
         </div>
       ) : (
         <button
-          className="mt-3 text-xs text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
+          className="mt-3 text-xs text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1 min-h-[44px]"
           onClick={handleWorldwide}
           disabled={searching}
           aria-label="Search leads worldwide across all countries"
