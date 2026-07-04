@@ -30,6 +30,10 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
 
   const handleTouchStart = (e) => {
     if (disabledRef.current || refreshingRef.current || !isAtTop()) return;
+    // Don't start pull tracking when the touch began on an interactive element
+    // (button, link, input, etc.) — prevents preventDefault on touchmove from
+    // blocking the synthetic click event that fires after touchend.
+    if (e.target.closest('button, a, input, select, textarea, [role="button"], label')) return;
     startY.current = e.touches[0].clientY;
     pullingRef.current = true;
     setPulling(true);
