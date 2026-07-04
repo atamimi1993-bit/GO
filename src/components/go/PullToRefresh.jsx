@@ -108,9 +108,10 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
           style={{ position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 72px)', zIndex: 45, transform: `translateY(${pullDistance}px)` }}
         >
           {refreshing ? (
-            <Loader2 className="text-primary animate-spin" size={24} />
+            <Loader2 aria-hidden="true" className="text-primary animate-spin" size={24} />
           ) : (
             <RefreshCw
+              aria-hidden="true"
               className="text-muted-foreground transition-transform"
               size={24}
               style={{ transform: `rotate(${pullDistance * 3}deg)` }}

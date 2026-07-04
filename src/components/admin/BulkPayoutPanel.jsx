@@ -167,8 +167,8 @@ export default function BulkPayoutPanel({ scrollRef }) {
               onClick={handleBulkPayout}
             >
               {processing
-                ? <><Loader2 size={14} className="animate-spin mr-1" /> Processing...</>
-                : <><DollarSign size={14} className="mr-1" /> Pay {selected.size} ({fmt(selectedTotal)})</>}
+                 ? <><Loader2 size={14} aria-hidden="true" className="animate-spin mr-1" /> Processing...</>
+                 : <><DollarSign size={14} aria-hidden="true" className="mr-1" /> Pay {selected.size} ({fmt(selectedTotal)})</>}
             </Button>
           </div>
         </div>

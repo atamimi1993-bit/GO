@@ -3,10 +3,10 @@ import { useOutletContext } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Loader2, Search, Truck, Car, MapPin } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import MobileSelect from '@/components/go/MobileSelect';
 import RentalCard from '@/components/rental/RentalCard';
 import PartnerRentals from '@/components/rental/PartnerRentals';
 import { useUserState } from '@/hooks/useUserState';
@@ -89,35 +89,37 @@ export default function Rentals() {
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
-          <Select value={vehicleType} onValueChange={setVehicleType}>
-            <SelectTrigger className="w-full sm:w-[160px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="car">Cars</SelectItem>
-              <SelectItem value="suv">SUVs</SelectItem>
-              <SelectItem value="pickup">Pickups</SelectItem>
-              <SelectItem value="van">Vans</SelectItem>
-              <SelectItem value="truck">Trucks</SelectItem>
-              <SelectItem value="box_truck">Box Trucks</SelectItem>
-              <SelectItem value="flatbed">Flatbeds</SelectItem>
-              <SelectItem value="semi">Semis</SelectItem>
-              <SelectItem value="trailer">Trailers</SelectItem>
-              <SelectItem value="rv">RVs</SelectItem>
-              <SelectItem value="motorcycle">Motorcycles</SelectItem>
-              <SelectItem value="bus">Buses</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={stateFilter || 'all'} onValueChange={(v) => setStateFilter(v === 'all' ? null : v)}>
-            <SelectTrigger className="w-full sm:w-[140px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All States</SelectItem>
-              {availableStates.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <MobileSelect
+            value={vehicleType}
+            onValueChange={setVehicleType}
+            placeholder="All Types"
+            className="w-full sm:w-[160px]"
+            options={[
+              { value: 'all', label: 'All Types' },
+              { value: 'car', label: 'Cars' },
+              { value: 'suv', label: 'SUVs' },
+              { value: 'pickup', label: 'Pickups' },
+              { value: 'van', label: 'Vans' },
+              { value: 'truck', label: 'Trucks' },
+              { value: 'box_truck', label: 'Box Trucks' },
+              { value: 'flatbed', label: 'Flatbeds' },
+              { value: 'semi', label: 'Semis' },
+              { value: 'trailer', label: 'Trailers' },
+              { value: 'rv', label: 'RVs' },
+              { value: 'motorcycle', label: 'Motorcycles' },
+              { value: 'bus', label: 'Buses' },
+            ]}
+          />
+          <MobileSelect
+            value={stateFilter || 'all'}
+            onValueChange={(v) => setStateFilter(v === 'all' ? null : v)}
+            placeholder="All States"
+            className="w-full sm:w-[140px]"
+            options={[
+              { value: 'all', label: 'All States' },
+              ...availableStates.map((s) => ({ value: s, label: s })),
+            ]}
+          />
         </div>
 
         {loading ? (

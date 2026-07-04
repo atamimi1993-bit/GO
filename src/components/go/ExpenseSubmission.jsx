@@ -147,7 +147,7 @@ export default function ExpenseSubmission({ driverProfile }) {
           </div>
         </div>
         <Button size="sm" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : <><Upload size={14} className="mr-1" /> Submit</>}
+          {showForm ? 'Cancel' : <><Upload size={14} aria-hidden="true" className="mr-1" /> Submit</>}
         </Button>
       </div>
 
@@ -251,7 +251,7 @@ export default function ExpenseSubmission({ driverProfile }) {
           )}
 
           <Button className="w-full bg-emerald-500 hover:bg-emerald-600" onClick={handleSubmit} disabled={submitting || uploading}>
-            {submitting ? <Loader2 size={16} className="animate-spin mr-1" /> : <Receipt size={16} className="mr-1" />}
+            {submitting ? <Loader2 size={16} aria-hidden="true" className="animate-spin mr-1" /> : <Receipt size={16} aria-hidden="true" className="mr-1" />}
             Submit Expense
           </Button>
         </div>

@@ -59,9 +59,9 @@ export default function DriverNavigationCard({ job }) {
   const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(dropoff)}&navigate=yes`;
 
   const mapApps = [
-    { name: 'Google Maps', url: googleMapsUrl, color: 'bg-blue-500 hover:bg-blue-600', icon: '🗺️' },
-    { name: 'Apple Maps', url: appleMapsUrl, color: 'bg-gray-700 hover:bg-gray-800', icon: '🍎' },
-    { name: 'Waze', url: wazeUrl, color: 'bg-cyan-500 hover:bg-cyan-600', icon: '🚗' },
+    { name: 'Google Maps', url: googleMapsUrl, color: 'bg-blue-500 hover:bg-blue-600', icon: '🗺️', ariaLabel: 'Open route in Google Maps' },
+    { name: 'Apple Maps', url: appleMapsUrl, color: 'bg-gray-700 hover:bg-gray-800', icon: '🍎', ariaLabel: 'Open route in Apple Maps' },
+    { name: 'Waze', url: wazeUrl, color: 'bg-cyan-500 hover:bg-cyan-600', icon: '🚗', ariaLabel: 'Open route in Waze' },
   ];
 
   const hasCoords = pickupCoords && dropoffCoords;
@@ -145,6 +145,7 @@ export default function DriverNavigationCard({ job }) {
               href={app.url}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={app.ariaLabel}
               className={`flex flex-col items-center gap-1.5 ${app.color} text-white rounded-xl py-3 px-2 transition-colors`}
             >
               <span className="text-xl">{app.icon}</span>
