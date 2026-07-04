@@ -15,6 +15,7 @@ export default function AvailableJobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(null);
+  const [declining, setDeclining] = useState(null);
   const [driverProfile, setDriverProfile] = useState(null);
   const { toast } = useToast();
 
@@ -91,6 +92,13 @@ export default function AvailableJobs() {
     setAccepting(null);
   };
 
+  const handleDecline = (job) => {
+    setDeclining(job.id);
+    setJobs(prev => prev.filter(j => j.id !== job.id));
+    toast({ title: 'Job declined', description: 'The job has been removed from your list.' });
+    setDeclining(null);
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
@@ -133,14 +141,24 @@ export default function AvailableJobs() {
                   <span><Package size={12} className="inline mr-1" />{job.total_weight_lbs?.toLocaleString()} lbs</span>
                   <span>{job.distance_miles} {job.distance_unit || 'mi'}</span>
                 </div>
-                <Button
-                  size="sm"
-                  className="bg-emerald-500 hover:bg-emerald-600"
-                  onClick={() => handleAccept(job)}
-                  disabled={accepting === job.id}
-                >
-                  {accepting === job.id ? <Loader2 size={14} className="animate-spin" /> : 'Accept Job'}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDecline(job)}
+                    disabled={declining === job.id || accepting === job.id}
+                  >
+                    {declining === job.id ? <Loader2 size={14} className="animate-spin" /> : 'Decline'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-500 hover:bg-emerald-600"
+                    onClick={() => handleAccept(job)}
+                    disabled={accepting === job.id || declining === job.id}
+                  >
+                    {accepting === job.id ? <Loader2 size={14} className="animate-spin" /> : 'Accept Job'}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
