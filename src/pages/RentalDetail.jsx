@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Loader2, MapPin, Fuel, Calendar, Truck, Car, Gauge, User, Phone, Mail, Bus, Bike, Caravan } from 'lucide-react';
+import { ArrowLeft, Loader2, MapPin, Fuel, Calendar, Truck, Car, Gauge, User, Phone, Mail, Bus, Bike, Caravan, FileDown } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
 import RentalRequestForm from '@/components/rental/RentalRequestForm';
 import { useToast } from '@/components/ui/use-toast';
@@ -27,6 +27,7 @@ export default function RentalDetail() {
   const [rental, setRental] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   useEffect(() => {
     base44.entities.VehicleRental.get(id)
@@ -55,6 +56,26 @@ export default function RentalDetail() {
   const isOwner = currentUser?.email === rental.owner_email;
 
   const features = rental.features ? rental.features.split(',').map(f => f.trim()).filter(Boolean) : [];
+
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      const res = await base44.functions.invoke('generate-rental-pdf', { rental_id: rental.id });
+      const blob = await res.data.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rental-summary-${rental.id.slice(-8)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast({ title: 'PDF downloaded', description: 'Your rental summary has been saved.' });
+    } catch (err) {
+      toast({ title: 'Download failed', description: err.message, variant: 'destructive' });
+    }
+    setDownloadingPdf(false);
+  };
 
   return (
     <div className="max-w-2xl mx-auto pb-4">
@@ -85,6 +106,18 @@ export default function RentalDetail() {
           <p className="text-xs text-muted-foreground">per day</p>
         </div>
       </div>
+
+      {/* Download PDF summary */}
+      <Button
+        variant="outline"
+        onClick={handleDownloadPdf}
+        disabled={downloadingPdf}
+        className="w-full mb-4"
+      >
+        {downloadingPdf
+          ? <><Loader2 size={16} className="animate-spin mr-1" /> Generating PDF...</>
+          : <><FileDown size={16} className="mr-1" /> Download PDF Summary</>}
+      </Button>
 
       {/* Specs */}
       <div className="bg-card border rounded-2xl p-5 mb-4 space-y-3">
