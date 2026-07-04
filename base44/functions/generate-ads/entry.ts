@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
     const isCustomers = audience === 'customers';
 
     const now = new Date();
-    const campaignDays = isCustomers ? 14 : 30;
+    const campaignDays = 14;
     const campaignEnd = new Date(now.getTime() + campaignDays * 24 * 60 * 60 * 1000);
 
     // Deactivate old ads for this audience only
@@ -43,7 +43,7 @@ For each ad, provide:
 
 Make the copy energetic, trustworthy, and action-oriented. Vary the tone between ads.`
       : `You are the marketing engine for "GO", a global moving and hauling marketplace platform.
-Generate 2 fresh promotional ad campaigns for DRIVERS (independent movers and truck owners) for the next month (starting ${now.toISOString()}).
+Generate 2 fresh promotional ad campaigns for DRIVERS (independent movers and truck owners) for the next 2 weeks (starting ${now.toISOString()}).
 
 Each campaign should target a different angle:
 1. An earnings incentive (e.g. complete N jobs this month for a bonus payout)
