@@ -37,11 +37,10 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   const handleTouchMove = (e) => {
     if (disabledRef.current || !pullingRef.current || refreshingRef.current) return;
     const diff = e.touches[0].clientY - startY.current;
-    if (diff > 0) {
+    if (diff > 5) {
       const newPull = Math.min(diff * 0.5, MAX_PULL);
       pullDistanceRef.current = newPull;
       setPullDistance(newPull);
-      e.preventDefault();
     }
   };
 
@@ -71,9 +70,9 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   useEffect(() => {
     const node = (scrollRef && scrollRef.current) ? scrollRef.current : wrapperRef.current;
     if (!node) return;
-    node.addEventListener('touchstart', handleTouchStart, { passive: false });
-    node.addEventListener('touchmove', handleTouchMove, { passive: false });
-    node.addEventListener('touchend', handleTouchEnd, { passive: false });
+    node.addEventListener('touchstart', handleTouchStart, { passive: true });
+    node.addEventListener('touchmove', handleTouchMove, { passive: true });
+    node.addEventListener('touchend', handleTouchEnd, { passive: true });
     return () => {
       node.removeEventListener('touchstart', handleTouchStart);
       node.removeEventListener('touchmove', handleTouchMove);
@@ -88,7 +87,8 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
       style={{
         isolation: 'isolate',
         willChange: 'transform',
-        overscrollBehaviorY: pulling ? 'contain' : undefined,
+        overscrollBehavior: pulling ? 'none' : 'auto',
+        touchAction: pulling ? 'none' : 'pan-y',
       }}
     >
       {(pullDistance > 0 || refreshing) && (

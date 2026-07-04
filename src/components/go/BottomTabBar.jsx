@@ -37,7 +37,7 @@ export default function BottomTabBar() {
                 navigate(getTargetPath(tab.path));
               }
             }}
-            className={`flex-1 flex flex-col items-center justify-center py-3 min-h-[56px] gap-0.5 text-xs font-medium transition-colors select-none ${active ? 'text-primary' : 'text-muted-foreground'}`}
+            className={`flex-1 flex flex-col items-center justify-center py-3 min-h-[56px] gap-0.5 text-xs font-medium transition-colors select-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded-lg outline-none ${active ? 'text-primary' : 'text-muted-foreground'}`}
           >
             <tab.icon size={22} strokeWidth={active ? 2.5 : 1.8} />
             <span>{tab.label}</span>
