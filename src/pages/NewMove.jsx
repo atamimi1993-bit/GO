@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import ItemForm from '@/components/go/ItemForm';
 import QuickAddItems from '@/components/go/QuickAddItems';
+import AIScanItems from '@/components/go/AIScanItems';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import LiabilityAgreement from '@/components/go/LiabilityAgreement';
 import ContractSign from '@/components/go/ContractSign';
@@ -342,6 +343,9 @@ export default function NewMove() {
             <h2 className="text-2xl font-display font-bold mb-1">Add Your Items</h2>
             <p className="text-muted-foreground text-sm">List everything you're moving — or upload a file.</p>
           </div>
+
+          {/* AI Smart Scan */}
+          <AIScanItems onItemsGenerated={(detected) => setItems([...items, ...detected])} existingItems={items} />
 
           {/* Upload */}
           <div className="bg-card border border-dashed border-border rounded-2xl p-6 text-center">
