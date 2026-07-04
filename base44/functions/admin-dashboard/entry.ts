@@ -11,7 +11,19 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Authentication required', code: 'AUTH_FAILED' }, { status: 401 });
     }
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    if (user.role !== 'admin') return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
+
+    // Verify admin role against the trusted server-stored User record — do not
+    // rely solely on the decrypted token context, which could be manipulated.
+    let trustedUser;
+    try {
+      trustedUser = await base44.entities.User.get(user.id);
+    } catch (lookupErr) {
+      console.error('admin-dashboard user lookup failed:', lookupErr.message);
+      return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
+    }
+    if (!trustedUser || trustedUser.role !== 'admin') {
+      return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
+    }
 
     const body = await req.json().catch(() => ({}));
     const action = body?.action || 'overview';

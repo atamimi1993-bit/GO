@@ -6,6 +6,15 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
+    // Reject requests carrying a user-level Authorization header — webhooks
+    // come from Stripe (no user auth), so an Authorization header indicates
+    // a spoofed request from an authenticated app user.
+    const authHeader = req.headers.get('authorization');
+    if (authHeader) {
+      console.error('stripe-webhook: rejected request with Authorization header');
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
 
@@ -14,8 +23,8 @@ Deno.serve(async (req) => {
     }
 
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-    if (!webhookSecret) {
-      console.error('STRIPE_WEBHOOK_SECRET is not configured');
+    if (!webhookSecret || webhookSecret.trim() === '') {
+      console.error('STRIPE_WEBHOOK_SECRET is not configured or is empty');
       return Response.json({ error: 'Webhook secret not configured' }, { status: 500 });
     }
 
