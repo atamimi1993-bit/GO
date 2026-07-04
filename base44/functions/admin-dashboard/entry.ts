@@ -71,6 +71,48 @@ Deno.serve(async (req) => {
       return Response.json({ payouts: enriched, byDriver: Object.values(byDriver), grandTotal, count: enriched.length });
     }
 
+    // Export all payouts (enriched with driver + move details) for spreadsheet use
+    if (action === 'export_payouts') {
+      const { status_filter } = body;
+      const query = status_filter ? { status: status_filter } : {};
+      const [payouts, drivers, moves] = await Promise.all([
+        base44.asServiceRole.entities.DriverPayout.filter(query, '-created_date', 500),
+        base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+      ]);
+      const driverMap = {};
+      for (const d of drivers) driverMap[d.id] = d;
+      const moveMap = {};
+      for (const m of moves) moveMap[m.id] = m;
+
+      const enriched = payouts.map((p) => {
+        const driver = driverMap[p.driver_profile_id];
+        const move = moveMap[p.move_request_id];
+        return {
+          payout_id: p.id,
+          created_date: p.created_date,
+          amount: p.amount || 0,
+          currency: p.currency || 'USD',
+          status: p.status,
+          deduction_amount: p.deduction_amount || 0,
+          deduction_reason: p.deduction_reason || '',
+          notes: p.notes || '',
+          driver_name: driver?.full_name || 'Unknown',
+          company_name: driver?.company_name || '',
+          bank_name: driver?.bank_name || '',
+          bank_account_type: driver?.bank_account_type || '',
+          bank_account_last4: driver?.bank_account_last4 || '',
+          move_date: move?.move_date || '',
+          customer_name: move?.customer_name || '',
+          pickup_address: move?.pickup_address || '',
+          dropoff_address: move?.dropoff_address || '',
+          job_type: move?.job_type || '',
+        };
+      });
+
+      return Response.json({ payouts: enriched, count: enriched.length });
+    }
+
     // Bulk process payouts — mark selected pending payouts as paid
     if (action === 'bulk_payout') {
       const { payout_ids } = body;

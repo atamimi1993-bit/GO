@@ -8,6 +8,7 @@ import {
   Wallet, Loader2, CheckCircle2, ChevronDown, ChevronUp, DollarSign,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import PayoutExportButton from '@/components/admin/PayoutExportButton';
 
 const fmt = (n) => `$${(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -151,7 +152,8 @@ export default function BulkPayoutPanel({ scrollRef }) {
               <p className="text-xs text-muted-foreground">{fmt(data.grandTotal)} total</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <PayoutExportButton />
             <Button size="sm" variant="outline" onClick={selected.size === data.payouts.length ? clearAll : selectAll}>
               {selected.size === data.payouts.length ? 'Clear All' : 'Select All'}
             </Button>
