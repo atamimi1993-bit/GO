@@ -1,0 +1,40 @@
+{
+  "name": "Auto Driver Payout on Completion",
+  "description": "When a MoveRequest transitions to completed, automatically create a pending DriverPayout record for the driver's job earnings and notify them. This ensures every completed move generates a payout without manual admin action.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "MoveRequest",
+      "events": [
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"completed\" and .trigger.old_data.status != \"completed\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_driver_payout_on_completion",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "create_payout": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "auto-create-driver-payout",
+            "args": {
+              "move_request_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Create driver payout & notify driver",
+            "description": "Automatically creates a pending DriverPayout for the driver's earnings from this move"
+          }
+        }
+      }
+    ]
+  }
+}
