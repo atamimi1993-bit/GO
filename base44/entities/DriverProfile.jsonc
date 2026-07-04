@@ -122,6 +122,27 @@
     "sign_on_bonus_eligible": {
       "type": "boolean",
       "default": false
+    },
+    "background_check_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "pending",
+        "clear",
+        "consider",
+        "failed"
+      ],
+      "default": "not_started"
+    },
+    "background_check_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "background_check_candidate_id": {
+      "type": "string"
+    },
+    "background_check_report_url": {
+      "type": "string"
     }
   },
   "required": [

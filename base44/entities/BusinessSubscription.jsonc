@@ -1,0 +1,98 @@
+{
+  "name": "BusinessSubscription",
+  "type": "object",
+  "properties": {
+    "business_account_id": {
+      "type": "string"
+    },
+    "business_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "business_name": {
+      "type": "string"
+    },
+    "plan_name": {
+      "type": "string"
+    },
+    "plan_tier": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "professional",
+        "enterprise"
+      ],
+      "default": "starter"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "cancelled",
+        "trialing"
+      ],
+      "default": "active"
+    },
+    "current_period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "cancelled_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deliveries_used": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "business_email",
+    "plan_tier"
+  ],
+  "rls": {
+    "create": {
+      "data.business_email": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.business_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.business_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
