@@ -8,6 +8,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import AdBanner from '@/components/go/AdBanner';
 import HomeStats from '@/components/go/HomeStats';
 import Testimonials from '@/components/go/Testimonials';
+import { Gift } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
@@ -115,6 +116,22 @@ export default function Home() {
           <h3 className="font-display font-bold text-lg mb-1">Need Help?</h3>
           <p className="text-sm text-muted-foreground mb-3">Visit our Help Center for guides, FAQs, and support.</p>
           <span className="text-amber-600 font-semibold text-sm group-hover:underline">Get Help →</span>
+        </Link>
+      </section>
+
+      {/* Refer a Friend */}
+      <section>
+        <Link to="/profile" className="block bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 text-white text-center hover:shadow-xl transition-shadow group">
+          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Gift size={28} />
+          </div>
+          <h2 className="text-2xl font-display font-bold mb-2">Refer a Friend, Earn 500 Points</h2>
+          <p className="text-white/90 text-sm mb-4 max-w-md mx-auto">
+            Share your referral code with friends. When they complete a move, you both earn 500 bonus loyalty points.
+          </p>
+          <span className="inline-block bg-white text-emerald-600 font-semibold text-sm px-6 py-2 rounded-full group-hover:bg-white/90 transition-colors">
+            Get Your Referral Code →
+          </span>
         </Link>
       </section>
 
