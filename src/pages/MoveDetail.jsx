@@ -10,6 +10,7 @@ import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, Cred
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import PromoCodeInput from '@/components/go/PromoCodeInput';
+import AssignedDriverCard from '@/components/go/AssignedDriverCard';
 import PriceConfirmation from '@/components/go/PriceConfirmation';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/go/PageHeader';
@@ -247,10 +248,7 @@ export default function MoveDetail() {
 
       {/* Assigned driver */}
       {move.assigned_driver_name && (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5 mb-4">
-          <h3 className="font-display font-bold text-sm mb-2 text-emerald-800 dark:text-emerald-200">Assigned Driver</h3>
-          <p className="font-medium">{move.assigned_driver_name}</p>
-        </div>
+        <AssignedDriverCard move={move} />
       )}
 
       {/* Live Tracking */}
