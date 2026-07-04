@@ -159,13 +159,14 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
   const taxAmount = subtotal * taxRate;
 
-  // App fee (10%) and driver fee (5%) (in USD)
+  // App fee (25%) (in USD)
   const appFee = subtotal * APP_FEE_RATE;
-  const driverFee = subtotal * DRIVER_FEE_RATE;
 
-  // Total and driver payout (in USD)
-  const totalPrice = subtotal + taxAmount + appFee + driverFee;
-  const driverPayout = subtotal + driverFee;
+  // Total (in USD) — no separate driver fee charged to customer
+  const totalPrice = subtotal + taxAmount + appFee;
+
+  // Driver earns 5% of the total job price (no bonus)
+  const driverPayout = totalPrice * DRIVER_FEE_RATE;
 
   // Currency conversion
   const currencyCode = currency || country?.currency || 'USD';
@@ -185,7 +186,7 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
     taxRate,
     taxAmount: convert(taxAmount),
     appFee: convert(appFee),
-    driverFee: convert(driverFee),
+    driverFee: 0,
     totalPrice: convert(totalPrice),
     driverPayout: convert(driverPayout),
     roundTripMiles,
