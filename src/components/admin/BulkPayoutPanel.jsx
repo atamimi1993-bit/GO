@@ -19,6 +19,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
   const [processing, setProcessing] = useState(false);
   const [selected, setSelected] = useState(new Set());
   const [expandedDrivers, setExpandedDrivers] = useState(new Set());
+  const [showAll, setShowAll] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -125,6 +126,8 @@ export default function BulkPayoutPanel({ scrollRef }) {
     grouped[p.driver_profile_id].payouts.push(p);
   }
   const driverGroups = Object.entries(grouped);
+  const MAX_GROUPS = 20;
+  const visibleGroups = showAll ? driverGroups : driverGroups.slice(0, MAX_GROUPS);
 
   const selectedTotal = data.payouts
     .filter((p) => selected.has(p.id))
@@ -172,7 +175,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
 
         {/* Driver groups */}
         <div className="space-y-2">
-          {driverGroups.map(([driverId, group]) => {
+          {visibleGroups.map(([driverId, group]) => {
             const payoutIds = group.payouts.map((p) => p.id);
             const allSelected = payoutIds.every((pid) => selected.has(pid));
             const someSelected = payoutIds.some((pid) => selected.has(pid));
@@ -242,6 +245,11 @@ export default function BulkPayoutPanel({ scrollRef }) {
             );
           })}
         </div>
+        {driverGroups.length > MAX_GROUPS && !showAll && (
+          <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => setShowAll(true)}>
+            Show all {driverGroups.length} drivers
+          </Button>
+        )}
     </div>
   );
 }

@@ -33,8 +33,9 @@ export default function TimingStep({ form, setForm }) {
 
         <div className="space-y-3">
           <Label>Service Type</Label>
-          <div
-            className={`flex items-center justify-between rounded-xl p-4 border-2 cursor-pointer transition-colors ${
+          <button
+            type="button"
+            className={`flex items-center justify-between rounded-xl p-4 border-2 cursor-pointer transition-colors text-left w-full ${
               !form.needs_storage ? 'border-emerald-500 bg-emerald-500/5' : 'border-border'
             }`}
             onClick={() => setForm({ ...form, needs_storage: false })}
@@ -47,9 +48,10 @@ export default function TimingStep({ form, setForm }) {
               </div>
             </div>
             <div className={`w-5 h-5 rounded-full border-2 ${!form.needs_storage ? 'border-emerald-500 bg-emerald-500' : 'border-muted-foreground'}`} />
-          </div>
-          <div
-            className={`flex items-center justify-between rounded-xl p-4 border-2 cursor-pointer transition-colors ${
+          </button>
+          <button
+            type="button"
+            className={`flex items-center justify-between rounded-xl p-4 border-2 cursor-pointer transition-colors text-left w-full ${
               form.needs_storage ? 'border-emerald-500 bg-emerald-500/5' : 'border-border'
             }`}
             onClick={() => setForm({ ...form, needs_storage: true })}
@@ -62,7 +64,7 @@ export default function TimingStep({ form, setForm }) {
               </div>
             </div>
             <div className={`w-5 h-5 rounded-full border-2 ${form.needs_storage ? 'border-emerald-500 bg-emerald-500' : 'border-muted-foreground'}`} />
-          </div>
+          </button>
         </div>
 
         <div>

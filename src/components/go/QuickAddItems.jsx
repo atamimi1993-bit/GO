@@ -73,9 +73,10 @@ export default function QuickAddItems({ onAdd, existingItems }) {
   const [search, setSearch] = useState('');
   const [quantities, setQuantities] = useState({});
 
-  const filtered = COMMON_ITEMS.filter(item =>
+  const allFiltered = COMMON_ITEMS.filter(item =>
     !search || item.name.toLowerCase().includes(search.toLowerCase())
   );
+  const filtered = search ? allFiltered : allFiltered.slice(0, 20);
 
   const handleAdd = (item) => {
     const qty = quantities[item.name] || 1;
@@ -134,6 +135,11 @@ export default function QuickAddItems({ onAdd, existingItems }) {
           );
         })}
       </div>
+      {!search && allFiltered.length > 20 && (
+        <p className="text-sm text-muted-foreground text-center py-2">
+          Search to see more items
+        </p>
+      )}
       {filtered.length === 0 && (
         <p className="text-sm text-muted-foreground text-center py-4">
           No items found. Try adding one manually below.

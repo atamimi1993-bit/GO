@@ -123,10 +123,11 @@ export default function EstimateStep({ form, totalWeight, selectedTier, onSelect
           const Icon = tier.icon;
           const isSelected = selectedTier === tier.key;
           return (
-            <div
+            <button
+              type="button"
               key={tier.key}
               onClick={() => onSelectTier(tier.key)}
-              className={`cursor-pointer border-2 rounded-2xl p-5 transition-all ${
+              className={`cursor-pointer border-2 rounded-2xl p-5 transition-all text-left w-full ${
                 isSelected ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-emerald-300'
               }`}
             >
@@ -153,11 +154,11 @@ export default function EstimateStep({ form, totalWeight, selectedTier, onSelect
                   </p>
                   {isSelected && <Check size={16} className="text-emerald-500 ml-auto mt-1" />}
                 </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                </div>
+                </button>
+                );
+                })}
+                </div>
 
       {selected && (
         <Button onClick={() => onConfirm(selected.pricing, selected.key, selected.truckSize)} size="lg" className="w-full bg-emerald-500 hover:bg-emerald-600">
