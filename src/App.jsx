@@ -53,6 +53,7 @@ const RentalDetail = lazy(() => import('@/pages/RentalDetail'));
 const NewRental = lazy(() => import('@/pages/NewRental'));
 const DriverReport = lazy(() => import('@/pages/DriverReport'));
 const DriverDetail = lazy(() => import('@/pages/DriverDetail'));
+const Overseer = lazy(() => import('@/pages/Overseer'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -137,6 +138,11 @@ const AuthenticatedApp = () => {
           <Route path="/rentals/:id" element={<PageTransition><RentalDetail /></PageTransition>} />
           <Route path="/driver-report" element={<PageTransition><DriverReport /></PageTransition>} />
           <Route path="/driver/:id" element={<PageTransition><DriverDetail /></PageTransition>} />
+
+          {/* Admin-only: AI oversight agent */}
+          <Route element={<AdminRoute />}>
+            <Route path="/overseer" element={<PageTransition><Overseer /></PageTransition>} />
+          </Route>
 
           {/* Admin-only routes */}
           <Route element={<AdminRoute />}>

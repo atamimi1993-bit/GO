@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Navigation, DollarSign, Trophy, TrendingUp, Truck, Container, BarChart3 } from 'lucide-react';
+import { Package, Navigation, DollarSign, Trophy, TrendingUp, Truck, Container, BarChart3, Bot } from 'lucide-react';
 
 const LINKS = [
   { label: 'My Moves', path: '/my-moves', icon: Package, desc: 'View and manage all move requests', accent: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
@@ -12,6 +12,7 @@ const LINKS = [
   { label: 'Metrics', path: '/metrics', icon: BarChart3, desc: 'Completed moves, driver regions, and move-fee revenue', accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
   { label: 'Drivers', path: '/driver-dashboard', icon: Truck, desc: 'Driver performance dashboard', accent: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' },
   { label: 'Freight', path: '/freight-dashboard', icon: Container, desc: 'Freight logistics dashboard', accent: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' },
+  { label: 'Overseer AI', path: '/overseer', icon: Bot, desc: 'Live AI agent that scans for issues & fixes them', accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
 ];
 
 export default function AdminQuickLinks() {
