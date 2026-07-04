@@ -86,7 +86,7 @@ export default function CustomerChatWidget() {
           onClick={() => setOpen(true)}
           aria-label="Open GO Assistant"
           style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
-          className="fixed md:!bottom-6 left-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
+          className="fixed md:!bottom-6 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
         >
           <MessageSquare size={24} />
           <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-[10px] flex items-center justify-center text-white font-bold">
@@ -97,7 +97,7 @@ export default function CustomerChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-20 md:bottom-6 left-4 z-50 w-[calc(100vw-2rem)] max-w-sm bg-card border rounded-2xl shadow-2xl flex flex-col" style={{ maxHeight: '70vh' }}>
+        <div className="fixed bottom-20 md:bottom-6 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm bg-card border rounded-2xl shadow-2xl flex flex-col" style={{ maxHeight: '70vh' }}>
           {/* Header */}
           <div className="flex items-center gap-2 p-3 border-b bg-primary text-primary-foreground rounded-t-2xl">
             <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
