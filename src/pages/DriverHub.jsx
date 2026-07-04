@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DriverTrackingControls from '@/components/go/DriverTrackingControls';
+import DriverLeaderboardCard from '@/components/go/DriverLeaderboardCard';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield } from 'lucide-react';
 
@@ -164,6 +165,9 @@ export default function DriverHub() {
           </div>
         </div>
       )}
+
+      {/* Driver leaderboard */}
+      <DriverLeaderboardCard currentDriverId={profile.id} />
 
       {profile.status === 'approved' && (
         <DriverTrackingControls driverProfile={profile} />
