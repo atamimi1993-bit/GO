@@ -120,7 +120,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
   const grouped = {};
   for (const p of data.payouts) {
     if (!grouped[p.driver_profile_id]) {
-      grouped[p.driver_profile_id] = { driver_name: p.driver_name, company_name: p.company_name, payouts: [] };
+      grouped[p.driver_profile_id] = { driver_name: p.driver_name, company_name: p.company_name, bank_name: p.bank_name, bank_account_type: p.bank_account_type, bank_account_last4: p.bank_account_last4, bank_routing_number: p.bank_routing_number, payouts: [] };
     }
     grouped[p.driver_profile_id].payouts.push(p);
   }
@@ -197,6 +197,13 @@ export default function BulkPayoutPanel({ scrollRef }) {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{group.driver_name}</p>
                     {group.company_name && <p className="text-xs text-muted-foreground truncate">{group.company_name}</p>}
+                    {group.bank_account_last4 ? (
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400 truncate">
+                        {group.bank_name} · {group.bank_account_type} · ••••{group.bank_account_last4} · R{group.bank_routing_number}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-red-500 truncate">No bank details on file</p>
+                    )}
                   </div>
                   <div className="text-right shrink-0">
                     <p className="font-semibold text-amber-600 dark:text-amber-400">{fmt(groupTotal)}</p>

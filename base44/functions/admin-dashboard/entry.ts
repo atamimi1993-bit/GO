@@ -51,6 +51,10 @@ Deno.serve(async (req) => {
         dropoff: moveMap[p.move_request_id]?.dropoff_address || '',
         move_date: moveMap[p.move_request_id]?.move_date || null,
         customer_name: moveMap[p.move_request_id]?.customer_name || '',
+        bank_name: driverMap[p.driver_profile_id]?.bank_name || null,
+        bank_account_type: driverMap[p.driver_profile_id]?.bank_account_type || null,
+        bank_account_last4: driverMap[p.driver_profile_id]?.bank_account_last4 || null,
+        bank_routing_number: driverMap[p.driver_profile_id]?.bank_routing_number || null,
       }));
 
       // Group totals by driver for convenience

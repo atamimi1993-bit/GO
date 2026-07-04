@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { User, Mail, Loader2, ArrowLeft } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import DriverPaymentInfo from '@/components/go/DriverPaymentInfo';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -71,6 +72,8 @@ export default function Profile() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+
+      <DriverPaymentInfo />
     </div>
     </PullToRefresh>
   );

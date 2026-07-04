@@ -72,6 +72,23 @@
         "None"
       ],
       "default": "None"
+    },
+    "bank_name": {
+      "type": "string"
+    },
+    "bank_account_type": {
+      "type": "string",
+      "enum": [
+        "checking",
+        "savings"
+      ],
+      "default": "checking"
+    },
+    "bank_routing_number": {
+      "type": "string"
+    },
+    "bank_account_last4": {
+      "type": "string"
     }
   },
   "required": [
