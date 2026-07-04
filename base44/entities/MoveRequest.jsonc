@@ -48,9 +48,25 @@
       "enum": [
         "residential",
         "freight",
-        "corporate_logistics"
+        "corporate_logistics",
+        "courier"
       ],
       "default": "residential"
+    },
+    "delivery_category": {
+      "type": "string",
+      "enum": [
+        "hospital",
+        "bank",
+        "office",
+        "pharmacy",
+        "lab_medical",
+        "legal_documents",
+        "retail",
+        "restaurant",
+        "other"
+      ],
+      "default": "other"
     },
     "items_summary": {
       "type": "string"

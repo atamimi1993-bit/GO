@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { ArrowRight, Package, Truck, Shield, DollarSign, Star, MapPin, CreditCard } from 'lucide-react';
+import { ArrowRight, Package, Truck, Shield, DollarSign, Star, MapPin, CreditCard, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import AdBanner from '@/components/go/AdBanner';
@@ -49,6 +49,9 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-3">
             <Button onClick={() => navigate('/new-move')} size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
               Start a Move <ArrowRight className="ml-2" size={20} />
+            </Button>
+            <Button onClick={() => navigate('/quick-delivery')} size="lg" className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+              Quick Delivery <Zap className="ml-2" size={20} />
             </Button>
             <Button onClick={() => navigate('/driver-hub')} size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
               Become a Driver <Truck className="ml-2" size={20} />

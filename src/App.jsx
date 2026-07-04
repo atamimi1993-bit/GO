@@ -20,6 +20,7 @@ const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Home = lazy(() => import('@/pages/Home'));
 const NewMove = lazy(() => import('@/pages/NewMove'));
+const QuickDelivery = lazy(() => import('@/pages/QuickDelivery'));
 const MyMoves = lazy(() => import('@/pages/MyMoves'));
 const TrackingHub = lazy(() => import('@/pages/TrackingHub'));
 const MoveDetail = lazy(() => import('@/pages/MoveDetail'));
@@ -104,6 +105,7 @@ const AuthenticatedApp = () => {
         <Route element={<AppLayout />}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
+          <Route path="/quick-delivery" element={<PageTransition><QuickDelivery /></PageTransition>} />
           <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
           <Route path="/driver-hub" element={<PageTransition><DriverHub /></PageTransition>} />
           <Route path="/drivers-wanted" element={<PageTransition><DriversWanted /></PageTransition>} />

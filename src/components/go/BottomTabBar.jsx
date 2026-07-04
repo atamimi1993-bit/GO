@@ -4,7 +4,7 @@ import { useTabHistory } from '@/lib/TabHistoryContext';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import { Home, Package, Truck, Warehouse, HelpCircle, Navigation, FileText, ShieldCheck, Plus } from 'lucide-react';
+import { Home, Package, Truck, Warehouse, HelpCircle, Navigation, FileText, ShieldCheck, Plus, Zap } from 'lucide-react';
 
 const adminTabs = [
   { label: 'Home', path: '/', icon: Home },
@@ -24,8 +24,8 @@ const driverTabs = [
 
 const customerTabs = [
   { label: 'Home', path: '/', icon: Home },
+  { label: 'Quick Ship', path: '/quick-delivery', icon: Zap },
   { label: 'New Move', path: '/new-move', icon: Plus },
-  { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Rentals', path: '/rentals', icon: Truck },
   { label: 'Help', path: '/help', icon: HelpCircle },
 ];

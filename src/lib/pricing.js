@@ -181,7 +181,71 @@ const DRIVER_RATES = {
     large:       { basePay: 80, perMile: 4.00, perLb: 0.030 },
     extra_large: { basePay: 100, perMile: 4.75, perLb: 0.025 },
   },
+  // Courier — small deliveries (documents, medical samples, pharmacy, etc.)
+  // Flat-rate-ish: low base, per-mile focused, minimal weight impact
+  courier: {
+    small:       { basePay: 12, perMile: 1.20, perLb: 0.010 },
+    medium:      { basePay: 15, perMile: 1.50, perLb: 0.008 },
+    large:       { basePay: 20, perMile: 2.00, perLb: 0.005 },
+    extra_large: { basePay: 25, perMile: 2.50, perLb: 0.003 },
+  },
 };
+
+// Courier delivery surcharge by category — covers special handling needs
+export const COURIER_CATEGORY_FEES = {
+  hospital: 10,        // medical items, lab samples
+  bank: 8,             // secure document transport
+  office: 0,
+  pharmacy: 5,
+  lab_medical: 15,     // temperature-sensitive, time-critical
+  legal_documents: 12, // chain-of-custody
+  retail: 0,
+  restaurant: 5,       // hot food, time-sensitive
+  other: 0,
+};
+
+// Quick courier price estimate — simplified for the one-page booking
+export function calculateCourierPrice({ distanceMiles, deliveryCategory = 'other', tolls = 0, countryCode, stateCode, currency, distanceUnit }) {
+  const distanceInMiles = distanceUnit === 'km' ? distanceMiles / MI_TO_KM : distanceMiles;
+  const roundTripMiles = distanceInMiles * 2;
+
+  // Small truck for all courier jobs
+  const truck = TRUCK_CONFIG.small;
+  const baseCost = truck.baseCost + (roundTripMiles * truck.costPerMile);
+  const fuelCost = (roundTripMiles / truck.mpg) * FUEL_PRICES.gasoline;
+  const driverRate = DRIVER_RATES.courier.small;
+  const driverPayout = driverRate.basePay + (roundTripMiles * driverRate.perMile);
+  const categoryFee = COURIER_CATEGORY_FEES[deliveryCategory] || 0;
+  const tollCost = Number(tolls) || 0;
+
+  const operationalSubtotal = baseCost + fuelCost + driverPayout + categoryFee + tollCost;
+
+  const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
+  const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
+  const taxMultiplier = 1 + taxRate;
+  const goProfit = (APP_FEE_RATE * taxMultiplier * operationalSubtotal) / (1 - APP_FEE_RATE * taxMultiplier);
+  const appFee = goProfit;
+  const taxAmount = (operationalSubtotal + appFee) * taxRate;
+  const totalPrice = operationalSubtotal + appFee + taxAmount;
+
+  return {
+    baseCost,
+    fuelCost,
+    driverPayout,
+    categoryFee,
+    tollCost,
+    appFee,
+    taxRate,
+    taxAmount,
+    totalPrice,
+    driverFee: 0,
+    driverPayout,
+    bulkyItemFee: 0,
+    materialsFee: 0,
+    carryingFee: 0,
+    extraServiceFee: 0,
+  };
+}
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
