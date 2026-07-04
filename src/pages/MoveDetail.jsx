@@ -9,6 +9,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield, Wallet, CalendarClock } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
+import RouteLogForm from '@/components/go/RouteLogForm';
 import PromoCodeInput from '@/components/go/PromoCodeInput';
 import AssignedDriverCard from '@/components/go/AssignedDriverCard';
 import PriceConfirmation from '@/components/go/PriceConfirmation';
@@ -260,6 +261,11 @@ export default function MoveDetail() {
             <MoveTracker moveId={move.id} />
           </Suspense>
         </div>
+      )}
+
+      {/* Route mileage & time log — driver fills out, admin can view */}
+      {move.assigned_driver_id && driverProfile?.id === move.assigned_driver_id && ['in_progress', 'completed'].includes(move.status) && (
+        <RouteLogForm move={move} driverProfile={driverProfile} onSaved={load} />
       )}
 
       {/* Price */}
