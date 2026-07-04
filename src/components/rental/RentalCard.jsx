@@ -26,7 +26,15 @@ const VEHICLE_LABELS = {
 
 export default function RentalCard({ rental }) {
   const Icon = VEHICLE_ICONS[rental.vehicle_type] || Truck;
-  const photos = rental.photo_urls ? JSON.parse(rental.photo_urls) : [];
+  const photos = (() => {
+    if (!rental.photo_urls) return [];
+    try {
+      const parsed = JSON.parse(rental.photo_urls);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [rental.photo_urls];
+    }
+  })();
   const photo = photos[0]?.url || photos[0] || null;
 
   return (
