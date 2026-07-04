@@ -1,0 +1,62 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "lead_name": {
+      "type": "string"
+    },
+    "lead_type": {
+      "type": "string",
+      "enum": [
+        "person",
+        "business"
+      ],
+      "default": "person"
+    },
+    "contact_info": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "moving_reason": {
+      "type": "string"
+    },
+    "move_timeline": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "qualified",
+        "converted",
+        "dismissed"
+      ],
+      "default": "new"
+    },
+    "search_query": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "lead_name",
+    "location"
+  ]
+}

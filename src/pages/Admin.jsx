@@ -4,6 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import StatCard from '@/components/admin/StatCard';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import LeadFinder from '@/components/admin/LeadFinder';
+import LeadList from '@/components/admin/LeadList';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -56,6 +58,15 @@ export default function Admin() {
     }
   };
 
+  const handleUpdateLeadStatus = async (leadId, status) => {
+    try {
+      await base44.functions.invoke('admin-dashboard', { action: 'update_lead_status', lead_id: leadId, status });
+      await load();
+    } catch (err) {
+      toast({ title: 'Failed to update lead', description: err.message, variant: 'destructive' });
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
   }
@@ -97,6 +108,11 @@ export default function Admin() {
           <StatCard icon={AlertCircle} label="Cancelled" value={movesByStatus.cancelled} accent="red" />
           <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
         </div>
+
+        {/* AI Lead Finder */}
+        <LeadFinder onLeadsGenerated={load} />
+
+        <LeadList leads={data.leads} onUpdateStatus={handleUpdateLeadStatus} />
 
         {/* Move status breakdown */}
         <div className="bg-card border rounded-2xl p-5 mb-6">

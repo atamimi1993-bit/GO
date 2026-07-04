@@ -19,13 +19,22 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, driver: updated });
     }
 
+    // Update lead status
+    if (action === 'update_lead_status') {
+      const { lead_id, status } = body;
+      if (!lead_id || !status) return Response.json({ error: 'lead_id and status are required' }, { status: 400 });
+      const updatedLead = await base44.asServiceRole.entities.Lead.update(lead_id, { status });
+      return Response.json({ success: true, lead: updatedLead });
+    }
+
     // Overview — aggregate everything
-    const [moves, drivers, payouts, trucks, users] = await Promise.all([
+    const [moves, drivers, payouts, trucks, users, leads] = await Promise.all([
       base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
       base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
       base44.asServiceRole.entities.DriverPayout.list('-created_date', 500),
       base44.asServiceRole.entities.Truck.list('-created_date', 500),
       base44.asServiceRole.entities.User.list('-created_date', 500),
+      base44.asServiceRole.entities.Lead.list('-created_date', 50),
     ]);
 
     const revenue = moves.reduce((sum, m) => sum + (m.total_price || 0), 0);
@@ -63,6 +72,7 @@ Deno.serve(async (req) => {
       pendingDrivers,
       recentPayouts: payouts.slice(0, 10),
       recentUsers: users.slice(0, 10),
+      leads,
     });
   } catch (error) {
     console.error('admin-dashboard error:', error);
