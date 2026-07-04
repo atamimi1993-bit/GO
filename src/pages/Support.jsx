@@ -104,7 +104,7 @@ export default function Support() {
   const handleKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } };
 
   return (
-    <div className="max-w-5xl mx-auto h-full flex flex-col">
+    <div className="max-w-5xl mx-auto flex flex-col flex-1 min-h-0">
       <div className="flex items-center gap-3 mb-4">
         <div className="bg-emerald-500 rounded-xl p-2 flex items-center justify-center">
           <Bot className="text-white" size={20} />

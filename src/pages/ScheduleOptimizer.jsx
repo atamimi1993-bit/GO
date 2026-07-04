@@ -183,7 +183,7 @@ export default function ScheduleOptimizer() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)]">
+    <div className="flex flex-col flex-1 min-h-0">
       <div className="flex items-center gap-3 mb-4 px-1">
         <div className="bg-blue-500 rounded-xl p-2.5 flex items-center justify-center">
           <CalendarClock className="text-white" size={22} />
@@ -197,7 +197,7 @@ export default function ScheduleOptimizer() {
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-1 pb-2" ref={scrollRef}>
+      <div className="flex-1 overflow-y-auto min-h-0 px-1 pb-2" ref={scrollRef}>
         {messages.length === 0 && (
           <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">

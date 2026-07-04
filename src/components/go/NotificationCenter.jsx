@@ -101,7 +101,7 @@ export default function NotificationCenter({ user }) {
         className="relative min-h-[44px] min-w-[44px]"
         aria-label="Notifications"
       >
-        <Bell size={20} />
+        <Bell size={20} aria-hidden="true" />
         {unread > 0 && (
           <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
