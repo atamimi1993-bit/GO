@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,11 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (!('ontouchstart' in window)) inputRef.current?.focus();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -171,7 +176,7 @@ export default function Register() {
               id="email"
               type="email"
               autoComplete="email"
-              autoFocus
+              ref={inputRef}
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

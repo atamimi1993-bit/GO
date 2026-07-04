@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (!('ontouchstart' in window)) inputRef.current?.focus();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,7 +84,7 @@ export default function Login() {
               id="email"
               type="email"
               autoComplete="email"
-              autoFocus
+              ref={inputRef}
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

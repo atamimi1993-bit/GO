@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,15 +17,30 @@ const STATUS_COLORS = {
 };
 
 export default function MyMoves() {
-  const [moves, setMoves] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const optimisticMove = location.state?.optimisticMove;
+  const [moves, setMoves] = useState(optimisticMove ? [optimisticMove] : []);
+  const [loading, setLoading] = useState(!optimisticMove);
 
   const loadMoves = async () => {
     const moves = await base44.entities.MoveRequest.list('-created_date', 50);
     setMoves(moves);
   };
   useEffect(() => {
-    loadMoves().finally(() => setLoading(false));
+    if (!optimisticMove) {
+      loadMoves().finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+      loadMoves();
+    }
+    const unsub = base44.entities.MoveRequest.subscribe((event) => {
+      if (event.type === 'create') {
+        setMoves((prev) => [event.data, ...prev.filter(m => !m._optimistic)]);
+      } else if (event.type === 'update') {
+        setMoves((prev) => prev.map(m => m.id === event.data.id ? event.data : m));
+      }
+    });
+    return unsub;
   }, []);
 
   if (loading) {

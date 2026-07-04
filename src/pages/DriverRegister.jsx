@@ -74,7 +74,7 @@ export default function DriverRegister() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
+      <button onClick={() => navigate(-1)} aria-label="Go back" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
         <ArrowLeft size={16} /> Back
       </button>
       <h1 className="text-2xl font-display font-bold mb-1">Driver Registration</h1>

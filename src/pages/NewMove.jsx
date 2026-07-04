@@ -128,6 +128,7 @@ export default function NewMove() {
         liability_signed_date: new Date().toISOString(),
         status: 'pending',
       };
+      navigate('/my-moves', { state: { optimisticMove: { ...moveData, _optimistic: true } } });
       const move = await base44.entities.MoveRequest.create(moveData);
       // Save individual items
       if (items.length > 0) {
