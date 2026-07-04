@@ -31,6 +31,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Rental not found' }, { status: 404 });
     }
 
+    // Verify the caller is authorized to view this rental
+    if (rental.owner_email !== user.email && user.role !== 'admin') {
+      if (!(rental.status === 'active' && rental.available)) {
+        return Response.json({ error: 'Access denied' }, { status: 403 });
+      }
+    }
+
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();

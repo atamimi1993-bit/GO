@@ -28,14 +28,14 @@ function escapeHtml(str) {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    let user;
-    try {
-      user = await base44.auth.me();
-    } catch (authErr) {
-      console.error('send-move-invoice auth failed:', authErr.message);
+    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
+    if (!isAuth) {
       return Response.json({ error: 'Authentication required' }, { status: 401 });
     }
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await base44.auth.me().catch(() => null);
+    if (user && user.role !== 'admin') {
+      return Response.json({ error: 'Admin access required' }, { status: 403 });
+    }
 
     const body = await req.json().catch(() => ({}));
     const { move_request_id } = body;

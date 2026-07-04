@@ -37,6 +37,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing owner_email' }, { status: 400 });
     }
 
+    // Verify the caller is the renter submitting the request
+    if (renter_email && renter_email !== user.email && user.role !== 'admin') {
+      return Response.json({ error: 'You can only submit rental requests on your own behalf' }, { status: 403 });
+    }
+
     const safeVehicleTitle = escapeHtml(vehicle_title || 'Your listing');
     const safeRenterName = escapeHtml(renter_name || 'N/A');
     const safeRenterEmail = escapeHtml(renter_email || 'N/A');

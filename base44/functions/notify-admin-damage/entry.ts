@@ -23,6 +23,16 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Damage report not found' }, { status: 404 });
     }
 
+    // Verify the caller owns this damage report or is admin
+    if (
+      report.created_by_id !== user.id &&
+      report.customer_email !== user.email &&
+      report.driver_profile_id !== user.id &&
+      user.role !== 'admin'
+    ) {
+      return Response.json({ error: 'Access denied' }, { status: 403 });
+    }
+
     const move = report.move_request_id
       ? await base44.asServiceRole.entities.MoveRequest.get(report.move_request_id)
       : null;

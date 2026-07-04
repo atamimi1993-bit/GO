@@ -11,6 +11,10 @@ Deno.serve(async (req) => {
     if (!isAuth) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const user = await base44.auth.me().catch(() => null);
+    if (user && user.role !== 'admin') {
+      return Response.json({ error: 'Admin access required' }, { status: 403 });
+    }
 
     const body = await req.json().catch(() => ({}));
     const { user_email, title, body: notifBody, type, link, icon } = body;
