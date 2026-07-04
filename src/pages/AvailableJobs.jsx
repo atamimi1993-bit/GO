@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
 import moment from 'moment';
+import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function AvailableJobs() {
   const [jobs, setJobs] = useState([]);
@@ -14,17 +15,17 @@ export default function AvailableJobs() {
   const [driverProfile, setDriverProfile] = useState(null);
   const { toast } = useToast();
 
+  const load = async () => {
+    try {
+      const u = await base44.auth.me();
+      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      if (profiles.length > 0) setDriverProfile(profiles[0]);
+      const pending = await base44.entities.MoveRequest.filter({ status: 'pending' }, '-created_date', 50);
+      setJobs(pending);
+    } catch {}
+    setLoading(false);
+  };
   useEffect(() => {
-    const load = async () => {
-      try {
-        const u = await base44.auth.me();
-        const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
-        if (profiles.length > 0) setDriverProfile(profiles[0]);
-        const pending = await base44.entities.MoveRequest.filter({ status: 'pending' }, '-created_date', 50);
-        setJobs(pending);
-      } catch {}
-      setLoading(false);
-    };
     load();
   }, []);
 
@@ -54,6 +55,7 @@ export default function AvailableJobs() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
 
   return (
+    <PullToRefresh onRefresh={load}>
     <div>
       <Link to="/driver-hub" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6">
         <ArrowLeft size={16} /> Driver Hub
@@ -106,5 +108,6 @@ export default function AvailableJobs() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

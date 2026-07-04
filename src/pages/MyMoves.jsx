@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Package, MapPin, Calendar, Loader2 } from 'lucide-react';
 import moment from 'moment';
+import PullToRefresh from '@/components/go/PullToRefresh';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-100 text-yellow-700',
@@ -19,10 +20,12 @@ export default function MyMoves() {
   const [moves, setMoves] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const loadMoves = async () => {
+    const moves = await base44.entities.MoveRequest.list('-created_date', 50);
+    setMoves(moves);
+  };
   useEffect(() => {
-    base44.entities.MoveRequest.list('-created_date', 50)
-      .then(setMoves)
-      .finally(() => setLoading(false));
+    loadMoves().finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -30,6 +33,7 @@ export default function MyMoves() {
   }
 
   return (
+    <PullToRefresh onRefresh={loadMoves}>
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -82,5 +86,6 @@ export default function MyMoves() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

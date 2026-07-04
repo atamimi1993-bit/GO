@@ -3,16 +3,19 @@ import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Warehouse, Search, MapPin, Phone, Globe, Star, Loader2, Snowflake } from 'lucide-react';
+import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function Storage() {
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  const loadFacilities = async () => {
+    const facilities = await base44.entities.StorageFacility.list('-rating', 50);
+    setFacilities(facilities);
+  };
   useEffect(() => {
-    base44.entities.StorageFacility.list('-rating', 50)
-      .then(setFacilities)
-      .finally(() => setLoading(false));
+    loadFacilities().finally(() => setLoading(false));
   }, []);
 
   const filtered = facilities.filter(f =>
@@ -24,6 +27,7 @@ export default function Storage() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
 
   return (
+    <PullToRefresh onRefresh={loadFacilities}>
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-display font-bold mb-1">Find Storage</h1>
@@ -77,5 +81,6 @@ export default function Storage() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

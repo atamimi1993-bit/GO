@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/components/ui/use-toast';
 import { TRUCK_SIZE_LABELS } from '@/lib/pricing';
 import { ArrowLeft, Plus, Truck, Upload, Loader2, ShieldCheck } from 'lucide-react';
+import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function MyTrucks() {
   const [trucks, setTrucks] = useState([]);
@@ -25,19 +26,19 @@ export default function MyTrucks() {
     registration_doc_url: '', inspection_doc_url: '', insurance_doc_url: '', photo_url: '',
   });
 
+  const load = async () => {
+    try {
+      const u = await base44.auth.me();
+      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      if (profiles.length > 0) {
+        setDriverProfile(profiles[0]);
+        const t = await base44.entities.Truck.filter({ driver_profile_id: profiles[0].id });
+        setTrucks(t);
+      }
+    } catch {}
+    setLoading(false);
+  };
   useEffect(() => {
-    const load = async () => {
-      try {
-        const u = await base44.auth.me();
-        const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
-        if (profiles.length > 0) {
-          setDriverProfile(profiles[0]);
-          const t = await base44.entities.Truck.filter({ driver_profile_id: profiles[0].id });
-          setTrucks(t);
-        }
-      } catch {}
-      setLoading(false);
-    };
     load();
   }, []);
 
@@ -79,6 +80,7 @@ export default function MyTrucks() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
 
   return (
+    <PullToRefresh onRefresh={load}>
     <div className="max-w-2xl mx-auto">
       <Link to="/driver-hub" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6">
         <ArrowLeft size={16} /> Driver Hub
@@ -188,5 +190,6 @@ export default function MyTrucks() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

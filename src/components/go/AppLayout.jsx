@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
 import { Home, Package, Truck, HelpCircle, User, Menu, X, LogOut, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import BottomTabBar from '@/components/go/BottomTabBar';
 
 const navItems = [
   { label: 'Home', path: '/', icon: Home },
@@ -20,7 +21,7 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top nav */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center">
             <Logo size="sm" />
@@ -32,7 +33,7 @@ export default function AppLayout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`select-none px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === item.path
                     ? 'bg-emerald-50 text-emerald-700'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -79,7 +80,7 @@ export default function AppLayout() {
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-6 py-3 text-sm font-medium ${
+                className={`select-none flex items-center gap-3 px-6 py-3 text-sm font-medium ${
                   location.pathname === item.path
                     ? 'bg-emerald-50 text-emerald-700'
                     : 'text-gray-600'
@@ -101,9 +102,12 @@ export default function AppLayout() {
         )}
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-6 pb-16 md:pb-0 overscroll-y-none">
         <Outlet />
       </main>
+      <div className="md:hidden">
+        <BottomTabBar />
+      </div>
     </div>
   );
 }

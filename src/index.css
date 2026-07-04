@@ -89,4 +89,23 @@
   body {
     @apply bg-background text-foreground font-body;
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      color-scheme: dark;
+    }
+  }
+
+  html, body {
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button, a, [role="tab"], nav, .select-none-ui {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 }
