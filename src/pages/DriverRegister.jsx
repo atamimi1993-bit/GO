@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Upload, Loader2, FileText } from 'lucide-react';
+import { ArrowLeft, Upload, Loader2, FileText, Truck } from 'lucide-react';
 import MobileSelect from '@/components/go/MobileSelect';
 import { Switch } from '@/components/ui/switch';
 import ContractSign from '@/components/go/ContractSign';
@@ -24,6 +24,10 @@ export default function DriverRegister() {
     cdl_certified: false, cdl_class: 'None',
     license_doc_url: '', insurance_doc_url: '', profile_photo_url: '',
   });
+  const [truck, setTruck] = useState({
+    make: '', model: '', year: '', license_plate: '', size_category: 'medium',
+    registration_doc_url: '', inspection_doc_url: '',
+  });
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -31,13 +35,17 @@ export default function DriverRegister() {
     }).catch(() => {});
   }, []);
 
-  const handleUpload = async (field, e) => {
+  const handleUpload = async (field, e, target = 'form') => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(u => ({ ...u, [field]: true }));
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setForm(f => ({ ...f, [field]: file_url }));
+      if (target === 'truck') {
+        setTruck(t => ({ ...t, [field]: file_url }));
+      } else {
+        setForm(f => ({ ...f, [field]: file_url }));
+      }
     } catch {
       toast({ title: 'Upload failed', variant: 'destructive' });
     }
@@ -62,6 +70,14 @@ export default function DriverRegister() {
       if (contractRecord?.id) {
         await base44.entities.Contract.update(contractRecord.id, { driver_profile_id: driver.id });
       }
+      if (truck.make && truck.model && truck.license_plate) {
+        await base44.entities.Truck.create({
+          ...truck,
+          year: truck.year ? Number(truck.year) : undefined,
+          driver_profile_id: driver.id,
+          company_name: form.company_name || undefined,
+        });
+      }
       toast({ title: 'Application submitted!', description: 'Your profile and signed contract are under review.' });
     } catch {
       toast({ title: 'Submission failed', description: 'Please try again from Driver Hub.', variant: 'destructive' });
@@ -69,23 +85,26 @@ export default function DriverRegister() {
     setSaving(false);
   };
 
-  const FileUploadField = ({ label, field, accept }) => (
-    <div>
-      <Label>{label}</Label>
-      <div className="flex items-center gap-2 mt-1">
-        {form[field] ? (
-          <span className="text-emerald-600 text-sm font-medium">✓ Uploaded</span>
-        ) : (
-          <label className="cursor-pointer" htmlFor={`upload-${field}`} aria-label={`Upload ${label.toLowerCase()}`}>
-            <Button variant="outline" size="sm" disabled={uploading[field]} asChild>
-              <span>{uploading[field] ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} className="mr-1" />}{uploading[field] ? 'Uploading...' : 'Upload'}</span>
-            </Button>
-            <input id={`upload-${field}`} type="file" accept={accept || '.pdf,.jpg,.png'} className="hidden" onChange={e => handleUpload(field, e)} />
-          </label>
-        )}
+  const FileUploadField = ({ label, field, accept, target }) => {
+    const source = target === 'truck' ? truck : form;
+    return (
+      <div>
+        <Label>{label}</Label>
+        <div className="flex items-center gap-2 mt-1">
+          {source[field] ? (
+            <span className="text-emerald-600 text-sm font-medium">✓ Uploaded</span>
+          ) : (
+            <label className="cursor-pointer" htmlFor={`upload-${field}`} aria-label={`Upload ${label.toLowerCase()}`}>
+              <Button variant="outline" size="sm" disabled={uploading[field]} asChild>
+                <span>{uploading[field] ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} className="mr-1" />}{uploading[field] ? 'Uploading...' : 'Upload'}</span>
+              </Button>
+              <input id={`upload-${field}`} type="file" accept={accept || '.pdf,.jpg,.png'} className="hidden" onChange={e => handleUpload(field, e, target)} />
+            </label>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="max-w-lg mx-auto">
@@ -135,6 +154,38 @@ export default function DriverRegister() {
           <FileUploadField label="Driver's License (photo/scan)" field="license_doc_url" />
           <FileUploadField label="Insurance Document" field="insurance_doc_url" />
           <FileUploadField label="Profile Photo" field="profile_photo_url" accept=".jpg,.png,.jpeg" />
+        </div>
+
+        {/* Vehicle Registration */}
+        <div className="border-t pt-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <Truck size={18} className="text-emerald-500" />
+            <h3 className="font-display font-bold text-sm">Vehicle Registration</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div><Label htmlFor="truck_make">Vehicle Make *</Label><Input id="truck_make" value={truck.make} onChange={e => setTruck({ ...truck, make: e.target.value })} placeholder="e.g. Ford" /></div>
+            <div><Label htmlFor="truck_model">Vehicle Model *</Label><Input id="truck_model" value={truck.model} onChange={e => setTruck({ ...truck, model: e.target.value })} placeholder="e.g. F-650" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><Label htmlFor="truck_year">Year</Label><Input id="truck_year" type="number" value={truck.year} onChange={e => setTruck({ ...truck, year: e.target.value })} placeholder="2020" /></div>
+            <div><Label htmlFor="truck_plate">License Plate *</Label><Input id="truck_plate" value={truck.license_plate} onChange={e => setTruck({ ...truck, license_plate: e.target.value })} /></div>
+          </div>
+          <div>
+            <Label>Truck Size</Label>
+            <MobileSelect
+              value={truck.size_category}
+              onValueChange={v => setTruck({ ...truck, size_category: v })}
+              options={[
+                { value: 'small', label: 'Small (up to 14ft)' },
+                { value: 'medium', label: 'Medium (16-20ft)' },
+                { value: 'large', label: 'Large (22-26ft)' },
+                { value: 'extra_large', label: 'Extra Large (26ft+)' },
+              ]}
+              placeholder="Select truck size"
+            />
+          </div>
+          <FileUploadField label="Vehicle Registration Document" field="registration_doc_url" target="truck" />
+          <FileUploadField label="Vehicle Inspection Document" field="inspection_doc_url" target="truck" />
         </div>
 
         <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600" disabled={saving}>
