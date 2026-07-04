@@ -24,6 +24,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
     if (scrollRef && scrollRef.current) {
       return scrollRef.current.scrollTop <= 1;
     }
+    // Only fall back to window scroll when no scrollRef was passed at all
     return (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) <= 1;
   };
 
@@ -69,8 +70,9 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   };
 
   useEffect(() => {
-    // Always prefer scrollRef over wrapperRef when available and valid
-    const node = (scrollRef && scrollRef.current) ? scrollRef.current : wrapperRef.current;
+    // If a scrollRef prop was passed, only use scrollRef.current (never fall
+    // back to wrapperRef). Only use wrapperRef when no scrollRef was passed.
+    const node = scrollRef ? scrollRef.current : wrapperRef.current;
     if (!node) return;
     node.addEventListener('touchstart', handleTouchStart, { passive: true });
     node.addEventListener('touchmove', handleTouchMove, { passive: false });

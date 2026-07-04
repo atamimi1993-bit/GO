@@ -38,9 +38,9 @@ export default function AppLayout() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-dvh flex flex-col bg-background">
       {/* Top nav */}
-      <header className="bg-card border-b border-border sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <header className="shrink-0 bg-card border-b border-border sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center">
             <Logo size="sm" />
@@ -104,7 +104,7 @@ export default function AppLayout() {
       <main
         ref={mainRef}
         data-scroll-container
-        className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-0 overscroll-y-none h-[calc(100dvh-4rem-56px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto md:h-auto md:overflow-visible"
+        className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 pb-20 md:pb-0 overscroll-y-none overflow-y-auto md:h-auto md:overflow-visible"
       >
         <Outlet context={{ scrollRef: mainRef }} />
       </main>

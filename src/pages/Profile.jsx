@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { User, Mail, Loader2, ArrowLeft } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function Profile() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
+    <PullToRefresh onRefresh={async () => { const u = await base44.auth.me(); setUser(u); }} scrollRef={null}>
     <div className="max-w-md mx-auto">
       <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]"><ArrowLeft size={16} /> Back</button>
       <h1 className="text-2xl font-display font-bold mb-6">My Account</h1>
@@ -69,5 +71,6 @@ export default function Profile() {
         </AlertDialog>
       </div>
     </div>
+    </PullToRefresh>
   );
 }
