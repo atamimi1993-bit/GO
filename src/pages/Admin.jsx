@@ -41,6 +41,7 @@ export default function Admin() {
   const { toast } = useToast();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
   const [showMap, setShowMap] = useState(false);
 
@@ -48,12 +49,20 @@ export default function Admin() {
     try {
       const res = await base44.functions.invoke('admin-dashboard', { action: 'overview' });
       setData(res.data);
+      setError(null);
     } catch (err) {
-      toast({ title: 'Failed to load dashboard', description: err.message, variant: 'destructive' });
+      const status = err?.response?.status;
+      if (status === 401) {
+        setError({ title: 'Authentication Required', message: 'Please log in again to view this dashboard.' });
+      } else if (status === 403) {
+        setError({ title: 'Access Denied', message: 'You need admin privileges to view this dashboard.' });
+      } else {
+        setError({ title: 'Failed to Load', message: err?.message || 'Something went wrong. Please try again.' });
+      }
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => { load(); }, [load]);
 
@@ -96,13 +105,22 @@ export default function Admin() {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
   }
 
-  if (!data) {
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <ShieldCheck className="text-muted-foreground mb-3" size={48} />
-        <h2 className="font-display font-bold text-lg mb-1">Access Denied</h2>
-        <p className="text-muted-foreground text-sm">You need admin privileges to view this dashboard.</p>
+        <h2 className="font-display font-bold text-lg mb-1">{error.title}</h2>
+        <p className="text-muted-foreground text-sm mb-4 max-w-xs">{error.message}</p>
+        <Button variant="outline" onClick={() => { setLoading(true); setError(null); load(); }}>
+          Retry
+        </Button>
       </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>
     );
   }
 
