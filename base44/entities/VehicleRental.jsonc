@@ -1,0 +1,114 @@
+{
+  "name": "VehicleRental",
+  "type": "object",
+  "properties": {
+    "owner_name": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "owner_phone": {
+      "type": "string"
+    },
+    "owner_type": {
+      "type": "string",
+      "enum": [
+        "driver",
+        "customer"
+      ],
+      "default": "customer"
+    },
+    "vehicle_type": {
+      "type": "string",
+      "enum": [
+        "car",
+        "truck",
+        "van",
+        "trailer"
+      ],
+      "default": "truck"
+    },
+    "make": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "year": {
+      "type": "number"
+    },
+    "license_plate": {
+      "type": "string"
+    },
+    "daily_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "photo_urls": {
+      "type": "string"
+    },
+    "available": {
+      "type": "boolean",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "rented",
+        "inactive"
+      ],
+      "default": "active"
+    },
+    "capacity_lbs": {
+      "type": "number",
+      "default": 0
+    },
+    "seats": {
+      "type": "number",
+      "default": 0
+    },
+    "transmission": {
+      "type": "string",
+      "enum": [
+        "automatic",
+        "manual"
+      ],
+      "default": "automatic"
+    },
+    "fuel_type": {
+      "type": "string",
+      "enum": [
+        "gasoline",
+        "diesel",
+        "electric",
+        "hybrid"
+      ],
+      "default": "gasoline"
+    },
+    "features": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_name",
+    "owner_email",
+    "owner_type",
+    "vehicle_type",
+    "make",
+    "model",
+    "daily_rate",
+    "city"
+  ]
+}

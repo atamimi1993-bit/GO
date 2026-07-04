@@ -38,6 +38,9 @@ const Leaderboard = lazy(() => import('@/pages/Leaderboard'));
 const DriverDashboard = lazy(() => import('@/pages/DriverDashboard'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const FinancialDashboard = lazy(() => import('@/pages/FinancialDashboard'));
+const Rentals = lazy(() => import('@/pages/Rentals'));
+const RentalDetail = lazy(() => import('@/pages/RentalDetail'));
+const NewRental = lazy(() => import('@/pages/NewRental'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -112,6 +115,9 @@ const AuthenticatedApp = () => {
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
           <Route path="/financials" element={<PageTransition><FinancialDashboard /></PageTransition>} />
+          <Route path="/rentals" element={<PageTransition><Rentals /></PageTransition>} />
+          <Route path="/rentals/new" element={<PageTransition><NewRental /></PageTransition>} />
+          <Route path="/rentals/:id" element={<PageTransition><RentalDetail /></PageTransition>} />
         </Route>
       </Route>
 

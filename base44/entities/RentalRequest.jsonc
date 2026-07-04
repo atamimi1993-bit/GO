@@ -1,0 +1,67 @@
+{
+  "name": "RentalRequest",
+  "type": "object",
+  "properties": {
+    "vehicle_rental_id": {
+      "type": "string"
+    },
+    "renter_name": {
+      "type": "string"
+    },
+    "renter_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "renter_phone": {
+      "type": "string"
+    },
+    "requested_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "requested_end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "message": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "quoted",
+        "accepted",
+        "rejected",
+        "cancelled",
+        "completed"
+      ],
+      "default": "pending"
+    },
+    "quoted_price": {
+      "type": "number",
+      "default": 0
+    },
+    "owner_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "vehicle_title": {
+      "type": "string"
+    },
+    "stripe_session_id": {
+      "type": "string"
+    },
+    "paid": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "vehicle_rental_id",
+    "renter_name",
+    "renter_email",
+    "requested_start_date",
+    "requested_end_date"
+  ]
+}
