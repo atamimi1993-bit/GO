@@ -40,30 +40,30 @@ export default function Home() {
       <AdBanner audience="customers" />
 
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900 rounded-3xl overflow-hidden px-8 py-16 md:py-24 text-white">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-emerald-400 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-56 h-56 bg-emerald-500 rounded-full blur-3xl" />
-        </div>
+      <section className="relative rounded-[2rem] overflow-hidden px-6 md:px-12 py-16 md:py-24 text-white border border-white/10" style={{ background: 'linear-gradient(135deg, hsl(225 47% 8%), hsl(220 45% 5%))' }}>
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-[100px] opacity-40 animate-glow-pulse" style={{ background: 'hsl(160 84% 52%)' }} />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full blur-[100px] opacity-25 animate-glow-pulse" style={{ background: 'hsl(265 85% 65%)', animationDelay: '2s' }} />
+        <div className="absolute top-1/3 left-0 w-64 h-64 rounded-full blur-[80px] opacity-20 animate-float" style={{ background: 'hsl(190 90% 50%)' }} />
+
         <div className="relative z-10 max-w-2xl">
           <div className="mb-6">
             <Logo size="lg" />
           </div>
-          <h1 className="text-4xl md:text-6xl font-display font-black leading-tight mb-4">
+          <h1 className="text-4xl md:text-6xl font-display font-black leading-[1.05] mb-5 tracking-tight">
             Move anything,<br />
-            <span className="text-emerald-400">anywhere.</span>
+            <span className="bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent">anywhere.</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-lg">
+          <p className="text-lg md:text-xl text-white/70 mb-8 max-w-lg leading-relaxed">
             The easiest way to move your belongings — anywhere in the world. Get instant pricing, verified drivers, and real-time tracking — all in one app.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button onClick={() => navigate('/new-move')} size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+            <Button onClick={() => navigate('/new-move')} size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto glow-primary border border-white/10">
               Start a Move <ArrowRight className="ml-2" size={20} />
             </Button>
-            <Button onClick={() => navigate('/quick-delivery')} size="lg" className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+            <Button onClick={() => navigate('/quick-delivery')} size="lg" className="glass-nav text-white hover:bg-white/15 rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto border border-white/15">
               Quick Delivery <Zap className="ml-2" size={20} />
             </Button>
-            <Button onClick={() => navigate('/driver-hub')} size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+            <Button onClick={() => navigate('/driver-hub')} size="lg" variant="ghost" className="text-white/80 hover:bg-white/10 hover:text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto border border-white/10">
               Become a Driver <Truck className="ml-2" size={20} />
             </Button>
           </div>
@@ -93,7 +93,7 @@ export default function Home() {
             <Link
               key={item.label}
               to={item.path}
-              className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-md transition-all"
+              className="flex flex-col items-center gap-2 p-4 rounded-2xl glass-card hover:border-primary/40 hover:-translate-y-0.5 transition-all"
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.accent}`}>
                 <item.icon size={22} />
@@ -114,11 +114,11 @@ export default function Home() {
             { icon: Truck, title: 'Driver Accepts', desc: 'Verified local drivers with licensed trucks accept your job.' },
             { icon: Shield, title: 'Move with Confidence', desc: 'Sign our liability agreement and track your move from start to finish.' },
           ].map((step, i) => (
-            <div key={i} className="bg-card rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-4">
-                <step.icon className="text-emerald-600" size={24} />
+            <div key={i} className="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <step.icon className="text-primary" size={24} />
               </div>
-              <div className="text-xs font-bold text-emerald-600 mb-1">STEP {i + 1}</div>
+              <div className="text-xs font-bold text-primary mb-1">STEP {i + 1}</div>
               <h3 className="font-display font-bold text-lg mb-2">{step.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
             </div>
@@ -160,9 +160,9 @@ export default function Home() {
             { icon: MapPin, title: 'Real-time Tracking', desc: 'Watch your move progress live — from pickup to dropoff, every step of the way.' },
             { icon: CreditCard, title: 'Secure Payments', desc: 'Payments processed through Stripe with optional payment plans for larger moves.' },
           ].map((feat, i) => (
-            <div key={i} className="bg-card rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-4">
-                <feat.icon className="text-emerald-600" size={24} />
+            <div key={i} className="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <feat.icon className="text-primary" size={24} />
               </div>
               <h3 className="font-display font-bold text-lg mb-2">{feat.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{feat.desc}</p>
@@ -173,15 +173,15 @@ export default function Home() {
 
       {/* Quick Links */}
       <section className="grid md:grid-cols-2 gap-4">
-        <Link to="/storage" className="bg-blue-500/10 rounded-2xl p-6 hover:shadow-md transition-shadow group">
+        <Link to="/storage" className="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-all group">
           <h3 className="font-display font-bold text-lg mb-1">Need Storage?</h3>
           <p className="text-sm text-muted-foreground mb-3">Find climate-controlled storage facilities near your move.</p>
-          <span className="text-blue-600 font-semibold text-sm group-hover:underline">Browse Storage →</span>
+          <span className="text-primary font-semibold text-sm group-hover:underline">Browse Storage →</span>
         </Link>
-        <Link to="/help" className="bg-amber-500/10 rounded-2xl p-6 hover:shadow-md transition-shadow group">
+        <Link to="/help" className="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-all group">
           <h3 className="font-display font-bold text-lg mb-1">Need Help?</h3>
           <p className="text-sm text-muted-foreground mb-3">Visit our Help Center for guides, FAQs, and support.</p>
-          <span className="text-amber-600 font-semibold text-sm group-hover:underline">Get Help →</span>
+          <span className="text-primary font-semibold text-sm group-hover:underline">Get Help →</span>
         </Link>
       </section>
 

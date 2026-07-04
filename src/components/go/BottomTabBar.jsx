@@ -55,7 +55,7 @@ export default function BottomTabBar() {
       : customerTabs;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border flex select-none" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-nav flex select-none" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {tabs.map(tab => {
         const active = location.pathname === tab.path || (tab.path !== '/' && location.pathname.startsWith(tab.path));
         return (
