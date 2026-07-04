@@ -3,13 +3,17 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { formatCurrency } from '@/lib/pricing';
-import { BarChart3, CheckCircle2, DollarSign, MapPin, Loader2, Lock, Trophy, TrendingUp } from 'lucide-react';
+import { BarChart3, CheckCircle2, DollarSign, MapPin, Loader2, Lock, Trophy, TrendingUp, Download, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import CompletedMovesChart from '@/components/admin/CompletedMovesChart';
+import RevenueTrendChart from '@/components/admin/RevenueTrendChart';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 const fmt = (n) => formatCurrency(n, 'USD');
 
 export default function MetricsDashboard() {
   const { scrollRef } = useOutletContext();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
   const [data, setData] = useState(null);
@@ -54,6 +58,30 @@ export default function MetricsDashboard() {
 
   const { monthlySeries, topRegions, totals } = data;
 
+  const avgRevenuePerMove = totals.totalCompletedMoves > 0 ? totals.totalRevenue / totals.totalCompletedMoves : 0;
+
+  // Month-over-month growth
+  const lastMonth = monthlySeries.length >= 1 ? monthlySeries[monthlySeries.length - 1] : null;
+  const prevMonth = monthlySeries.length >= 2 ? monthlySeries[monthlySeries.length - 2] : null;
+  const movesGrowth = prevMonth && prevMonth.completed_moves > 0
+    ? ((lastMonth.completed_moves - prevMonth.completed_moves) / prevMonth.completed_moves) * 100
+    : null;
+  const revenueGrowth = prevMonth && prevMonth.move_fee_revenue > 0
+    ? ((lastMonth.move_fee_revenue - prevMonth.move_fee_revenue) / prevMonth.move_fee_revenue) * 100
+    : null;
+
+  const GrowthBadge = ({ pct }) => {
+    if (pct === null) return null;
+    const isUp = pct > 0;
+    const isFlat = pct === 0;
+    return (
+      <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${isFlat ? 'text-muted-foreground' : isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+        {isFlat ? <Minus size={12} /> : isUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+        {isFlat ? '0%' : `${Math.abs(pct).toFixed(1)}%`}
+      </span>
+    );
+  };
+
   const stats = [
     {
       label: 'Completed Moves',
@@ -61,6 +89,7 @@ export default function MetricsDashboard() {
       icon: CheckCircle2,
       accent: 'text-emerald-600',
       bg: 'bg-emerald-500/5 border-emerald-500/20',
+      growth: movesGrowth,
     },
     {
       label: 'Move-Fee Revenue',
@@ -68,10 +97,11 @@ export default function MetricsDashboard() {
       icon: DollarSign,
       accent: 'text-blue-600',
       bg: 'bg-blue-500/5 border-blue-500/20',
+      growth: revenueGrowth,
     },
     {
-      label: 'Total Move Revenue',
-      value: fmt(totals.totalRevenue),
+      label: 'Avg Revenue / Move',
+      value: fmt(avgRevenuePerMove),
       icon: TrendingUp,
       accent: 'text-purple-600',
       bg: 'bg-purple-500/5 border-purple-500/20',
@@ -86,6 +116,40 @@ export default function MetricsDashboard() {
   ];
 
   const maxMoves = topRegions.length > 0 ? topRegions[0].completed_moves : 1;
+
+  const handleExportCSV = () => {
+    const escape = (val) => {
+      if (val === null || val === undefined) return '';
+      const s = String(val);
+      if (s.includes(',') || s.includes('"') || s.includes('\n')) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    };
+
+    const monthHeaders = ['month', 'completed_moves', 'move_fee_revenue', 'total_revenue'];
+    const monthRows = monthlySeries.map((r) => ({ month: r.month, completed_moves: r.completed_moves, move_fee_revenue: r.move_fee_revenue, total_revenue: r.total_revenue }));
+
+    const regionHeaders = ['region', 'completed_moves', 'revenue', 'move_fee_revenue', 'driver_count'];
+    const regionRows = topRegions.map((r) => ({ region: r.region, completed_moves: r.completed_moves, revenue: r.revenue, move_fee_revenue: r.move_fee_revenue, driver_count: r.driver_count }));
+
+    const lines = [];
+    lines.push('# Monthly Metrics');
+    lines.push(monthHeaders.join(','));
+    for (const row of monthRows) lines.push(monthHeaders.map((h) => escape(row[h])).join(','));
+    lines.push('');
+    lines.push('# Top Driver Regions');
+    lines.push(regionHeaders.join(','));
+    for (const row of regionRows) lines.push(regionHeaders.map((h) => escape(row[h])).join(','));
+
+    const csv = lines.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `metrics-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: 'CSV downloaded', description: 'Open it in Google Sheets (File → Import → Upload).' });
+  };
 
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
@@ -110,9 +174,17 @@ export default function MetricsDashboard() {
               <div className="min-w-0">
                 <p className="text-xl font-display font-bold truncate">{s.value}</p>
                 <p className="text-xs text-muted-foreground">{s.label}</p>
+                {s.growth !== undefined && s.growth !== null && <div className="mt-0.5"><GrowthBadge pct={s.growth} /></div>}
               </div>
             </div>
           ))}
+        </div>
+
+        {/* CSV Export */}
+        <div className="flex justify-end mb-4">
+          <Button variant="outline" size="sm" onClick={handleExportCSV} className="min-h-[44px]">
+            <Download size={14} className="mr-1" /> Export CSV
+          </Button>
         </div>
 
         {/* Completed moves per month chart */}
@@ -121,6 +193,14 @@ export default function MetricsDashboard() {
             <BarChart3 size={16} className="text-emerald-600" /> Completed Moves Per Month
           </h3>
           <CompletedMovesChart chartData={monthlySeries} />
+        </div>
+
+        {/* Move-fee revenue trend chart */}
+        <div className="bg-card border rounded-2xl p-5 mb-6">
+          <h3 className="font-display font-bold text-sm mb-4 flex items-center gap-2">
+            <TrendingUp size={16} className="text-blue-600" /> Move-Fee Revenue Trend
+          </h3>
+          <RevenueTrendChart chartData={monthlySeries} />
         </div>
 
         {/* Top-performing driver regions */}
