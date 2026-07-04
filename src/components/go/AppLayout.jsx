@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, ShieldCheck, Container, Navigation, DollarSign, Trophy, TrendingUp, Car, FileText } from 'lucide-react';
+import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, ShieldCheck, Navigation, DollarSign, Trophy, TrendingUp, Car, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/AuthContext';
@@ -17,8 +17,6 @@ const navItems = [
   { label: 'Rentals', path: '/rentals', icon: Car },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
   { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
-  { label: 'Drivers', path: '/driver-dashboard', icon: Truck, adminOnly: true },
-  { label: 'Freight', path: '/freight-dashboard', icon: Container, cdlOrAdmin: true },
 ];
 
 export default function AppLayout() {
