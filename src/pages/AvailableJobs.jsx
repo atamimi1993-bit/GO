@@ -76,7 +76,7 @@ export default function AvailableJobs() {
       ) : (
         <div className="space-y-3">
           {jobs.map(job => (
-            <div key={job.id} className="bg-card border rounded-2xl p-5">
+            <div key={job.id} className="select-none bg-card border rounded-2xl p-5">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2">

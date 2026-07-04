@@ -101,7 +101,7 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  button, [role="tab"], nav, .select-none-ui {
+  button, [role="tab"], nav, .select-none-ui, a[role="link"], [data-radix-collection-item] {
     user-select: none;
     -webkit-user-select: none;
   }
