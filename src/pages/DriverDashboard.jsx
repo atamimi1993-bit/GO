@@ -6,6 +6,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import DriverPersonalDashboard from '@/components/go/DriverPersonalDashboard';
 import {
   Truck, DollarSign, TrendingUp, Loader2, Star, ShieldCheck,
   Briefcase, Wallet, Search, ChevronDown, ChevronUp,
@@ -40,7 +41,13 @@ export default function DriverDashboard() {
   const [sortDir, setSortDir] = useState('desc');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  const isAdmin = user?.role === 'admin';
+
   const load = useCallback(async () => {
+    if (!isAdmin) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await base44.functions.invoke('admin-dashboard', { action: 'driver_performance' });
       setData(res.data);
@@ -49,7 +56,7 @@ export default function DriverDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, isAdmin]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -64,6 +71,11 @@ export default function DriverDashboard() {
 
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
+  }
+
+  // Non-admin drivers see only their own data
+  if (!isAdmin) {
+    return <DriverPersonalDashboard user={user} />;
   }
 
   if (!data) {
@@ -109,7 +121,7 @@ export default function DriverDashboard() {
           <div>
             <h1 className="text-2xl font-display font-bold">Driver Performance</h1>
             <p className="text-muted-foreground text-sm">
-              Monitor total earnings and active jobs per driver, {user?.full_name || 'Admin'}.
+              Monitor total earnings and active jobs across all drivers, {user?.full_name || 'Admin'}.
             </p>
           </div>
         </div>
