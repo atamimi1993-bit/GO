@@ -22,7 +22,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Tips can only be given for completed moves' }, { status: 400 });
     }
 
-    const origin = body.origin || 'https://go.base44.com';
+    // Derive origin from the request's own headers — never trust user-supplied body.origin
+    // to prevent open-redirect attacks via crafted success_url/cancel_url.
+    const headerOrigin = req.headers.get('origin') || req.headers.get('referer');
+    let origin = 'https://go.base44.com';
+    if (headerOrigin) {
+      try {
+        const url = new URL(headerOrigin);
+        if (url.protocol === 'https:' || url.protocol === 'http:') {
+          origin = url.origin;
+        }
+      } catch {
+        // Invalid URL — fall back to default
+      }
+    }
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
