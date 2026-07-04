@@ -117,6 +117,7 @@ export default function RecruitmentPipeline() {
                   <p className="text-sm font-medium truncate">{d.full_name}</p>
                   <button
                     onClick={() => copyCode(d.referral_code)}
+                    aria-label={`Copy referral code ${d.referral_code}`}
                     className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Copy size={11} /> {d.referral_code}

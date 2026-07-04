@@ -84,7 +84,11 @@ export default function Admin() {
     try {
       await base44.functions.invoke('admin-dashboard', { action, driver_id: driverId });
       toast({ title: `${driver?.full_name || 'Driver'} has been ${action === 'approve_driver' ? 'approved' : 'rejected'}` });
-      await load();
+      // Optimistically decrement the pending drivers count instead of a full re-fetch
+      setData((prev) => prev ? ({
+        ...prev,
+        stats: { ...prev.stats, pendingDrivers: Math.max(0, (prev.stats?.pendingDrivers || 0) - 1) },
+      }) : prev);
     } catch (err) {
       // Restore the original pending drivers list on error
       setData((prev) => ({ ...prev, pendingDrivers: prevPendingDrivers }));
