@@ -184,6 +184,14 @@
     "assigned_driver_name": {
       "type": "string"
     },
+    "dispatched_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "declined_driver_ids": {
+      "type": "string",
+      "default": ""
+    },
     "liability_signed": {
       "type": "boolean",
       "default": false

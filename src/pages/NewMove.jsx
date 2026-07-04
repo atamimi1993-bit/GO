@@ -228,7 +228,9 @@ export default function NewMove() {
       if (contractRecord?.id) {
         await base44.entities.Contract.update(contractRecord.id, { move_request_id: move.id });
       }
-      toast({ title: 'Move booked!', description: 'A driver will accept your job shortly.' });
+      // Auto-dispatch to nearest available certified driver (fire-and-forget)
+      base44.functions.invoke('auto-dispatch-driver', { move_request_id: move.id }).catch(() => {});
+      toast({ title: 'Move booked!', description: "Finding your driver — you'll be notified when a driver accepts." });
       navigate('/my-moves');
     } catch {
       toast({ title: 'Error', description: 'Something went wrong. Please try again.', variant: 'destructive' });

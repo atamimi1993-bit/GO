@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 const DriverTrackingControls = lazy(() => import('@/components/go/DriverTrackingControls'));
 const DriverLeaderboardCard = lazy(() => import('@/components/go/DriverLeaderboardCard'));
+const DispatchJobOffer = lazy(() => import('@/components/go/DispatchJobOffer'));
 const ExpenseSubmission = lazy(() => import('@/components/go/ExpenseSubmission'));
 const DriverNavigationCard = lazy(() => import('@/components/go/DriverNavigationCard'));
 const ComplianceManager = lazy(() => import('@/components/go/ComplianceManager'));
@@ -120,6 +121,13 @@ export default function DriverHub() {
             <p className="text-xs text-yellow-700 dark:text-yellow-300">Your documents are being verified. You'll be able to accept jobs once approved.</p>
           </div>
         </div>
+      )}
+
+      {/* Pending dispatch job offer — accept/decline with countdown */}
+      {profile.status === 'approved' && (
+        <Suspense fallback={null}>
+          <DispatchJobOffer driverProfile={profile} onResponded={load} />
+        </Suspense>
       )}
 
       {/* Driver promos */}
