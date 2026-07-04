@@ -8,6 +8,7 @@ import { Plus, Loader2, Search, Truck, Car, MapPin } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import RentalCard from '@/components/rental/RentalCard';
+import PartnerRentals from '@/components/rental/PartnerRentals';
 import { useUserState } from '@/hooks/useUserState';
 
 export default function Rentals() {
@@ -139,6 +140,8 @@ export default function Rentals() {
             ))}
           </div>
         )}
+
+        <PartnerRentals />
       </div>
     </PullToRefresh>
   );
