@@ -10,6 +10,7 @@ import EarningsCharts from '@/components/admin/EarningsCharts';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
+import MarketingPanel from '@/components/admin/MarketingPanel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -121,6 +122,9 @@ export default function Admin() {
 
         {/* Driver performance */}
         <DriverPerformance />
+
+        {/* Marketing & promotions */}
+        <MarketingPanel />
 
         {/* Bulk payout processing */}
         <BulkPayoutPanel scrollRef={scrollRef} />
