@@ -5,25 +5,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Search, Loader2, Sparkles, Globe } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { COUNTRY_LIST } from '@/lib/pricing';
 
-const STATES = [
-  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
-  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
-  'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
-  'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
-  'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
-  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-  'Wisconsin', 'Wyoming',
-];
+const COUNTRIES = COUNTRY_LIST.map(c => c.name);
 
 export default function LeadFinder({ onLeadsGenerated }) {
   const [location, setLocation] = useState('');
   const [keywords, setKeywords] = useState('');
   const [searching, setSearching] = useState(false);
   const [lastResult, setLastResult] = useState(null);
-  const [allStatesMode, setAllStatesMode] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0, state: '', totalFound: 0, totalCreated: 0 });
+  const [worldwideMode, setWorldwideMode] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0, country: '', totalFound: 0, totalCreated: 0 });
   const { toast } = useToast();
 
   const handleSearch = async () => {
@@ -52,37 +44,37 @@ export default function LeadFinder({ onLeadsGenerated }) {
     }
   };
 
-  const handleAllStates = async () => {
-    setAllStatesMode(true);
+  const handleWorldwide = async () => {
+    setWorldwideMode(true);
     setSearching(true);
-    const totalFound = { count: 0, created: 0 };
-    setProgress({ current: 0, total: STATES.length, state: STATES[0], totalFound: 0, totalCreated: 0 });
+    const totals = { found: 0, created: 0 };
+    setProgress({ current: 0, total: COUNTRIES.length, country: COUNTRIES[0], totalFound: 0, totalCreated: 0 });
 
-    for (let i = 0; i < STATES.length; i++) {
-      const state = STATES[i];
-      setProgress((p) => ({ ...p, current: i, state, totalFound: totalFound.count, totalCreated: totalFound.created }));
+    for (let i = 0; i < COUNTRIES.length; i++) {
+      const country = COUNTRIES[i];
+      setProgress((p) => ({ ...p, current: i, country, totalFound: totals.found, totalCreated: totals.created }));
       try {
         const res = await base44.functions.invoke('find-leads', {
-          location: state,
+          location: country,
           keywords: keywords.trim(),
         });
-        totalFound.count += res.data.found || 0;
-        totalFound.created += res.data.created || 0;
-        setProgress((p) => ({ ...p, totalFound: totalFound.count, totalCreated: totalFound.created }));
+        totals.found += res.data.found || 0;
+        totals.created += res.data.created || 0;
+        setProgress((p) => ({ ...p, totalFound: totals.found, totalCreated: totals.created }));
         if (onLeadsGenerated) onLeadsGenerated();
       } catch (err) {
-        console.error(`Failed for ${state}:`, err);
+        console.error(`Failed for ${country}:`, err);
       }
     }
 
-    setProgress((p) => ({ ...p, current: STATES.length, state: 'Done', totalFound: totalFound.count, totalCreated: totalFound.created }));
-    toast({ title: 'All 50 states complete', description: `${totalFound.count} leads found, ${totalFound.created} saved.` });
+    setProgress((p) => ({ ...p, current: COUNTRIES.length, country: 'Done', totalFound: totals.found, totalCreated: totals.created }));
+    toast({ title: 'Worldwide search complete', description: `${totals.found} leads found, ${totals.created} saved across ${COUNTRIES.length} countries.` });
     setSearching(false);
   };
 
-  const stopAllStates = () => {
+  const stopWorldwide = () => {
     setSearching(false);
-    setAllStatesMode(false);
+    setWorldwideMode(false);
   };
 
   const pct = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0;
@@ -95,7 +87,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
         </div>
         <div>
           <h2 className="font-display font-bold text-lg">AI Lead Finder</h2>
-          <p className="text-xs text-muted-foreground">Searches the web for people and businesses likely to need moving services.</p>
+          <p className="text-xs text-muted-foreground">Searches the web worldwide for people and businesses likely to need moving services.</p>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row gap-2">
@@ -105,7 +97,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
             id="lead-location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="City, state or area (e.g. Austin, TX)"
+            placeholder="City, country or region (e.g. Paris, France)"
             disabled={searching}
             aria-label="Search location"
             onKeyDown={(e) => { if (e.key === 'Enter' && !searching) handleSearch(); }}
@@ -129,17 +121,17 @@ export default function LeadFinder({ onLeadsGenerated }) {
           disabled={searching}
           aria-label="Find leads"
         >
-          {searching && !allStatesMode ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-          {searching && !allStatesMode ? 'Searching...' : 'Find Leads'}
+          {searching && !worldwideMode ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+          {searching && !worldwideMode ? 'Searching...' : 'Find Leads'}
         </Button>
       </div>
 
-      {/* All 50 States Mode */}
-      {allStatesMode ? (
+      {/* Worldwide Mode */}
+      {worldwideMode ? (
         <div className="mt-4 border-t pt-4" aria-live="polite">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium">
-              {searching ? `Searching ${progress.state}...` : `Complete — all 50 states done`}
+              {searching ? `Searching ${progress.country}...` : `Complete — all ${COUNTRIES.length} countries done`}
             </span>
             <span className="text-sm text-muted-foreground">{progress.current}/{progress.total}</span>
           </div>
@@ -151,7 +143,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
               {progress.totalFound} leads found · {progress.totalCreated} saved so far
             </p>
             {searching && (
-              <Button size="sm" variant="outline" onClick={stopAllStates}>
+              <Button size="sm" variant="outline" onClick={stopWorldwide}>
                 Stop
               </Button>
             )}
@@ -160,14 +152,14 @@ export default function LeadFinder({ onLeadsGenerated }) {
       ) : (
         <button
           className="mt-3 text-xs text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
-          onClick={handleAllStates}
+          onClick={handleWorldwide}
           disabled={searching}
         >
-          <Globe size={12} /> Search all 50 states
+          <Globe size={12} /> Search worldwide ({COUNTRIES.length} countries)
         </button>
       )}
 
-      {lastResult && !allStatesMode && (
+      {lastResult && !worldwideMode && (
         <p className="text-sm text-muted-foreground mt-3" aria-live="polite">
           Found <span className="font-semibold text-foreground">{lastResult.found}</span> leads
           {lastResult.created > 0 && ` — ${lastResult.created} saved to your leads list below`}.

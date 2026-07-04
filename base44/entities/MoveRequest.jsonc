@@ -48,6 +48,21 @@
       "type": "number",
       "default": 0
     },
+    "distance_unit": {
+      "type": "string",
+      "enum": [
+        "mi",
+        "km"
+      ],
+      "default": "mi"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
     "truck_size_needed": {
       "type": "string",
       "enum": [

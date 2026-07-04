@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, DollarSign, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { formatCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 const STATUS_COLORS = {
@@ -49,7 +50,7 @@ export default function MyPayouts() {
 
       <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 mb-6 text-center">
         <p className="text-sm text-emerald-600 dark:text-emerald-400 mb-1">Total Earnings</p>
-        <p className="text-4xl font-display font-black text-emerald-600 dark:text-emerald-400">${total.toFixed(2)}</p>
+        <p className="text-4xl font-display font-black text-emerald-600 dark:text-emerald-400">{formatCurrency(total)}</p>
       </div>
 
       {payouts.length === 0 ? (
@@ -62,10 +63,10 @@ export default function MyPayouts() {
           {payouts.map(p => (
             <div key={p.id} className="bg-card border rounded-xl px-5 py-4 flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">${p.amount.toFixed(2)}</p>
+                <p className="font-medium text-sm">{formatCurrency(p.amount, p.currency)}</p>
                 <p className="text-xs text-muted-foreground">{format(parseISO(p.created_date), 'MMM d, yyyy')}</p>
                 {p.deduction_amount > 0 && (
-                  <p className="text-xs text-red-500">-${p.deduction_amount.toFixed(2)} deduction: {p.deduction_reason}</p>
+                  <p className="text-xs text-red-500">-{formatCurrency(p.deduction_amount, p.currency)} deduction: {p.deduction_reason}</p>
                 )}
               </div>
               <Badge className={STATUS_COLORS[p.status]}>{p.status}</Badge>

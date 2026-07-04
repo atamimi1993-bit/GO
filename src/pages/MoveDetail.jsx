@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
+import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -70,11 +71,18 @@ export default function MoveDetail() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
   if (!move) return <div className="text-center py-20"><p className="text-muted-foreground">Move not found.</p></div>;
 
+  const currencyCode = move.currency || 'USD';
+  const curr = getCurrency(currencyCode);
+  const distUnit = move.distance_unit || 'mi';
   const pricing = {
     baseCost: move.base_cost, fuelCost: move.fuel_cost, taxRate: move.tax_rate,
     taxAmount: move.tax_amount, appFee: move.app_fee, driverFee: move.driver_fee,
     totalPrice: move.total_price, driverPayout: move.driver_payout,
-    roundTripMiles: move.distance_miles * 2, gallonsNeeded: 0,
+    currency: curr,
+    displayDistance: (move.distance_miles || 0) * 2,
+    displayDistanceUnit: distUnit,
+    displayFuel: 0,
+    displayFuelUnit: distUnit === 'km' ? 'L' : 'gal',
   };
 
   return (
@@ -149,7 +157,7 @@ export default function MoveDetail() {
       )}
 
       {/* Price */}
-      <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} />
+      <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} currencyCode={currencyCode} />
 
       {!move.paid && move.status !== 'cancelled' && (
         <Button
@@ -157,7 +165,7 @@ export default function MoveDetail() {
           disabled={paying}
           className="w-full mt-4 bg-emerald-500 hover:bg-emerald-600"
         >
-          {paying ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</> : <><CreditCard size={16} className="mr-1" /> Pay ${move.total_price?.toFixed(2)}</>}
+          {paying ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</> : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{move.total_price?.toFixed(curr.decimals)}</>}
         </Button>
       )}
 

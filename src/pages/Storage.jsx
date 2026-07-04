@@ -23,7 +23,8 @@ export default function Storage() {
   const filtered = facilities.filter(f =>
     !search || f.name?.toLowerCase().includes(search.toLowerCase()) ||
     f.city?.toLowerCase().includes(search.toLowerCase()) ||
-    f.state?.toLowerCase().includes(search.toLowerCase())
+    f.state?.toLowerCase().includes(search.toLowerCase()) ||
+    f.country?.toLowerCase().includes(search.toLowerCase())
   );
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
@@ -40,7 +41,7 @@ export default function Storage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
         <Input
           className="pl-10"
-          placeholder="Search by city, state, or facility name..."
+          placeholder="Search by city, country, or facility name..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -62,7 +63,7 @@ export default function Storage() {
                 )}
               </div>
               <p className="text-sm text-muted-foreground flex items-center gap-1 mb-1">
-                <MapPin size={14} className="text-muted-foreground" /> {f.address}, {f.city}, {f.state} {f.zip}
+                <MapPin size={14} className="text-muted-foreground" /> {f.address}, {f.city}, {f.state} {f.zip}{f.country ? ', ' + f.country : ''}
               </p>
               {f.phone && <p className="text-sm text-muted-foreground flex items-center gap-1 mb-1"><Phone size={14} /> {f.phone}</p>}
               {f.website && (

@@ -89,7 +89,7 @@ export default function DriverRegister() {
           <div><Label htmlFor="phone">Phone *</Label><Input id="phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="(555) 123-4567" /></div>
           <div><Label htmlFor="company">Company (optional)</Label><Input id="company" value={form.company_name} onChange={e => setForm({ ...form, company_name: e.target.value })} /></div>
         </div>
-        <div><Label htmlFor="service_area">Service Area *</Label><Input id="service_area" value={form.service_area} onChange={e => setForm({ ...form, service_area: e.target.value })} placeholder="e.g. Los Angeles, CA" /></div>
+        <div><Label htmlFor="service_area">Service Area *</Label><Input id="service_area" value={form.service_area} onChange={e => setForm({ ...form, service_area: e.target.value })} placeholder="e.g. London, UK or Tokyo, Japan" /></div>
         <div className="grid grid-cols-2 gap-4">
           <div><Label htmlFor="license_number">License Number *</Label><Input id="license_number" value={form.license_number} onChange={e => setForm({ ...form, license_number: e.target.value })} /></div>
           <div><Label htmlFor="license_expiry">License Expiry *</Label><Input id="license_expiry" type="date" value={form.license_expiry} onChange={e => setForm({ ...form, license_expiry: e.target.value })} /></div>

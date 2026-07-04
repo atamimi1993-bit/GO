@@ -12,7 +12,7 @@ import ItemForm from '@/components/go/ItemForm';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import LiabilityAgreement from '@/components/go/LiabilityAgreement';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { calculateMovePrice, recommendTruckSize, TRUCK_SIZE_LABELS, STATE_TAX_RATES } from '@/lib/pricing';
+import { calculateMovePrice, recommendTruckSize, TRUCK_SIZE_LABELS, COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES } from '@/lib/pricing';
 import { ArrowLeft, ArrowRight, Upload, Trash2, Package, MapPin, Calendar, FileText, Loader2 } from 'lucide-react';
 
 const STEPS = ['Details', 'Items', 'Quote', 'Agreement'];
@@ -27,7 +27,8 @@ export default function NewMove() {
 
   const [form, setForm] = useState({
     pickup_address: '', dropoff_address: '', move_date: '', move_time: '',
-    distance_miles: '', state_code: '', notes: '', needs_storage: false,
+    distance_miles: '', country_code: 'US', currency: 'USD', distance_unit: 'mi',
+    notes: '', needs_storage: false,
     customer_name: '', customer_email: '', customer_phone: '',
   });
   const [items, setItems] = useState([]);
@@ -100,7 +101,9 @@ export default function NewMove() {
       totalWeightLbs: totalWeight,
       distanceMiles: Number(form.distance_miles),
       truckSize: rec,
-      stateCode: form.state_code,
+      countryCode: form.country_code,
+      currency: form.currency,
+      distanceUnit: form.distance_unit,
     });
     setPricing(price);
   };
@@ -117,6 +120,9 @@ export default function NewMove() {
         move_date: form.move_date,
         move_time: form.move_time,
         distance_miles: Number(form.distance_miles),
+        distance_unit: form.distance_unit,
+        country_code: form.country_code,
+        currency: form.currency,
         truck_size_needed: truckSize,
         total_weight_lbs: totalWeight,
         items_summary: items.map(i => `${i.quantity}x ${i.name} (${i.weight_lbs}lbs)`).join(', '),
@@ -136,7 +142,6 @@ export default function NewMove() {
       };
       navigate('/my-moves', { state: { optimisticMove: { ...moveData, _optimistic: true } } });
       const move = await base44.entities.MoveRequest.create(moveData);
-      // Save individual items
       if (items.length > 0) {
         await base44.entities.MoveItem.bulkCreate(
           items.map(item => ({ ...item, move_request_id: move.id }))
@@ -151,10 +156,15 @@ export default function NewMove() {
   };
 
   const canNextStep = () => {
-    if (step === 0) return form.pickup_address && form.dropoff_address && form.move_date && form.distance_miles && form.state_code;
+    if (step === 0) return form.pickup_address && form.dropoff_address && form.move_date && form.distance_miles && form.country_code;
     if (step === 1) return items.length > 0;
     if (step === 2) return pricing;
     return true;
+  };
+
+  const handleCountryChange = (code) => {
+    const cfg = COUNTRY_CONFIG[code];
+    setForm(f => ({ ...f, country_code: code, currency: cfg?.currency || 'USD', distance_unit: cfg?.distanceUnit || 'mi' }));
   };
 
   return (
@@ -197,15 +207,15 @@ export default function NewMove() {
             </div>
             <div>
               <Label>Phone</Label>
-              <Input value={form.customer_phone} onChange={e => setForm({ ...form, customer_phone: e.target.value })} placeholder="(555) 123-4567" />
+              <Input value={form.customer_phone} onChange={e => setForm({ ...form, customer_phone: e.target.value })} placeholder="+1 (555) 123-4567" />
             </div>
             <div>
               <Label className="flex items-center gap-2"><MapPin size={14} /> Pickup Address</Label>
-              <Input value={form.pickup_address} onChange={e => setForm({ ...form, pickup_address: e.target.value })} placeholder="123 Main St, City, State" />
+              <Input value={form.pickup_address} onChange={e => setForm({ ...form, pickup_address: e.target.value })} placeholder="123 Main St, City, Country" />
             </div>
             <div>
               <Label className="flex items-center gap-2"><MapPin size={14} /> Drop-off Address</Label>
-              <Input value={form.dropoff_address} onChange={e => setForm({ ...form, dropoff_address: e.target.value })} placeholder="456 Oak Ave, City, State" />
+              <Input value={form.dropoff_address} onChange={e => setForm({ ...form, dropoff_address: e.target.value })} placeholder="456 Oak Ave, City, Country" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
@@ -217,18 +227,38 @@ export default function NewMove() {
                 <Input type="time" value={form.move_time} onChange={e => setForm({ ...form, move_time: e.target.value })} />
               </div>
               <div>
-                <Label>Distance (miles)</Label>
+                <Label>Distance ({form.distance_unit})</Label>
                 <Input type="number" placeholder="e.g. 25" value={form.distance_miles} onChange={e => setForm({ ...form, distance_miles: e.target.value })} />
               </div>
             </div>
-            <div>
-              <Label>State (for tax calculation)</Label>
-              <MobileSelect
-                value={form.state_code}
-                onValueChange={v => setForm({ ...form, state_code: v })}
-                options={Object.keys(STATE_TAX_RATES).sort().map(s => ({ value: s, label: s }))}
-                placeholder="Select state"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <Label>Country</Label>
+                <MobileSelect
+                  value={form.country_code}
+                  onValueChange={handleCountryChange}
+                  options={COUNTRY_LIST.map(c => ({ value: c.code, label: c.name }))}
+                  placeholder="Select country"
+                />
+              </div>
+              <div>
+                <Label>Currency</Label>
+                <MobileSelect
+                  value={form.currency}
+                  onValueChange={v => setForm({ ...form, currency: v })}
+                  options={Object.keys(CURRENCIES).sort().map(c => ({ value: c, label: `${c} (${CURRENCIES[c].symbol.trim()})` }))}
+                  placeholder="Select currency"
+                />
+              </div>
+              <div>
+                <Label>Distance Unit</Label>
+                <MobileSelect
+                  value={form.distance_unit}
+                  onValueChange={v => setForm({ ...form, distance_unit: v })}
+                  options={[{ value: 'mi', label: 'Miles (mi)' }, { value: 'km', label: 'Kilometers (km)' }]}
+                  placeholder="Select unit"
+                />
+              </div>
             </div>
             <div className="flex items-center justify-between bg-blue-500/10 rounded-xl p-4">
               <div>
@@ -316,7 +346,7 @@ export default function NewMove() {
               <div className="bg-card border rounded-2xl p-4 space-y-2">
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">From</span><span className="font-medium">{form.pickup_address}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">To</span><span className="font-medium">{form.dropoff_address}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Distance</span><span className="font-medium">{form.distance_miles} mi (one way)</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Distance</span><span className="font-medium">{form.distance_miles} {form.distance_unit} (one way)</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total Weight</span><span className="font-medium">{totalWeight.toLocaleString()} lbs</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Items</span><span className="font-medium">{items.length}</span></div>
               </div>
@@ -328,14 +358,15 @@ export default function NewMove() {
                   onValueChange={v => {
                     setTruckSize(v);
                     setPricing(calculateMovePrice({
-                      totalWeightLbs: totalWeight, distanceMiles: Number(form.distance_miles), truckSize: v, stateCode: form.state_code
+                      totalWeightLbs: totalWeight, distanceMiles: Number(form.distance_miles), truckSize: v,
+                      countryCode: form.country_code, currency: form.currency, distanceUnit: form.distance_unit
                     }));
                   }}
                   options={Object.entries(TRUCK_SIZE_LABELS).map(([k, v]) => ({ value: k, label: v }))}
                 />
               </div>
 
-              <PriceBreakdown pricing={pricing} truckSize={truckSize} />
+              <PriceBreakdown pricing={pricing} truckSize={truckSize} currencyCode={form.currency} />
             </>
           )}
         </div>

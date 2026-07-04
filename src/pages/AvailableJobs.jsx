@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { formatCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function AvailableJobs() {
@@ -46,6 +47,7 @@ export default function AvailableJobs() {
         driver_profile_id: driverProfile.id,
         move_request_id: job.id,
         amount: job.driver_payout,
+        currency: job.currency || 'USD',
         status: 'pending',
       });
       toast({ title: 'Job accepted!', description: "You've been assigned to this move." });
@@ -81,7 +83,7 @@ export default function AvailableJobs() {
                 <div>
                   <div className="flex items-center gap-2">
                     <DollarSign size={18} className="text-emerald-600" />
-                    <span className="font-display font-bold text-lg text-emerald-600">${job.driver_payout?.toFixed(2)} payout</span>
+                    <span className="font-display font-bold text-lg text-emerald-600">{formatCurrency(job.driver_payout, job.currency)} payout</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     <Calendar size={12} className="inline mr-1" />
@@ -97,7 +99,7 @@ export default function AvailableJobs() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span><Package size={12} className="inline mr-1" />{job.total_weight_lbs?.toLocaleString()} lbs</span>
-                  <span>{job.distance_miles} mi</span>
+                  <span>{job.distance_miles} {job.distance_unit || 'mi'}</span>
                 </div>
                 <Button
                   size="sm"

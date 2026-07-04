@@ -1,6 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@17.0.0';
 
+const ZERO_DECIMAL_CURRENCIES = [
+  'BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA', 'PYG', 'RWF',
+  'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF', 'IDR', 'PHP', 'NGN', 'EGP',
+  'MAD', 'GHS', 'HUF', 'ISK', 'TND', 'TZS', 'ARS', 'COP', 'SEK', 'NOK',
+  'DKK', 'CZK', 'HUF', 'KES', 'TRY'
+];
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -27,16 +34,22 @@ Deno.serve(async (req) => {
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
     const origin = req.headers.get('origin') || new URL(req.url).origin;
 
+    const currencyCode = (move.currency || 'USD').toUpperCase();
+    const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.includes(currencyCode);
+    const unitAmount = isZeroDecimal
+      ? Math.round(move.total_price)
+      : Math.round(move.total_price * 100);
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
         price_data: {
-          currency: 'usd',
+          currency: currencyCode.toLowerCase(),
           product_data: {
             name: 'GO Move Service',
             description: 'Move from ' + move.pickup_address + ' to ' + move.dropoff_address,
           },
-          unit_amount: Math.round(move.total_price * 100),
+          unit_amount: unitAmount,
         },
         quantity: 1,
       }],

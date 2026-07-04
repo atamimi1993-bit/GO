@@ -34,7 +34,7 @@ export default function Home() {
             <span className="text-emerald-400">anywhere.</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-lg">
-            The easiest way to move your belongings. Get instant pricing, verified drivers, and real-time tracking — all in one app.
+            The easiest way to move your belongings — anywhere in the world. Get instant pricing, verified drivers, and real-time tracking — all in one app.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link to="/new-move">
@@ -80,7 +80,7 @@ export default function Home() {
             { value: '10K+', label: 'Moves Completed' },
             { value: '500+', label: 'Verified Drivers' },
             { value: '4.9', label: 'Average Rating', icon: Star },
-            { value: '50', label: 'States Covered' },
+            { value: '50+', label: 'Countries' },
           ].map((stat, i) => (
             <div key={i}>
               <div className="text-3xl font-display font-black text-foreground flex items-center justify-center gap-1">

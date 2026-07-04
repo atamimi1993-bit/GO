@@ -17,6 +17,10 @@
     "zip": {
       "type": "string"
     },
+    "country": {
+      "type": "string",
+      "default": "US"
+    },
     "phone": {
       "type": "string"
     },
