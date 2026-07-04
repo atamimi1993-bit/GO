@@ -75,7 +75,7 @@ export default function Terms() {
           <div className="prose prose-sm dark:prose-invert max-w-none space-y-4 text-muted-foreground">
             <div>
               <h3 className="font-semibold text-foreground mb-1">1. Information We Collect</h3>
-              <p>We collect the following types of information: Account information (name, email, phone number), Move details (addresses, item lists, dates), Driver information (license number, insurance documents, vehicle registration), and Payment information (processed securely through Stripe — we do not store card details).</p>
+              <p>We collect the following types of information: Account information (name, email, phone number), Move details (addresses, item lists, dates), Driver information (license number, insurance documents, vehicle registration), Payment information (processed securely through Stripe — we do not store card details), and Location data (GPS coordinates from drivers during active moves for real-time tracking — collected only when a driver starts tracking and stops when the move is completed).</p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-1">2. How We Use Your Information</h3>

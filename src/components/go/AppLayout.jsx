@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import BottomTabBar from '@/components/go/BottomTabBar';
+import OfflineBanner from '@/components/go/OfflineBanner';
 
 const navItems = [
   { label: 'Home', path: '/', icon: Home },
@@ -52,6 +53,7 @@ export default function AppLayout() {
 
   return (
     <div className="h-dvh flex flex-col bg-background">
+      <OfflineBanner />
       {/* Top nav */}
       <header className="shrink-0 bg-card border-b border-border sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
