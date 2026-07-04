@@ -37,16 +37,16 @@ export default function Home() {
             The easiest way to move your belongings — anywhere in the world. Get instant pricing, verified drivers, and real-time tracking — all in one app.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/new-move">
-              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+            <Button asChild size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+              <Link to="/new-move">
                 Start a Move <ArrowRight className="ml-2" size={20} />
-              </Button>
-            </Link>
-            <Link to="/driver-hub">
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+              <Link to="/driver-hub">
                 Become a Driver <Truck className="ml-2" size={20} />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
