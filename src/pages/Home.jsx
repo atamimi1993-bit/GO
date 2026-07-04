@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
 import { ArrowRight, Package, Truck, Shield, DollarSign, Star } from 'lucide-react';
@@ -8,6 +8,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
+  const navigate = useNavigate();
   const { scrollRef } = useOutletContext();
   const queryClient = useQueryClient();
   const { data: user } = useQuery({
@@ -37,15 +38,11 @@ export default function Home() {
             The easiest way to move your belongings — anywhere in the world. Get instant pricing, verified drivers, and real-time tracking — all in one app.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button asChild size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
-              <Link to="/new-move">
-                Start a Move <ArrowRight className="ml-2" size={20} />
-              </Link>
+            <Button onClick={() => navigate('/new-move')} size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+              Start a Move <ArrowRight className="ml-2" size={20} />
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
-              <Link to="/driver-hub">
-                Become a Driver <Truck className="ml-2" size={20} />
-              </Link>
+            <Button onClick={() => navigate('/driver-hub')} size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 h-14 text-lg font-semibold w-full sm:w-auto">
+              Become a Driver <Truck className="ml-2" size={20} />
             </Button>
           </div>
         </div>
