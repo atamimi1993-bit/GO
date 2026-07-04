@@ -157,6 +157,30 @@ const FEE_PER_50FT = 1;          // $1 per 50ft of distance from street to door
 const EXTRA_HELPER_FEE = 50;     // additional mover for the job
 const ELEVATOR_SERVICE_FEE = 30; // buildings requiring elevator reservation
 
+// Labor rates — hourly by truck size (base labor hours derived from weight)
+const LABOR_RATES = {
+  small:       { hourlyRate: 45, baseHours: 2 },
+  medium:      { hourlyRate: 55, baseHours: 3 },
+  large:       { hourlyRate: 65, baseHours: 4 },
+  extra_large: { hourlyRate: 75, baseHours: 5 },
+};
+
+// Long carry threshold — fee kicks in beyond 75ft from truck to door
+const LONG_CARRY_THRESHOLD_FT = 75;
+const LONG_CARRY_FEE_PER_50FT = 2;
+
+// Minimum job fee — floor on operational cost to cover dispatch overhead
+const MINIMUM_JOB_FEE = 150;
+
+// Loyalty discount — returning customer markdown (5% off adjusted subtotal)
+const LOYALTY_DISCOUNT_RATE = 0.05;
+
+// Same-day surcharge (within 1.2–1.5× range)
+const SAME_DAY_MULTIPLIER = 1.35;
+
+// Peak day surcharge — last weekend of month (within 1.15–1.3× range)
+const PEAK_DAY_MULTIPLIER = 1.25;
+
 // Insurance tiers — damage protection upsell (pure profit for GO)
 const INSURANCE_TIERS = {
   basic:    { fee: 15, coverage: 1000,  label: 'Basic Protection',    description: 'Covers up to $1,000 in damage' },
@@ -256,7 +280,7 @@ export function calculateCourierPrice({ distanceMiles, deliveryCategory = 'other
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
-export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0, extraHelper = false, elevatorService = false, pendingMovesCount = 0 }) {
+export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0, extraHelper = false, elevatorService = false, pendingMovesCount = 0, moveDate, isReturningCustomer = false, laborHours }) {
   const truck = TRUCK_CONFIG[truckSize] || TRUCK_CONFIG.medium;
 
   // Convert metric inputs to imperial for internal calculation
@@ -265,8 +289,13 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
 
   const roundTripMiles = distanceInMiles * 2;
 
-  // Base cost + per-mile + per-pound (calculated in USD)
-  const baseCost = truck.baseCost + (roundTripMiles * truck.costPerMile) + (weightInLbs * truck.costPerLb);
+  // Labor cost — estimated from weight + truck base hours, or overridden by caller
+  const labor = LABOR_RATES[truckSize] || LABOR_RATES.medium;
+  const estimatedLaborHours = Number(laborHours) || (labor.baseHours + Math.ceil(weightInLbs / 2000));
+  const laborCost = estimatedLaborHours * labor.hourlyRate;
+
+  // Base price = base_rate + (distance × per_mile) + (labor_hours × hourly_rate)
+  const baseCost = truck.baseCost + (roundTripMiles * truck.costPerMile) + laborCost;
 
   // Fuel cost for round trip (in USD) — uses driver's actual truck MPG & fuel type if provided
   const actualMpg = truckMpg || truck.mpg;
@@ -291,10 +320,16 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Materials surcharge — customer-requested packing materials beyond what's included
   const materialsFeeCost = Number(materialsFee) || 0;
 
-  // Carrying surcharge — based on total steps (pickup + dropoff) and distance from street
+  // Stairs fee — per flight, only when no elevator service at either location
   const totalSteps = (Number(pickupSteps) || 0) + (Number(dropoffSteps) || 0);
+  const stairsFee = elevatorService ? 0 : (totalSteps * FEE_PER_STEP);
+
+  // Long carry fee — only applies if total distance from truck to door exceeds 75ft
   const totalDistanceFromStreet = (Number(pickupDistanceFromStreet) || 0) + (Number(dropoffDistanceFromStreet) || 0);
-  const carryingFee = (totalSteps * FEE_PER_STEP) + (Math.floor(totalDistanceFromStreet / 50) * FEE_PER_50FT);
+  const longCarryFee = totalDistanceFromStreet > LONG_CARRY_THRESHOLD_FT
+    ? Math.ceil((totalDistanceFromStreet - LONG_CARRY_THRESHOLD_FT) / 50) * LONG_CARRY_FEE_PER_50FT
+    : 0;
+  const carryingFee = stairsFee + longCarryFee;
 
   // Extra service add-ons — customer-selected optional services
   const extraServiceFee = (extraHelper ? EXTRA_HELPER_FEE : 0) + (elevatorService ? ELEVATOR_SERVICE_FEE : 0);
@@ -303,17 +338,30 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost + bulkyItemFee + materialsFeeCost + carryingFee + extraServiceFee;
 
   // Apply surge / dynamic pricing — multiplies the operational cost during peak demand.
-  // The 25% app fee applies to the surge-adjusted total, so GO earns proportionally more.
   const surge = calculateSurgeMultiplier(new Date(), pendingMovesCount);
-  const surgeMultiplier = surge.multiplier;
-  const adjustedOperationalSubtotal = operationalSubtotal * surgeMultiplier;
+
+  // Move-date-based multipliers
+  const peakDayMultiplier = isLastWeekendOfMonth(moveDate) ? PEAK_DAY_MULTIPLIER : 1;
+  const sameDayMultiplier = isSameDay(moveDate) ? SAME_DAY_MULTIPLIER : 1;
+  const dynamicMultiplier = surge.multiplier * peakDayMultiplier * sameDayMultiplier;
+  const surgeMultiplier = dynamicMultiplier;
+
+  const surgeAdjustedSubtotal = operationalSubtotal * dynamicMultiplier;
+
+  // Loyalty discount — returning customer gets % off the surge-adjusted subtotal
+  const loyaltyDiscount = isReturningCustomer ? surgeAdjustedSubtotal * LOYALTY_DISCOUNT_RATE : 0;
+
+  // Minimum job fee — floor on operational cost to cover dispatch overhead
+  const preFloorSubtotal = surgeAdjustedSubtotal - loyaltyDiscount;
+  const minimumJobApplied = preFloorSubtotal < MINIMUM_JOB_FEE;
+  const adjustedOperationalSubtotal = minimumJobApplied ? MINIMUM_JOB_FEE : preFloorSubtotal;
 
   // Tax rate: country config overrides state
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
 
   // GO platform fee — 25% of the TOTAL price the customer pays (including tax)
-  // Solving: goProfit = APP_FEE_RATE * (adjustedOperationalSubtotal + goProfit) * (1 + taxRate)
+  // The 25% applies to the adjusted total, so GO earns proportionally more on premium jobs.
   const taxMultiplier = 1 + taxRate;
   const goProfit = (APP_FEE_RATE * taxMultiplier * adjustedOperationalSubtotal) / (1 - APP_FEE_RATE * taxMultiplier);
   const appFee = goProfit;
@@ -339,18 +387,27 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
 
   return {
     baseCost: convert(baseCost),
+    laborCost: convert(laborCost),
+    laborHours: estimatedLaborHours,
     fuelCost: convert(fuelCost),
     tolls: convert(tollCost),
     bulkyItemFee: convert(bulkyItemFee),
     materialsFee: convert(materialsFeeCost),
     carryingFee: convert(carryingFee),
+    stairsFee: convert(stairsFee),
+    longCarryFee: convert(longCarryFee),
     extraServiceFee: convert(extraServiceFee),
     surgeMultiplier: surgeMultiplier,
     surgeLabel: surge.label,
     surgeLevel: surge.level,
     surgeReasons: surge.reasons,
+    peakDayMultiplier,
+    sameDayMultiplier,
+    loyaltyDiscount: convert(loyaltyDiscount),
+    minimumJobFee: minimumJobApplied ? MINIMUM_JOB_FEE : 0,
     operationalSubtotal: convert(operationalSubtotal),
-    surgeAdjustedSubtotal: convert(adjustedOperationalSubtotal),
+    surgeAdjustedSubtotal: convert(surgeAdjustedSubtotal),
+    adjustedOperationalSubtotal: convert(adjustedOperationalSubtotal),
     extraHelper: extraHelper,
     elevatorService: elevatorService,
     taxRate,
@@ -464,6 +521,39 @@ export const CREDIT_TIERS = [
 
 export const INSTALLMENT_TERM_OPTIONS = [3, 6, 12, 24, 36, 48];
 
+// ─── Move-Date Helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Check if a date falls on the last weekend (Sat/Sun) of its month.
+ * @param {string} dateStr - ISO date string (YYYY-MM-DD)
+ * @returns {boolean}
+ */
+function isLastWeekendOfMonth(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr + 'T12:00:00');
+  if (isNaN(d.getTime())) return false;
+  const day = d.getDay();
+  if (day !== 0 && day !== 6) return false; // not a weekend
+  const nextWeek = new Date(d);
+  nextWeek.setDate(d.getDate() + 7);
+  return nextWeek.getMonth() !== d.getMonth();
+}
+
+/**
+ * Check if a date string is today.
+ * @param {string} dateStr - ISO date string (YYYY-MM-DD)
+ * @returns {boolean}
+ */
+function isSameDay(dateStr) {
+  if (!dateStr) return false;
+  const today = new Date();
+  const d = new Date(dateStr + 'T12:00:00');
+  if (isNaN(d.getTime())) return false;
+  return d.getFullYear() === today.getFullYear() &&
+    d.getMonth() === today.getMonth() &&
+    d.getDate() === today.getDate();
+}
+
 // ─── Surge / Dynamic Pricing ─────────────────────────────────────────────────
 // Adjusts rates based on demand, time of day, day of week, and season.
 // Multiplier of 1.0 = normal pricing; >1.0 = surge premium.
@@ -550,4 +640,4 @@ export function calculateSurgeMultiplier(date = new Date(), pendingMovesCount = 
   };
 }
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS, LABOR_RATES, MINIMUM_JOB_FEE };

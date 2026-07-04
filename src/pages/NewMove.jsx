@@ -48,6 +48,7 @@ export default function NewMove() {
   const [accessMedia, setAccessMedia] = useState([]);
   const [mediaAnalysis, setMediaAnalysis] = useState(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [isReturningCustomer, setIsReturningCustomer] = useState(false);
 
   const totalWeight = items.reduce((sum, item) => sum + (item.weight_lbs * item.quantity), 0);
 
@@ -78,6 +79,9 @@ export default function NewMove() {
   useEffect(() => {
     base44.auth.me().then(u => {
       setForm(f => ({ ...f, customer_name: u.full_name || '', customer_email: u.email || '' }));
+      base44.entities.MoveRequest.filter({ customer_email: u.email, status: 'completed' }).then(moves => {
+        if (moves.length > 0) setIsReturningCustomer(true);
+      }).catch(() => {});
     }).catch(() => {});
     const params = new URLSearchParams(window.location.search);
     const refCode = params.get('ref');
@@ -142,6 +146,8 @@ export default function NewMove() {
         dropoffDistanceFromStreet: form.dropoff_distance_from_street,
         extraHelper: form.extra_helper,
         elevatorService: form.elevator_service,
+        moveDate: form.move_date,
+        isReturningCustomer,
       })
     : null;
 

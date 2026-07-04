@@ -9,21 +9,29 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
 
   const curr = pricing.currency || getCurrency(currencyCode || 'USD');
   const sym = curr.symbol;
-  const fmt = (v) => sym + Number(v).toFixed(curr.decimals);
+  const fmt = (v) => v < 0 ? `-${sym}${Math.abs(Number(v)).toFixed(curr.decimals)}` : sym + Number(v).toFixed(curr.decimals);
 
   const fuelLabel = pricing.displayFuel != null
     ? `Fuel (${pricing.displayFuel} ${pricing.displayFuelUnit} × ${pricing.displayDistance} ${pricing.displayDistanceUnit} round-trip)`
     : `Fuel (${pricing.gallonsNeeded || 0} gal × ${pricing.roundTripMiles || 0} mi round-trip)`;
 
+  const surgeReasons = [...(pricing.surgeReasons || [])];
+  if (pricing.peakDayMultiplier > 1) surgeReasons.push('Last weekend of month');
+  if (pricing.sameDayMultiplier > 1) surgeReasons.push('Same-day service');
+  const surgeLabel = surgeReasons.length > 1 ? surgeReasons.join(' + ') : (pricing.surgeLabel || 'Dynamic pricing');
+
   const lines = [
     { label: `Base cost (${TRUCK_SIZE_LABELS[truckSize] || truckSize})`, value: pricing.baseCost },
+    ...(pricing.laborCost ? [{ label: `Labor (${pricing.laborHours} hrs)`, value: pricing.laborCost }] : []),
     { label: fuelLabel, value: pricing.fuelCost },
     ...(pricing.tolls ? [{ label: 'Tolls (reimbursed to driver)', value: pricing.tolls }] : []),
     ...(pricing.bulkyItemFee ? [{ label: 'Bulky item surcharge', value: pricing.bulkyItemFee }] : []),
     ...(pricing.materialsFee ? [{ label: 'Packing materials', value: pricing.materialsFee }] : []),
-    ...(pricing.carryingFee ? [{ label: 'Carrying surcharge (steps + distance)', value: pricing.carryingFee }] : []),
+    ...(pricing.stairsFee ? [{ label: 'Stairs fee (no elevator)', value: pricing.stairsFee }] : []),
+    ...(pricing.longCarryFee ? [{ label: 'Long carry fee (75ft+)', value: pricing.longCarryFee }] : []),
     ...(pricing.extraServiceFee ? [{ label: `Extra services${pricing.extraHelper ? ' (helper)' : ''}${pricing.elevatorService ? ' (elevator)' : ''}`, value: pricing.extraServiceFee }] : []),
-    ...(pricing.surgeMultiplier > 1 ? [{ label: `Surge (${pricing.surgeLabel}, ×${pricing.surgeMultiplier})`, value: pricing.surgeAdjustedSubtotal - pricing.operationalSubtotal }] : []),
+    ...(pricing.surgeMultiplier > 1 ? [{ label: `Dynamic pricing (${surgeLabel}, ×${pricing.surgeMultiplier})`, value: pricing.surgeAdjustedSubtotal - pricing.operationalSubtotal }] : []),
+    ...(pricing.loyaltyDiscount ? [{ label: 'Loyalty discount (returning customer)', value: -pricing.loyaltyDiscount, highlight: true }] : []),
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
     ...(showInternalCosts ? [{ label: 'GO App Fee (25%)', value: pricing.appFee }] : []),
   ];
@@ -39,10 +47,16 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
       <div className="space-y-2">
         {lines.map((line, i) => (
           <div key={i} className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{line.label}</span>
-            <span className="font-medium">{fmt(line.value)}</span>
+            <span className={line.highlight ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>{line.label}</span>
+            <span className={`font-medium ${line.highlight ? "text-emerald-600 dark:text-emerald-400" : ""}`}>{fmt(line.value)}</span>
           </div>
         ))}
+        {pricing.minimumJobFee ? (
+          <div className="flex justify-between text-xs text-muted-foreground bg-muted/50 rounded-lg px-2 py-1">
+            <span>Minimum job fee floor applied</span>
+            <span className="font-medium">{fmt(pricing.minimumJobFee)}</span>
+          </div>
+        ) : null}
       </div>
       <div className="border-t pt-3 flex justify-between">
         <span className="font-display font-bold text-lg">Total</span>
