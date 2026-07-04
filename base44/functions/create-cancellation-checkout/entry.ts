@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
       },
     });
 
-    await base44.asServiceRole.entities.MoveRequest.update(move.id, {
+    await base44.entities.MoveRequest.update(move.id, {
       cancellation_session_id: session.id,
       cancellation_fee: CANCELLATION_FEE,
     });

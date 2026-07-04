@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       },
     });
 
-    await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
+    await base44.entities.MoveRequest.update(moveRequestId, {
       tip_session_id: session.id,
     });
 

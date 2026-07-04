@@ -319,7 +319,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    await base44.asServiceRole.entities.MoveRequest.update(move.id, updateData);
+    await base44.entities.MoveRequest.update(move.id, updateData);
 
     return Response.json({ url: session.url });
   } catch (error) {
