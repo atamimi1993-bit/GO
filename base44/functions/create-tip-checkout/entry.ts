@@ -6,9 +6,9 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
-    // Reject unauthenticated callers — checkout endpoints must still require a session
-    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
-    if (!isAuth) {
+    // Require authentication and fetch the caller's identity
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -20,10 +20,22 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'move_request_id and a positive tip_amount are required' }, { status: 400 });
     }
 
-    const move = await base44.asServiceRole.entities.MoveRequest.get(moveRequestId);
+    // Use user-scoped read to enforce row-level security — prevents IDOR
+    let move;
+    try {
+      move = await base44.entities.MoveRequest.get(moveRequestId);
+    } catch {
+      return Response.json({ error: 'Move not found' }, { status: 404 });
+    }
     if (!move) {
       return Response.json({ error: 'Move not found' }, { status: 404 });
     }
+
+    // Explicit ownership check: only the customer who created the move may tip
+    if (move.customer_email !== user.email && move.created_by_id !== user.id) {
+      return Response.json({ error: 'You do not have access to this move' }, { status: 403 });
+    }
+
     if (move.status !== 'completed') {
       return Response.json({ error: 'Tips can only be given for completed moves' }, { status: 400 });
     }

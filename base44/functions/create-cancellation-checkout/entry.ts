@@ -7,9 +7,9 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Reject unauthenticated callers — checkout endpoints must still require a session
-    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
-    if (!isAuth) {
+    // Require authentication and fetch the caller's identity
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -20,9 +20,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'move_request_id is required' }, { status: 400 });
     }
 
-    const move = await base44.asServiceRole.entities.MoveRequest.get(move_request_id);
+    // Use user-scoped read to enforce row-level security — prevents IDOR
+    let move;
+    try {
+      move = await base44.entities.MoveRequest.get(move_request_id);
+    } catch {
+      return Response.json({ error: 'Move not found' }, { status: 404 });
+    }
     if (!move) {
       return Response.json({ error: 'Move not found' }, { status: 404 });
+    }
+
+    // Explicit ownership check: only the customer who created the move may cancel
+    if (move.customer_email !== user.email && move.created_by_id !== user.id) {
+      return Response.json({ error: 'You do not have access to this move' }, { status: 403 });
     }
 
     // Can only cancel moves that haven't been completed or already cancelled

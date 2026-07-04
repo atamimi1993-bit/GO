@@ -1,5 +1,15 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -27,16 +37,24 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing owner_email' }, { status: 400 });
     }
 
+    const safeVehicleTitle = escapeHtml(vehicle_title || 'Your listing');
+    const safeRenterName = escapeHtml(renter_name || 'N/A');
+    const safeRenterEmail = escapeHtml(renter_email || 'N/A');
+    const safeRenterPhone = escapeHtml(renter_phone);
+    const safeStartDate = escapeHtml(requested_start_date);
+    const safeEndDate = escapeHtml(requested_end_date);
+    const safeMessage = escapeHtml(message);
+
     const subject = `New rental request for your ${vehicle_title || 'vehicle'}`;
     const bodyHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #10b981;">You have a new rental request!</h2>
-        <p><strong>Vehicle:</strong> ${vehicle_title || 'Your listing'}</p>
-        <p><strong>Renter:</strong> ${renter_name || 'N/A'}</p>
-        <p><strong>Email:</strong> ${renter_email || 'N/A'}</p>
-        ${renter_phone ? `<p><strong>Phone:</strong> ${renter_phone}</p>` : ''}
-        <p><strong>Requested dates:</strong> ${requested_start_date} to ${requested_end_date}</p>
-        ${message ? `<p><strong>Message:</strong><br>${message}</p>` : ''}
+        <p><strong>Vehicle:</strong> ${safeVehicleTitle}</p>
+        <p><strong>Renter:</strong> ${safeRenterName}</p>
+        <p><strong>Email:</strong> ${safeRenterEmail}</p>
+        ${safeRenterPhone ? `<p><strong>Phone:</strong> ${safeRenterPhone}</p>` : ''}
+        <p><strong>Requested dates:</strong> ${safeStartDate} to ${safeEndDate}</p>
+        ${safeMessage ? `<p><strong>Message:</strong><br>${safeMessage}</p>` : ''}
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
         <p style="color: #6b7280; font-size: 14px;">Log in to your GO account to review this request and send a quote.</p>
       </div>
