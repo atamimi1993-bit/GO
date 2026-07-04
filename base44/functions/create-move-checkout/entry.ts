@@ -10,7 +10,7 @@ const ZERO_DECIMAL_CURRENCIES = [
 
 // Installment plan rate table — APR % (longer terms = higher rates, lower credit = higher rates)
 const INSTALLMENT_RATES = {
-  excellent: { 3: 0.00, 6: 1.99, 12: 3.99, 24: 5.99, 36: 6.99, 48: 8.00 },
+  excellent: { 3: 1.90, 6: 2.90, 12: 4.90, 24: 6.90, 36: 7.90, 48: 9.00 },
   good:      { 3: 3.99, 6: 5.99, 12: 7.99, 24: 9.99, 36: 11.99, 48: 14.00 },
   fair:      { 3: 8.99, 6: 10.99, 12: 12.99, 24: 15.99, 36: 18.99, 48: 22.00 },
 };
