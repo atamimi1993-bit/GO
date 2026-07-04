@@ -222,7 +222,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
                     {group.payouts.map((p) => {
                       const isSel = selected.has(p.id);
                       return (
-                        <div key={p.id} className="flex items-center gap-3 p-3 hover:bg-muted/30">
+                        <div key={p.id} className="flex items-center gap-3 p-3 hover:bg-muted/30" aria-label={`Payout $${p.amount} for ${group.driver_name}: ${p.pickup} to ${p.dropoff}`}>
                           <Checkbox
                             checked={isSel}
                             onCheckedChange={() => toggleSelect(p.id)}

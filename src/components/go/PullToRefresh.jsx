@@ -21,8 +21,11 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   useEffect(() => { onRefreshRef.current = onRefresh; }, [onRefresh]);
 
   const isAtTop = () => {
-    if (scrollRef && scrollRef.current) {
-      return scrollRef.current.scrollTop <= 1;
+    if (scrollRef) {
+      if (scrollRef.current === null) return false;
+      if (scrollRef.current) {
+        return scrollRef.current.scrollTop <= 1;
+      }
     }
     // Only fall back to window scroll when no scrollRef was passed at all
     return (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) <= 1;
@@ -106,7 +109,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
           aria-live="polite"
           aria-label={refreshing ? 'Refreshing content' : 'Pull to refresh'}
           className="left-0 right-0 flex items-center justify-center pointer-events-none"
-          style={{ position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 72px)', zIndex: 45, transform: `translateY(${pullDistance}px)` }}
+          style={{ position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 72px)', zIndex: 55, transform: `translateY(${pullDistance}px)` }}
         >
           {refreshing ? (
             <Loader2 aria-hidden="true" className="text-primary animate-spin" size={24} />

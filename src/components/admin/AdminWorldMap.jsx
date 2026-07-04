@@ -210,12 +210,12 @@ export default function AdminWorldMap() {
           <Loader2 className="animate-spin text-muted-foreground" size={32} />
         </div>
       ) : (
-        <div className="h-96 w-full rounded-xl overflow-hidden border" role="img" aria-label={`Global operations map showing ${movePins.length} active and completed moves and ${driverPins.length} driver service areas`}>
+        <div className="h-96 w-full rounded-xl overflow-hidden border" role="img" aria-label={`Global operations map showing ${newClients.length} active moves, ${completedClients.length} completed moves, and ${driverPins.length} driver service areas`}>
           <MapContainer
             center={[39.8283, -98.5795]}
             zoom={3}
             className="h-full w-full"
-            scrollWheelZoom={true}
+            scrollWheelZoom={false}
             worldCopyJump={true}
             minZoom={2}
             maxBounds={[[-90, -180], [90, 180]]}

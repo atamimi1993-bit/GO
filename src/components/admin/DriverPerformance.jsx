@@ -94,8 +94,8 @@ export default function DriverPerformance() {
                 </tr>
               </thead>
               <tbody role="rowgroup">
-                {visibleDrivers.map((d) => (
-                  <tr role="row" key={d.id} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" onClick={() => navigate(`/driver/${d.id}`)}>
+                {visibleDrivers.map((d, idx) => (
+                  <tr role="row" key={d.id} aria-rowindex={idx + 1} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" onClick={() => navigate(`/driver/${d.id}`)}>
                     <td role="cell" className="py-3 pr-3">
                       <div className="flex items-center gap-2 min-w-0">
                         <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
@@ -150,8 +150,8 @@ export default function DriverPerformance() {
 
           {/* Mobile card list view */}
           <div className="sm:hidden space-y-3">
-            {visibleDrivers.map((d) => (
-              <div key={d.id} className="border rounded-xl p-4 space-y-3 cursor-pointer hover:border-emerald-300 transition-colors" onClick={() => navigate(`/driver/${d.id}`)}>
+            {visibleDrivers.map((d, idx) => (
+              <div key={d.id} role="row" aria-rowindex={idx + 1} className="border rounded-xl p-4 space-y-3 cursor-pointer hover:border-emerald-300 transition-colors" onClick={() => navigate(`/driver/${d.id}`)}>
                 {/* Driver name + status */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
