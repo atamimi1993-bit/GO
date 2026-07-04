@@ -3,7 +3,7 @@ import { Link, useLocation, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Package, MapPin, Calendar, Loader2 } from 'lucide-react';
+import { Plus, Package, MapPin, Calendar, Loader2, Navigation } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
@@ -100,6 +100,15 @@ export default function MyMoves() {
               </div>
               {move.assigned_driver_name && (
                 <p className="mt-2 text-xs text-muted-foreground">Driver: <span className="font-medium">{move.assigned_driver_name}</span></p>
+              )}
+              {['accepted', 'in_progress'].includes(move.status) && (
+                <div className="mt-3 flex justify-end" onClick={(e) => e.preventDefault()}>
+                  <Link to={`/move/${move.id}`}>
+                    <Button size="sm" variant="outline" className="border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10">
+                      <Navigation size={14} className="mr-1" /> Track
+                    </Button>
+                  </Link>
+                </div>
               )}
             </Link>
           ))}
