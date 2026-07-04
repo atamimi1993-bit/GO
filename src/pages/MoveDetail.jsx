@@ -273,15 +273,24 @@ export default function MoveDetail() {
         <PriceConfirmation move={move} onConfirmed={load} />
       )}
 
-      {/* Payment plan balance — deposit already paid, show balance due */}
+      {/* Payment plan — installments tracked, show next installment due */}
       {!move.paid && move.deposit_paid && move.balance_due > 0 && move.status !== 'cancelled' && (
         <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 mt-2 space-y-3">
           <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-medium">
-            <CalendarClock size={16} /> Payment Plan Active
+            <CalendarClock size={16} /> Payment Plan — {move.installments_paid || 0} of 3 installments paid
+          </div>
+          {/* Progress bar */}
+          <div className="flex gap-1.5">
+            {[1, 2, 3].map((n) => (
+              <div
+                key={n}
+                className={`flex-1 h-2 rounded-full ${(move.installments_paid || 0) >= n ? 'bg-blue-500' : 'bg-muted'}`}
+              />
+            ))}
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Deposit Paid</span>
-            <span className="text-emerald-600 dark:text-emerald-400">{curr.symbol}{(move.deposit_amount || 0).toFixed(curr.decimals)}</span>
+            <span className="text-muted-foreground">Installment Amount</span>
+            <span className="font-medium">{curr.symbol}{(move.installment_amount || move.deposit_amount || 0).toFixed(curr.decimals)}</span>
           </div>
           <div className="flex justify-between text-sm font-bold pt-1 border-t border-blue-500/20">
             <span>Remaining Balance</span>
@@ -294,7 +303,7 @@ export default function MoveDetail() {
           >
             {payingBalance
               ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting...</>
-              : <><CreditCard size={16} className="mr-1" /> Pay Balance {curr.symbol}{(move.balance_due || 0).toFixed(curr.decimals)}</>}
+              : <><CreditCard size={16} className="mr-1" /> Pay Installment {((move.installments_paid || 0) + 1)} of 3 — {curr.symbol}{(move.installment_amount || move.deposit_amount || 0).toFixed(curr.decimals)}</>}
           </Button>
         </div>
       )}
@@ -333,9 +342,9 @@ export default function MoveDetail() {
                   <Wallet size={18} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">Pay in 2 installments</p>
+                  <p className="text-sm font-medium">Pay in 3 installments</p>
                   <p className="text-xs text-muted-foreground">
-                    {curr.symbol}{(chargeTotal * 0.5).toFixed(curr.decimals)} now · {curr.symbol}{(chargeTotal * 0.5).toFixed(curr.decimals)} later
+                    {curr.symbol}{(chargeTotal / 3).toFixed(curr.decimals)} now · {curr.symbol}{(chargeTotal / 3).toFixed(curr.decimals)} × 2 later
                   </p>
                 </div>
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${usePaymentPlan ? 'border-blue-500' : 'border-muted-foreground/30'}`}>
@@ -353,7 +362,7 @@ export default function MoveDetail() {
             {paying
               ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</>
               : usePaymentPlan
-                ? <><Wallet size={16} className="mr-1" /> Pay Deposit {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) * 0.5).toFixed(curr.decimals)}</>
+                ? <><Wallet size={16} className="mr-1" /> Pay Installment 1 of 3 — {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 3).toFixed(curr.decimals)}</>
                 : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{(promoData?.discounted_total || move.total_price || 0).toFixed(curr.decimals)}</>}
           </Button>
         </>

@@ -25,7 +25,27 @@ Deno.serve(async (req) => {
       const paymentType = session.metadata?.payment_type || 'full';
 
       if (moveRequestId) {
-        if (paymentType === 'deposit') {
+        if (paymentType === 'installment') {
+          // Fetch fresh move to get current installment count
+          const move = await base44.asServiceRole.entities.MoveRequest.get(moveRequestId);
+          const newCount = (move?.installments_paid || 0) + 1;
+          const installmentAmount = move?.installment_amount || 0;
+          const newBalance = Math.round(((move?.balance_due || 0) - installmentAmount) * 100) / 100;
+
+          const updateFields = {
+            deposit_paid: true,
+            installments_paid: newCount,
+            balance_due: Math.max(0, newBalance),
+          };
+
+          if (newCount >= 3) {
+            updateFields.paid = true;
+            updateFields.balance_due = 0;
+          }
+
+          await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, updateFields);
+          console.log(`Installment ${newCount}/3 paid for move ${moveRequestId}. Balance: ${Math.max(0, newBalance)}`);
+        } else if (paymentType === 'deposit') {
           await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
             deposit_paid: true,
           });

@@ -185,6 +185,14 @@
     "deposit_paid": {
       "type": "boolean",
       "default": false
+    },
+    "installment_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "installments_paid": {
+      "type": "number",
+      "default": 0
     }
   },
   "required": [
