@@ -155,7 +155,15 @@ export default function RentalDetail() {
       {isOwner ? (
         <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-5 text-center">
           <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">This is your listing</p>
-          <p className="text-xs text-muted-foreground mt-1">Rental requests will be emailed to you. You can quote a price and the renter will pay securely.</p>
+          {rental.status === 'pending_review' ? (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">Your listing is pending review. Once an admin verifies your registration documents, it will go live on the marketplace.</p>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-1">Rental requests will be emailed to you. You can quote a price and the renter will pay securely.</p>
+          )}
+        </div>
+      ) : rental.status !== 'active' ? (
+        <div className="bg-muted border rounded-2xl p-5 text-center">
+          <p className="text-sm font-medium">This vehicle is currently not available for rent.</p>
         </div>
       ) : rental.available ? (
         <div className="bg-card border rounded-2xl p-5">

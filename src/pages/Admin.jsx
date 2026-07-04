@@ -12,6 +12,7 @@ import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
 const MarketingPanel = lazy(() => import('@/components/admin/MarketingPanel'));
 const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
+const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApprovalPanel'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -165,6 +166,11 @@ export default function Admin() {
         {/* Marketing & promotions */}
         <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
           <MarketingPanel />
+        </Suspense>
+
+        {/* Pending vehicle listing approvals */}
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <RentalApprovalPanel scrollRef={scrollRef} />
         </Suspense>
 
         {/* Driver expense receipts */}

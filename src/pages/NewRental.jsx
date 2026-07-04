@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Loader2, Camera, X } from 'lucide-react';
+import { ArrowLeft, Loader2, Camera, X, FileText, Upload } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
 import { useUserState } from '@/hooks/useUserState';
 import { useToast } from '@/components/ui/use-toast';
@@ -18,7 +18,15 @@ export default function NewRental() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [photos, setPhotos] = useState([]);
+  const [regDoc, setRegDoc] = useState(null);
+  const [insuranceDoc, setInsuranceDoc] = useState(null);
+  const [uploadingDocs, setUploadingDocs] = useState(false);
   const fileInputRef = useRef(null);
+  const regDocRef = useRef(null);
+  const insuranceDocRef = useRef(null);
+
+  const REQUIRES_REGISTRATION = ['van', 'truck', 'box_truck', 'flatbed', 'semi', 'trailer', 'bus'];
+  const needsRegistration = REQUIRES_REGISTRATION.includes(form.vehicle_type);
 
   const [form, setForm] = useState({
     owner_type: 'customer',
@@ -69,10 +77,29 @@ export default function NewRental() {
 
   const removePhoto = (idx) => setPhotos(photos.filter((_, i) => i !== idx));
 
+  const handleDocUpload = async (e, setter) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingDocs(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setter(file_url);
+      toast({ title: 'Document uploaded' });
+    } catch {
+      toast({ title: 'Upload failed', description: 'Could not upload document.', variant: 'destructive' });
+    }
+    setUploadingDocs(false);
+    if (e.target) e.target.value = '';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.make || !form.model || !form.daily_rate || !form.city) {
       toast({ title: 'Missing fields', description: 'Please fill in all required fields.', variant: 'destructive' });
+      return;
+    }
+    if (needsRegistration && !regDoc) {
+      toast({ title: 'Registration required', description: 'Please upload the vehicle registration document for verification.', variant: 'destructive' });
       return;
     }
     setSaving(true);
@@ -86,11 +113,13 @@ export default function NewRental() {
         capacity_lbs: Number(form.capacity_lbs) || 0,
         seats: Number(form.seats) || 0,
         photo_urls: JSON.stringify(photos),
+        registration_doc_url: regDoc || undefined,
+        insurance_doc_url: insuranceDoc || undefined,
         available: true,
-        status: 'active',
+        status: 'pending_review',
       };
       const rental = await base44.entities.VehicleRental.create(data);
-      toast({ title: 'Listing created!', description: 'Your vehicle is now available for rent.' });
+      toast({ title: 'Listing submitted!', description: 'Your vehicle is pending review. We will verify your registration documents before it goes live.' });
       navigate(`/rentals/${rental.id}`);
     } catch (err) {
       toast({ title: 'Failed to create listing', description: err.message || 'Please try again.', variant: 'destructive' });
@@ -251,6 +280,66 @@ export default function NewRental() {
           </div>
           <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handlePhotos} className="hidden" />
         </div>
+
+        {/* Registration & Insurance Documents */}
+        {needsRegistration && (
+          <div className="bg-card border rounded-2xl p-5 space-y-4">
+            <div>
+              <h3 className="font-semibold text-sm">Verification Documents</h3>
+              <p className="text-xs text-muted-foreground mt-1">Required for trucks, vans, and commercial vehicles. Your listing will be reviewed before going live.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Registration */}
+              <div className="space-y-1.5">
+                <Label>Registration Document *</Label>
+                {regDoc ? (
+                  <div className="flex items-center gap-2 p-3 rounded-lg border bg-emerald-500/5">
+                    <FileText size={18} className="text-emerald-500 shrink-0" />
+                    <a href={regDoc} target="_blank" rel="noopener noreferrer" className="text-sm text-emerald-600 dark:text-emerald-400 truncate flex-1 underline">View document</a>
+                    <button type="button" onClick={() => setRegDoc(null)} className="text-muted-foreground hover:text-destructive shrink-0">
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => regDocRef.current?.click()}
+                    disabled={uploadingDocs}
+                    className="w-full flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed border-input text-sm text-muted-foreground hover:bg-muted/50 disabled:opacity-50"
+                  >
+                    {uploadingDocs ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                    Upload registration
+                  </button>
+                )}
+                <input ref={regDocRef} type="file" accept="image/*,application/pdf" onChange={(e) => handleDocUpload(e, setRegDoc)} className="hidden" />
+              </div>
+              {/* Insurance */}
+              <div className="space-y-1.5">
+                <Label>Insurance Document (optional)</Label>
+                {insuranceDoc ? (
+                  <div className="flex items-center gap-2 p-3 rounded-lg border bg-emerald-500/5">
+                    <FileText size={18} className="text-emerald-500 shrink-0" />
+                    <a href={insuranceDoc} target="_blank" rel="noopener noreferrer" className="text-sm text-emerald-600 dark:text-emerald-400 truncate flex-1 underline">View document</a>
+                    <button type="button" onClick={() => setInsuranceDoc(null)} className="text-muted-foreground hover:text-destructive shrink-0">
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => insuranceDocRef.current?.click()}
+                    disabled={uploadingDocs}
+                    className="w-full flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed border-input text-sm text-muted-foreground hover:bg-muted/50 disabled:opacity-50"
+                  >
+                    {uploadingDocs ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                    Upload insurance
+                  </button>
+                )}
+                <input ref={insuranceDocRef} type="file" accept="image/*,application/pdf" onChange={(e) => handleDocUpload(e, setInsuranceDoc)} className="hidden" />
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-between">
           <Button type="button" variant="ghost" onClick={() => navigate('/rentals')}>

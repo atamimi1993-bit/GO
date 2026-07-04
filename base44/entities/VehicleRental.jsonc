@@ -66,6 +66,12 @@
     "photo_urls": {
       "type": "string"
     },
+    "registration_doc_url": {
+      "type": "string"
+    },
+    "insurance_doc_url": {
+      "type": "string"
+    },
     "available": {
       "type": "boolean",
       "default": true
@@ -73,11 +79,12 @@
     "status": {
       "type": "string",
       "enum": [
+        "pending_review",
         "active",
         "rented",
         "inactive"
       ],
-      "default": "active"
+      "default": "pending_review"
     },
     "capacity_lbs": {
       "type": "number",
