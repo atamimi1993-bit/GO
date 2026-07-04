@@ -201,7 +201,7 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Operational subtotal = everything it costs to do the job (base + fuel + driver labor + tolls)
   const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost;
 
-  // GO platform fee — 20% of the FULL operational cost (GO's profit scales with every dollar)
+  // GO platform fee — 25% of the FULL operational cost (base + fuel + driver labor + tolls)
   const appFee = operationalSubtotal * APP_FEE_RATE;
   const goProfit = appFee; // GO keeps this; customer already paid for gas/miles/driver
   const driverFee = 0;
