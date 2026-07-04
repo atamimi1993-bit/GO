@@ -27,6 +27,7 @@ export default function BottomTabBar() {
             to={tab.path}
             aria-label={tab.label}
             aria-current={active ? 'page' : undefined}
+            aria-pressed={active}
             onClick={(e) => {
               if (active) {
                 if (location.pathname === tab.path) {

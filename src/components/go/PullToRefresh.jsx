@@ -82,12 +82,13 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   }, [scrollRef]);
 
   return (
+    <div className="relative" style={{ position: 'relative' }}>
     <div
       ref={wrapperRef}
       className="relative"
       style={{
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'clip',
         isolation: 'isolate',
         willChange: 'transform',
         overscrollBehavior: pulling ? 'none' : 'auto',
@@ -96,10 +97,13 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
     >
       {(pullDistance > 0 || refreshing) && (
         <div
-          className="flex items-center justify-center z-50 pointer-events-none"
+          className="flex items-center justify-center pointer-events-none"
           style={{
-            position: 'sticky',
+            position: 'absolute',
             top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
             height: 0,
             overflow: 'visible',
             transform: `translateY(${pullDistance - 40}px)`,
@@ -125,6 +129,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
       >
         {children}
       </div>
+    </div>
     </div>
   );
 }

@@ -138,6 +138,7 @@ export default function TipSection({ move }) {
                       <button
                         key={pct}
                         onClick={() => { setSelectedTip(amt); setCustomTip(''); }}
+                        aria-pressed={selectedTip === amt}
                         className={`flex flex-col items-center justify-center py-2 rounded-lg transition-colors min-h-[52px] ${
                           selectedTip === amt
                             ? 'bg-amber-500 text-white'

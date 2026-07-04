@@ -124,7 +124,7 @@ export default function Support() {
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Conversation list */}
         <PullToRefresh scrollRef={listRef} onRefresh={loadConversations}>
-        <div ref={listRef} className={`${mobileView === 'list' ? 'flex' : 'hidden'} sm:flex w-full sm:w-56 shrink-0 overflow-y-auto border-r border-border pr-2 space-y-1 flex-col`}>
+        <div ref={listRef} role="navigation" aria-label="Conversations list" className={`${mobileView === 'list' ? 'flex' : 'hidden'} sm:flex w-full sm:w-56 shrink-0 overflow-y-auto border-r border-border pr-2 space-y-1 flex-col`}>
           <Button variant="outline" size="sm" className="w-full mb-2" onClick={handleNewChat} disabled={creating}>
             {creating ? <Loader2 size={14} className="animate-spin mr-1" /> : <Plus size={14} className="mr-1" />} New Chat
           </Button>
