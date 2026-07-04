@@ -147,6 +147,7 @@ export default function ExpenseSubmission({ driverProfile }) {
                   <button
                     key={t.value}
                     type="button"
+                    aria-label={`Select ${t.label} expense type`}
                     onClick={() => setForm({ ...form, expense_type: t.value })}
                     className={`flex flex-col items-center gap-1 p-2 rounded-lg border transition-colors ${form.expense_type === t.value ? 'border-primary bg-primary/5' : 'border-input'}`}
                   >

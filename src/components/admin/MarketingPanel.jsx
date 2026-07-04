@@ -212,19 +212,19 @@ export default function MarketingPanel() {
                   <span className="font-mono font-bold text-sm">{c.code}</span>
                   {c.discount_percent > 0 && <span className="text-xs text-emerald-600 dark:text-emerald-400 ml-auto">{c.discount_percent}% off</span>}
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => copyCode(c.code)} aria-label="Copy code">
+                <Button size="icon" variant="ghost" onClick={() => copyCode(c.code)} aria-label={`Copy promo code ${c.code}`}>
                   <Copy size={14} />
                 </Button>
               </div>
 
               {/* Actions */}
               <div className="flex flex-col gap-2 mt-auto">
-                <Button size="sm" variant="outline" onClick={() => generateAd(c)} disabled={generatingAd === c.code}>
+                <Button size="sm" variant="outline" aria-label={`Generate ad for ${c.title}`} onClick={() => generateAd(c)} disabled={generatingAd === c.code}>
                   {generatingAd === c.code ? <Loader2 size={14} className="animate-spin mr-1" /> : <Sparkles size={14} className="mr-1" />}
                   {adImages[c.code] ? 'Regenerate Ad' : 'Generate Ad'}
                 </Button>
                 <div className="flex gap-2">
-                  <Button size="sm" className="flex-1 bg-purple-500 hover:bg-purple-600" onClick={() => sendPromoEmail(c)} disabled={sending === c.code}>
+                  <Button size="sm" className="flex-1 bg-purple-500 hover:bg-purple-600" aria-label={`Send ${c.title} campaign`} onClick={() => sendPromoEmail(c)} disabled={sending === c.code}>
                     {sending === c.code ? <Loader2 size={14} className="animate-spin mr-1" /> : <Mail size={14} className="mr-1" />}
                     Send
                   </Button>

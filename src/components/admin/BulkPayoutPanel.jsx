@@ -184,6 +184,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
                 {/* Driver header */}
                 <button
                   type="button"
+                  aria-label={`${expanded ? 'Collapse' : 'Expand'} payouts for ${group.driver_name}`}
                   onClick={() => toggleExpand(driverId)}
                   className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors text-left focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 outline-none rounded-lg"
                 >

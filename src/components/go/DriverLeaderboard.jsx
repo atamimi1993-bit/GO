@@ -15,7 +15,7 @@ const RANK_BADGE = {
   3: { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', icon: Award },
 };
 
-export default function DriverLeaderboard() {
+export default function DriverLeaderboard({ scrollRef }) {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -64,7 +64,7 @@ export default function DriverLeaderboard() {
   }
 
   return (
-    <PullToRefresh onRefresh={loadRankings}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={loadRankings}>
       <div className="space-y-6 pb-8">
         {/* Header */}
         <div className="text-center pt-2">
