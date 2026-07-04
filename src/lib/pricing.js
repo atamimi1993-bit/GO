@@ -141,8 +141,8 @@ const COUNTRY_LIST = Object.entries(COUNTRY_CONFIG)
   .sort((a, b) => a.name.localeCompare(b.name));
 
 // GO platform margin — applied to the FULL operational cost (base + fuel + driver pay)
-// 20% on everything means GO's profit scales with every big job, not just gas+miles
-const APP_FEE_RATE = 0.20;
+// 25% on everything means GO's profit scales with every big job, not just gas+miles
+const APP_FEE_RATE = 0.25;
 const MI_TO_KM = 1.60934;
 
 // Bulky item surcharge — flat fee per item flagged as bulky (special handling or 75+ lbs)
