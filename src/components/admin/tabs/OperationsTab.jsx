@@ -1,7 +1,8 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, TrendingUp, Flame } from 'lucide-react';
+import { MapPin, TrendingUp, Flame, Route } from 'lucide-react';
 import SectionSkeleton from '@/components/admin/SectionSkeleton';
+const BatchMetricsDashboard = lazy(() => import('@/components/admin/BatchMetricsDashboard'));
 
 const MoveStatusTracker = lazy(() => import('@/components/admin/MoveStatusTracker'));
 const MoveCalendar = lazy(() => import('@/components/admin/MoveCalendar'));
@@ -15,6 +16,18 @@ export default function OperationsTab({ scrollRef }) {
 
   return (
     <div className="space-y-6">
+      {/* Route batching metrics */}
+      <div className="bg-card border rounded-2xl p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Route size={20} className="text-violet-500" />
+          <h2 className="font-display font-bold text-lg">Route Batching</h2>
+          <span className="text-xs text-muted-foreground ml-auto">Multi-stop optimization</span>
+        </div>
+        <Suspense fallback={<SectionSkeleton />}>
+          <BatchMetricsDashboard />
+        </Suspense>
+      </div>
+
       {/* Fleet management */}
       <Suspense fallback={<SectionSkeleton />}>
         <FleetManagement />

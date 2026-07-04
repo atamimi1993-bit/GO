@@ -55,10 +55,78 @@ Deno.serve(async (req) => {
         driver_rate_confirmed: true,
       });
 
-      return Response.json({ accepted: true, move_request_id });
+      // If this is a batch, confirm the other job too and mark batch as accepted
+      if (move.batch_id) {
+        const batch = await base44.asServiceRole.entities.RouteBatch.get(move.batch_id).catch(() => null);
+        if (batch && batch.status === 'offered') {
+          const jobIds = (batch.job_ids || '').split(',').filter(Boolean);
+          for (const jobId of jobIds) {
+            if (jobId !== move_request_id) {
+              await base44.asServiceRole.entities.MoveRequest.update(jobId, {
+                driver_rate_confirmed: true,
+              });
+            }
+          }
+          await base44.asServiceRole.entities.RouteBatch.update(batch.id, {
+            status: 'accepted',
+            accepted_at: new Date().toISOString(),
+          });
+        }
+      }
+
+      return Response.json({ accepted: true, move_request_id, batch_accepted: !!move.batch_id });
     }
 
-    // Decline — clear assignment, add to declined list, re-dispatch
+    // Decline — check if this move is part of a batch
+    if (move.batch_id) {
+      // Decline entire batch — clear both jobs, re-dispatch individually
+      const batch = await base44.asServiceRole.entities.RouteBatch.get(move.batch_id).catch(() => null);
+      if (batch && (batch.status === 'offered' || batch.status === 'accepted')) {
+        const jobIds = (batch.job_ids || '').split(',').filter(Boolean);
+        const declinedList = (move.declined_driver_ids || '').split(',').filter(Boolean);
+        if (!declinedList.includes(driver.id)) declinedList.push(driver.id);
+
+        // Clear both jobs
+        for (const jobId of jobIds) {
+          await base44.asServiceRole.entities.MoveRequest.update(jobId, {
+            assigned_driver_id: null,
+            assigned_driver_name: null,
+            status: 'pending',
+            driver_rate_confirmed: false,
+            dispatched_at: null,
+            batch_id: null,
+            batch_stop_order: 0,
+            declined_driver_ids: declinedList.join(','),
+          });
+        }
+
+        // Mark batch as declined
+        await base44.asServiceRole.entities.RouteBatch.update(batch.id, {
+          status: 'declined',
+        });
+
+        // Re-dispatch each job individually
+        const reDispatchResults = [];
+        for (const jobId of jobIds) {
+          try {
+            const res = await base44.functions.invoke('auto-dispatch-driver', { move_request_id: jobId });
+            reDispatchResults.push(res?.data || { dispatched: false });
+          } catch (err) {
+            console.error('Re-dispatch failed for batch job:', err.message);
+            reDispatchResults.push({ dispatched: false, reason: err.message });
+          }
+        }
+
+        return Response.json({
+          declined: true,
+          batch_declined: true,
+          move_request_id,
+          re_dispatch: reDispatchResults,
+        });
+      }
+    }
+
+    // Single-job decline (original logic)
     const declinedList = (move.declined_driver_ids || '').split(',').filter(Boolean);
     if (!declinedList.includes(driver.id)) declinedList.push(driver.id);
 
