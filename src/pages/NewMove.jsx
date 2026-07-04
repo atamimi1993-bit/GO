@@ -13,6 +13,12 @@ import PriceBreakdown from '@/components/go/PriceBreakdown';
 import LiabilityAgreement from '@/components/go/LiabilityAgreement';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { calculateMovePrice, recommendTruckSize, TRUCK_SIZE_LABELS, COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES } from '@/lib/pricing';
+
+const JOB_TYPES = [
+  { value: 'residential', label: 'Residential Move' },
+  { value: 'freight', label: 'Freight / Large-Scale Haul' },
+  { value: 'corporate_logistics', label: 'Corporate Logistics' },
+];
 import { ArrowLeft, ArrowRight, Upload, Trash2, Package, MapPin, Calendar, FileText, Loader2 } from 'lucide-react';
 
 const STEPS = ['Details', 'Items', 'Quote', 'Agreement'];
@@ -28,6 +34,7 @@ export default function NewMove() {
   const [form, setForm] = useState({
     pickup_address: '', dropoff_address: '', move_date: '', move_time: '',
     distance_miles: '', country_code: 'US', currency: 'USD', distance_unit: 'mi',
+    job_type: 'residential',
     notes: '', needs_storage: false,
     customer_name: '', customer_email: '', customer_phone: '',
   });
@@ -123,6 +130,7 @@ export default function NewMove() {
         distance_unit: form.distance_unit,
         country_code: form.country_code,
         currency: form.currency,
+        job_type: form.job_type,
         truck_size_needed: truckSize,
         total_weight_lbs: totalWeight,
         items_summary: items.map(i => `${i.quantity}x ${i.name} (${i.weight_lbs}lbs)`).join(', '),
@@ -195,6 +203,15 @@ export default function NewMove() {
             <p className="text-muted-foreground text-sm">Tell us about your move.</p>
           </div>
           <div className="bg-card border rounded-2xl p-6 space-y-4">
+            <div>
+              <Label>Job Type</Label>
+              <MobileSelect
+                value={form.job_type}
+                onValueChange={v => setForm({ ...form, job_type: v })}
+                options={JOB_TYPES}
+                placeholder="Select job type"
+              />
+            </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label>Your Name</Label>

@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, Upload, Loader2 } from 'lucide-react';
+import MobileSelect from '@/components/go/MobileSelect';
+import { Switch } from '@/components/ui/switch';
 
 export default function DriverRegister() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ export default function DriverRegister() {
   const [form, setForm] = useState({
     full_name: '', email: '', phone: '', license_number: '', license_expiry: '',
     service_area: '', company_name: '',
+    cdl_certified: false, cdl_class: 'None',
     license_doc_url: '', insurance_doc_url: '', profile_photo_url: '',
   });
 
@@ -93,6 +96,27 @@ export default function DriverRegister() {
         <div className="grid grid-cols-2 gap-4">
           <div><Label htmlFor="license_number">License Number *</Label><Input id="license_number" value={form.license_number} onChange={e => setForm({ ...form, license_number: e.target.value })} /></div>
           <div><Label htmlFor="license_expiry">License Expiry *</Label><Input id="license_expiry" type="date" value={form.license_expiry} onChange={e => setForm({ ...form, license_expiry: e.target.value })} /></div>
+        </div>
+
+        <div className="border-t pt-4 space-y-3">
+          <div className="flex items-center justify-between bg-amber-500/5 rounded-xl p-4">
+            <div>
+              <p className="font-medium text-sm">CDL Certified?</p>
+              <p className="text-xs text-muted-foreground">Required for freight and corporate logistics jobs.</p>
+            </div>
+            <Switch checked={form.cdl_certified} onCheckedChange={v => setForm({ ...form, cdl_certified: v, cdl_class: v ? 'Class A' : 'None' })} />
+          </div>
+          {form.cdl_certified && (
+            <div>
+              <Label>CDL Class</Label>
+              <MobileSelect
+                value={form.cdl_class}
+                onValueChange={v => setForm({ ...form, cdl_class: v })}
+                options={[{ value: 'Class A', label: 'Class A (Combination vehicles)' }, { value: 'Class B', label: 'Class B (Straight vehicles)' }]}
+                placeholder="Select CDL class"
+              />
+            </div>
+          )}
         </div>
 
         <div className="border-t pt-4 space-y-4">

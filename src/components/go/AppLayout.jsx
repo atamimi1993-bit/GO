@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, Bot, ShieldCheck } from 'lucide-react';
+import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, Bot, ShieldCheck, Container } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/AuthContext';
@@ -16,6 +16,7 @@ const navItems = [
   { label: 'Help Center', path: '/help', icon: HelpCircle },
   { label: 'Assistant', path: '/support', icon: Bot },
   { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
+  { label: 'Freight', path: '/freight-dashboard', icon: Container, adminOnly: true },
 ];
 
 export default function AppLayout() {

@@ -59,6 +59,19 @@
     },
     "company_name": {
       "type": "string"
+    },
+    "cdl_certified": {
+      "type": "boolean",
+      "default": false
+    },
+    "cdl_class": {
+      "type": "string",
+      "enum": [
+        "Class A",
+        "Class B",
+        "None"
+      ],
+      "default": "None"
     }
   },
   "required": [

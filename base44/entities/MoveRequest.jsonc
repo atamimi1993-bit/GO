@@ -37,6 +37,15 @@
       ],
       "default": "pending"
     },
+    "job_type": {
+      "type": "string",
+      "enum": [
+        "residential",
+        "freight",
+        "corporate_logistics"
+      ],
+      "default": "residential"
+    },
     "items_summary": {
       "type": "string"
     },
