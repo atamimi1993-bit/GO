@@ -27,6 +27,53 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, lead: updatedLead });
     }
 
+    // Per-driver performance: total earnings + active jobs
+    if (action === 'driver_performance') {
+      const [drivers, moves, payouts] = await Promise.all([
+        base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverPayout.list('-created_date', 500),
+      ]);
+
+      const byDriver = {};
+      for (const d of drivers) {
+        byDriver[d.id] = {
+          id: d.id,
+          full_name: d.full_name,
+          company_name: d.company_name || null,
+          status: d.status,
+          rating: d.rating || 0,
+          active_jobs: 0,
+          completed_jobs: 0,
+          total_jobs: 0,
+          total_earnings: 0,
+          pending_payouts: 0,
+        };
+      }
+      for (const m of moves) {
+        const entry = m.assigned_driver_id ? byDriver[m.assigned_driver_id] : null;
+        if (!entry) continue;
+        entry.total_jobs += 1;
+        if (['accepted', 'in_progress'].includes(m.status)) entry.active_jobs += 1;
+        if (m.status === 'completed') entry.completed_jobs += 1;
+      }
+      for (const p of payouts) {
+        const entry = p.driver_profile_id ? byDriver[p.driver_profile_id] : null;
+        if (!entry) continue;
+        entry.total_earnings += p.amount || 0;
+        if (p.status === 'pending') entry.pending_payouts += p.amount || 0;
+      }
+
+      const driverStats = Object.values(byDriver).sort((a, b) => b.total_earnings - a.total_earnings);
+      const totals = {
+        totalEarnings: driverStats.reduce((s, d) => s + d.total_earnings, 0),
+        pendingPayouts: driverStats.reduce((s, d) => s + d.pending_payouts, 0),
+        activeJobs: driverStats.reduce((s, d) => s + d.active_jobs, 0),
+        completedJobs: driverStats.reduce((s, d) => s + d.completed_jobs, 0),
+      };
+      return Response.json({ drivers: driverStats, totals });
+    }
+
     // Overview — aggregate everything
     const [moves, drivers, payouts, trucks, users, leads] = await Promise.all([
       base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),

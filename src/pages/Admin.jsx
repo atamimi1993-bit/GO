@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import StatCard from '@/components/admin/StatCard';
+import DriverPerformance from '@/components/admin/DriverPerformance';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
@@ -108,6 +109,9 @@ export default function Admin() {
           <StatCard icon={AlertCircle} label="Cancelled" value={movesByStatus.cancelled} accent="red" />
           <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
         </div>
+
+        {/* Driver performance */}
+        <DriverPerformance />
 
         {/* AI Lead Finder */}
         <LeadFinder onLeadsGenerated={load} />
