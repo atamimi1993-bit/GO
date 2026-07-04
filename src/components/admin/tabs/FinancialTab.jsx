@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import SectionSkeleton from '@/components/admin/SectionSkeleton';
 
+const MarginPayoutDashboard = lazy(() => import('@/components/admin/MarginPayoutDashboard'));
 const RecordExportButton = lazy(() => import('@/components/admin/RecordExportButton'));
 const InstantPayoutCard = lazy(() => import('@/components/admin/InstantPayoutCard'));
 const BulkPayoutPanel = lazy(() => import('@/components/admin/BulkPayoutPanel'));
@@ -16,6 +17,10 @@ export default function FinancialTab({ data, scrollRef }) {
 
   return (
     <div className="space-y-6">
+      <Suspense fallback={<SectionSkeleton />}>
+        <MarginPayoutDashboard />
+      </Suspense>
+
       <Suspense fallback={<SectionSkeleton />}>
         <RecordExportButton />
       </Suspense>
