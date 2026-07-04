@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Package, Truck, Star, Check, Loader2, Sparkles } from 'lucide-react';
+import { Package, Truck, Star, Check, Loader2, Sparkles, ScanSearch } from 'lucide-react';
 import { calculateMovePrice, recommendTruckSize, formatCurrency, TRUCK_SIZE_LABELS } from '@/lib/pricing';
 
 const SERVICE_TIERS = [
@@ -11,7 +11,7 @@ const SERVICE_TIERS = [
 
 const round2 = (v) => Math.round(v * 100) / 100;
 
-export default function EstimateStep({ form, totalWeight, selectedTier, onSelectTier, onConfirm }) {
+export default function EstimateStep({ form, totalWeight, selectedTier, onSelectTier, onConfirm, mediaAnalysis }) {
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
 
@@ -32,8 +32,10 @@ export default function EstimateStep({ form, totalWeight, selectedTier, onSelect
       tolls: Number(form.tolls) || 0,
     });
 
+    const diffMult = mediaAnalysis?.difficulty_multiplier || 1;
+
     return SERVICE_TIERS.map(tier => {
-      const m = tier.multiplier;
+      const m = tier.multiplier * diffMult;
       const adjustedPricing = {
         ...base,
         baseCost: round2(base.baseCost * m),
@@ -46,7 +48,7 @@ export default function EstimateStep({ form, totalWeight, selectedTier, onSelect
       return { ...tier, pricing: adjustedPricing, truckSize };
     });
   }, [generated, totalWeight, form.distance_miles, form.pickup_state, form.country_code,
-      form.currency, form.distance_unit, form.job_type, form.tolls, truckSize]);
+      form.currency, form.distance_unit, form.job_type, form.tolls, truckSize, mediaAnalysis]);
 
   const handleGenerate = () => {
     setGenerating(true);
@@ -71,6 +73,31 @@ export default function EstimateStep({ form, totalWeight, selectedTier, onSelect
           <div className="flex justify-between text-sm"><span className="text-muted-foreground">Recommended Truck</span><span className="font-medium">{TRUCK_SIZE_LABELS[truckSize]?.split('(')[0]?.trim()}</span></div>
           <div className="flex justify-between text-sm"><span className="text-muted-foreground">Service Type</span><span className="font-medium">{form.needs_storage ? 'Storage Needed' : 'Straight Delivery'}</span></div>
         </div>
+
+        {mediaAnalysis && (
+          <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 space-y-2">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-medium">
+              <ScanSearch size={16} /> Media Analysis Applied
+            </div>
+            <p className="text-xs text-muted-foreground select-text">{mediaAnalysis.summary}</p>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <span className="text-[10px] bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">
+                {mediaAnalysis.difficulty_multiplier >= 1 ? '+' : ''}{Math.round((mediaAnalysis.difficulty_multiplier - 1) * 100)}% complexity
+              </span>
+              {mediaAnalysis.specialty_items?.length > 0 && (
+                <span className="text-[10px] bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full font-medium">
+                  {mediaAnalysis.specialty_items.length} specialty item{mediaAnalysis.specialty_items.length > 1 ? 's' : ''}
+                </span>
+              )}
+              {mediaAnalysis.fragile_items_count > 0 && (
+                <span className="text-[10px] bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                  {mediaAnalysis.fragile_items_count} fragile
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="text-center py-4">
           <Button onClick={handleGenerate} size="lg" disabled={generating} className="bg-emerald-500 hover:bg-emerald-600">
             {generating

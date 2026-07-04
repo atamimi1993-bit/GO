@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Camera, Video, X, AlertTriangle, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { checkImageBlur } from '@/lib/blurDetection';
+import MediaAnalysisPanel from '@/components/go/MediaAnalysisPanel';
 
-export default function PhotoVideoStep({ media, onAddMedia, onRemoveMedia }) {
+export default function PhotoVideoStep({ media, onAddMedia, onRemoveMedia, onAnalysis }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
   const { toast } = useToast();
@@ -112,6 +113,10 @@ export default function PhotoVideoStep({ media, onAddMedia, onRemoveMedia }) {
           onChange={handleFiles}
         />
       </div>
+
+      {media.length > 0 && (
+        <MediaAnalysisPanel media={media} onAnalysis={onAnalysis} />
+      )}
 
       <p className="text-xs text-muted-foreground text-center">
         We automatically check your photos for blur and will warn you if any are unclear.

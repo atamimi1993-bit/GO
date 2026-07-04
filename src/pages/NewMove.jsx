@@ -37,6 +37,7 @@ export default function NewMove() {
   });
   const [items, setItems] = useState([]);
   const [media, setMedia] = useState([]);
+  const [mediaAnalysis, setMediaAnalysis] = useState(null);
 
   const totalWeight = items.reduce((sum, item) => sum + (item.weight_lbs * item.quantity), 0);
 
@@ -217,7 +218,7 @@ export default function NewMove() {
       )}
 
       {step === 3 && (
-        <PhotoVideoStep media={media} onAddMedia={handleAddMedia} onRemoveMedia={handleRemoveMedia} />
+        <PhotoVideoStep media={media} onAddMedia={handleAddMedia} onRemoveMedia={handleRemoveMedia} onAnalysis={setMediaAnalysis} />
       )}
 
       {step === 4 && <TimingStep form={form} setForm={setForm} />}
@@ -229,6 +230,7 @@ export default function NewMove() {
           selectedTier={selectedTier}
           onSelectTier={setSelectedTier}
           onConfirm={handleConfirmTier}
+          mediaAnalysis={mediaAnalysis}
         />
       )}
 
