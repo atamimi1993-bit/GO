@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Package, Truck, Star, Check, ScanSearch } from 'lucide-react';
 import { calculateMovePrice, recommendTruckSize, formatCurrency, TRUCK_SIZE_LABELS } from '@/lib/pricing';
+import CustomerSavingsBadge from '@/components/go/RevenueSplitBadge';
 
 const SERVICE_TIERS = [
   { key: 'self_service', name: 'Self-Service', multiplier: 0.85, icon: Package, description: 'You load and unload. Driver transports only.' },
@@ -35,10 +36,14 @@ export default function EstimateStep({ form, totalWeight, selectedTier, onSelect
         ...base,
         baseCost: round2(base.baseCost * m),
         fuelCost: round2(base.fuelCost * m),
+        laborCost: round2(base.laborCost * m),
         taxAmount: round2(base.taxAmount * m),
         appFee: round2(base.appFee * m),
         driverPayout: round2(base.driverPayout * m),
         totalPrice: round2(base.totalPrice * m),
+        marketRate: round2(base.marketRate * m),
+        customerSavings: round2(base.customerSavings * m),
+        serviceValue: round2(base.serviceValue * m),
       };
       return { ...tier, pricing: adjustedPricing, truckSize };
     });
@@ -128,9 +133,12 @@ export default function EstimateStep({ form, totalWeight, selectedTier, onSelect
                 </div>
 
       {selected && (
-        <Button onClick={() => onConfirm(selected.pricing, selected.key, selected.truckSize)} size="lg" className="w-full bg-emerald-500 hover:bg-emerald-600">
-          Continue to Agreement <Check size={16} className="ml-2" />
-        </Button>
+        <div className="space-y-3">
+          <CustomerSavingsBadge pricing={selected.pricing} />
+          <Button onClick={() => onConfirm(selected.pricing, selected.key, selected.truckSize)} size="lg" className="w-full bg-emerald-500 hover:bg-emerald-600">
+            Continue to Agreement <Check size={16} className="ml-2" />
+          </Button>
+        </div>
       )}
     </div>
   );

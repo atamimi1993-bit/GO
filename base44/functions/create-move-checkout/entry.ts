@@ -252,7 +252,9 @@ Deno.serve(async (req) => {
         if (driver?.stripe_account_id && driver?.stripe_payouts_enabled) {
           let appFeePortion;
           if (move.app_fee && move.app_fee > 0) {
-            appFeePortion = move.app_fee / 2;
+            // app_fee is the platform's full take — for split payments, charge proportionally
+            const ratio = chargeAmount / (move.total_price || chargeAmount);
+            appFeePortion = move.app_fee * ratio;
           } else {
             appFeePortion = chargeAmount * 0.25;
           }

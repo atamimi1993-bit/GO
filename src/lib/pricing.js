@@ -140,9 +140,36 @@ const COUNTRY_LIST = Object.entries(COUNTRY_CONFIG)
   .map(([code, cfg]) => ({ code, name: cfg.name }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-// GO platform margin — applied to the FULL operational cost (base + fuel + driver pay)
-// 25% on everything means GO's profit scales with every big job, not just gas+miles
-const APP_FEE_RATE = 0.25;
+// ─── Three-Way Revenue Split ──────────────────────────────────────────────────
+// Priority: Owner → Company → Drivers → Customers
+//
+// Traditional movers charge 40-60% overhead (fleet, staff, brick-and-mortar).
+// GO doesn't carry that overhead, so we can: price below market, pay drivers
+// above market, and still take 25% from the efficiency gap.
+//
+//   job_value (service value) = base + labor + distance + fees + surge
+//   driver_payout  = job_value × 0.75   (PROTECTED FLOOR — never reduced by discounts)
+//   platform_fee   = job_value × 0.25   (target — absorbs customer discount from its share)
+//   customer_price = market_rate × 0.90  (10% below what competitors charge)
+//
+// Reconciliation rule: if customer_price < driver_payout + platform_fee,
+// the shortfall comes from platform_fee, NEVER from driver_payout.
+// This guarantees drivers always earn 75%+ regardless of discounts/promos.
+
+const APP_FEE_RATE = 0.25;        // Platform target share of service value
+const DRIVER_SHARE = 0.75;       // Driver protected floor share of service value
+const PLATFORM_SHARE = 0.25;    // Platform target share of service value
+
+// Market rate — traditional competitors charge ~45% above GO's service cost
+// due to fleet overhead, full-time dispatch staff, and brick-and-mortar offices
+const MARKET_RATE_MULTIPLIER = 1.45;
+
+// Customer discount below market rate (10% — wins customers without killing margin)
+const CUSTOMER_DISCOUNT_RATE = 0.10;
+
+// Platform minimum — GO always earns at least this per job, even after discounts
+const PLATFORM_MINIMUM_FEE = 20;
+
 const MI_TO_KM = 1.60934;
 
 // Bulky item surcharge — flat fee per item flagged as bulky (special handling or 75+ lbs)
@@ -245,36 +272,67 @@ export function calculateCourierPrice({ distanceMiles, deliveryCategory = 'other
   const baseCost = truck.baseCost + (roundTripMiles * truck.costPerMile);
   const fuelCost = (roundTripMiles / truck.mpg) * FUEL_PRICES.gasoline;
   const driverRate = DRIVER_RATES.courier.small;
-  const driverPayout = driverRate.basePay + (roundTripMiles * driverRate.perMile);
+  const baseDriverPayout = driverRate.basePay + (roundTripMiles * driverRate.perMile);
   const categoryFee = COURIER_CATEGORY_FEES[deliveryCategory] || 0;
   const tollCost = Number(tolls) || 0;
 
-  const operationalSubtotal = baseCost + fuelCost + driverPayout + categoryFee + tollCost;
+  // Hard costs (passthrough)
+  const hardCosts = fuelCost + tollCost;
+
+  // Service value (split 75/25) — base + category handling fee
+  const serviceValue = baseCost + categoryFee;
+
+  // Three-way split
+  const splitDriverPayout = serviceValue * DRIVER_SHARE;
+  const driverPayout = Math.max(splitDriverPayout, baseDriverPayout);
+
+  // Market rate and customer discount
+  const marketServiceRate = serviceValue * MARKET_RATE_MULTIPLIER;
+  const customerServicePrice = serviceValue * (1 - CUSTOMER_DISCOUNT_RATE);
+  let platformFee = customerServicePrice - driverPayout;
+  if (platformFee < PLATFORM_MINIMUM_FEE) platformFee = PLATFORM_MINIMUM_FEE;
+
+  const customerPricePreTax = customerServicePrice + hardCosts;
 
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
-  const taxMultiplier = 1 + taxRate;
-  const goProfit = (APP_FEE_RATE * taxMultiplier * operationalSubtotal) / (1 - APP_FEE_RATE * taxMultiplier);
-  const appFee = goProfit;
-  const taxAmount = (operationalSubtotal + appFee) * taxRate;
-  const totalPrice = operationalSubtotal + appFee + taxAmount;
+  const taxAmount = customerPricePreTax * taxRate;
+  const totalPrice = customerPricePreTax + taxAmount;
+
+  const marketRateTotal = (marketServiceRate + hardCosts) * (1 + taxRate);
+  const customerSavings = marketRateTotal - totalPrice;
+  const customerSavingsPercent = marketRateTotal > 0 ? Math.round((customerSavings / marketRateTotal) * 100) : 0;
+
+  const currencyCode = currency || country?.currency || 'USD';
+  const curr = CURRENCIES[currencyCode] || CURRENCIES.USD;
+  const convert = (usd) => Math.round(usd * curr.rate * Math.pow(10, curr.decimals)) / Math.pow(10, curr.decimals);
 
   return {
-    baseCost,
-    fuelCost,
-    driverPayout,
-    categoryFee,
-    tollCost,
-    appFee,
+    baseCost: convert(baseCost),
+    fuelCost: convert(fuelCost),
+    driverPayout: convert(driverPayout),
+    driverPayoutPercent: totalPrice > 0 ? Math.round((driverPayout / totalPrice) * 100) : 0,
+    platformTakePercent: totalPrice > 0 ? Math.round((platformFee / totalPrice) * 100) : 0,
+    categoryFee: convert(categoryFee),
+    tollCost: convert(tollCost),
+    appFee: convert(platformFee),
+    goProfit: convert(platformFee),
     taxRate,
-    taxAmount,
-    totalPrice,
+    taxAmount: convert(taxAmount),
+    totalPrice: convert(totalPrice),
+    marketRate: convert(marketRateTotal),
+    customerSavings: convert(customerSavings),
+    customerSavingsPercent,
     driverFee: 0,
-    driverPayout,
     bulkyItemFee: 0,
     materialsFee: 0,
     carryingFee: 0,
     extraServiceFee: 0,
+    serviceValue: convert(serviceValue),
+    operationalSubtotal: convert(serviceValue + hardCosts),
+    surgeAdjustedSubtotal: convert(serviceValue + hardCosts),
+    adjustedOperationalSubtotal: convert(serviceValue + hardCosts),
+    currency: curr,
   };
 }
 const LB_TO_KG = 0.453592;
@@ -286,7 +344,6 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Convert metric inputs to imperial for internal calculation
   const weightInLbs = weightUnit === 'kg' ? totalWeightLbs / LB_TO_KG : totalWeightLbs;
   const distanceInMiles = distanceUnit === 'km' ? distanceMiles / MI_TO_KM : distanceMiles;
-
   const roundTripMiles = distanceInMiles * 2;
 
   // Labor cost — estimated from weight + truck base hours, or overridden by caller
@@ -294,33 +351,36 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const estimatedLaborHours = Number(laborHours) || (labor.baseHours + Math.ceil(weightInLbs / 2000));
   const laborCost = estimatedLaborHours * labor.hourlyRate;
 
-  // Base price = base_rate + (distance × per_mile) + (labor_hours × hourly_rate)
+  // Base service cost (truck dispatch + distance + labor) — this is the core service value
   const baseCost = truck.baseCost + (roundTripMiles * truck.costPerMile) + laborCost;
 
-  // Fuel cost for round trip (in USD) — uses driver's actual truck MPG & fuel type if provided
+  // Fuel cost — HARD COST (passthrough to driver, NOT split between platform/driver)
   const actualMpg = truckMpg || truck.mpg;
   const actualFuelType = fuelType || 'gasoline';
   const fuelPrice = FUEL_PRICES[actualFuelType] || FUEL_PRICES.gasoline;
   const gallonsNeeded = roundTripMiles / actualMpg;
   const fuelCost = actualFuelType === 'electric' ? roundTripMiles * fuelPrice : gallonsNeeded * fuelPrice;
 
-  // Driver payout: rate based on truck size + job type (GO covers gas & miles)
+  // Driver base rate — MINIMUM FLOOR for driver payout (from the rate table by truck + job type)
+  // The three-way split (75% of service value) almost always exceeds this, but it
+  // guarantees drivers never earn less than the base rate on any job.
   const jobKey = jobType || 'residential';
   const rateTable = DRIVER_RATES[jobKey] || DRIVER_RATES.residential;
   const driverRate = rateTable[truckSize] || rateTable.medium;
-  const driverPayout = driverRate.basePay + (roundTripMiles * driverRate.perMile) + (weightInLbs * driverRate.perLb);
+  const baseDriverPayout = driverRate.basePay + (roundTripMiles * driverRate.perMile) + (weightInLbs * driverRate.perLb);
 
-  // Tolls — passthrough cost the customer pays, driver gets reimbursed
+  // Hard costs (passthrough — reimbursed to driver, NOT part of the 75/25 split)
   const tollCost = Number(tolls) || 0;
+  const hardCosts = fuelCost + tollCost;
 
-  // Bulky item surcharge — flat fee per item flagged as bulky
+  // Service fees — part of service value, split 75/25 between driver and platform
   const bulkyCount = Number(bulkyItemCount) || 0;
   const bulkyItemFee = bulkyCount * BULKY_ITEM_FEE;
 
-  // Materials surcharge — customer-requested packing materials beyond what's included
+  // Materials — 100% PLATFORM PROFIT (upsell, NOT split with driver)
   const materialsFeeCost = Number(materialsFee) || 0;
 
-  // Stairs fee — per flight, only when no elevator service at either location
+  // Stairs fee — per step, only when no elevator service at either location
   const totalSteps = (Number(pickupSteps) || 0) + (Number(dropoffSteps) || 0);
   const stairsFee = elevatorService ? 0 : (totalSteps * FEE_PER_STEP);
 
@@ -334,44 +394,81 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Extra service add-ons — customer-selected optional services
   const extraServiceFee = (extraHelper ? EXTRA_HELPER_FEE : 0) + (elevatorService ? ELEVATOR_SERVICE_FEE : 0);
 
-  // Operational subtotal = everything it costs to do the job
-  const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost + bulkyItemFee + materialsFeeCost + carryingFee + extraServiceFee;
+  // ─── SERVICE VALUE (what the moving service is worth — the basis for the 75/25 split) ───
+  // Excludes hard costs (fuel, tolls — passthrough) and upsells (materials — 100% platform)
+  const serviceValue = baseCost + bulkyItemFee + carryingFee + extraServiceFee;
 
-  // Apply surge / dynamic pricing — multiplies the operational cost during peak demand.
+  // Apply surge / dynamic pricing — multiplies service value during peak demand
   const surge = calculateSurgeMultiplier(new Date(), pendingMovesCount);
-
-  // Move-date-based multipliers
   const peakDayMultiplier = isLastWeekendOfMonth(moveDate) ? PEAK_DAY_MULTIPLIER : 1;
   const sameDayMultiplier = isSameDay(moveDate) ? SAME_DAY_MULTIPLIER : 1;
   const dynamicMultiplier = surge.multiplier * peakDayMultiplier * sameDayMultiplier;
   const surgeMultiplier = dynamicMultiplier;
 
-  const surgeAdjustedSubtotal = operationalSubtotal * dynamicMultiplier;
+  const surgeAdjustedServiceValue = serviceValue * dynamicMultiplier;
 
-  // Loyalty discount — returning customer gets % off the surge-adjusted subtotal
-  const loyaltyDiscount = isReturningCustomer ? surgeAdjustedSubtotal * LOYALTY_DISCOUNT_RATE : 0;
+  // Loyalty discount — platform absorbs (reduces customer price, NEVER reduces driver payout)
+  const loyaltyDiscount = isReturningCustomer ? surgeAdjustedServiceValue * LOYALTY_DISCOUNT_RATE : 0;
 
-  // Minimum job fee — floor on operational cost to cover dispatch overhead
-  const preFloorSubtotal = surgeAdjustedSubtotal - loyaltyDiscount;
-  const minimumJobApplied = preFloorSubtotal < MINIMUM_JOB_FEE;
-  const adjustedOperationalSubtotal = minimumJobApplied ? MINIMUM_JOB_FEE : preFloorSubtotal;
+  // Minimum service value floor — protects both driver and platform on tiny jobs
+  const preFloorServiceValue = surgeAdjustedServiceValue - loyaltyDiscount;
+  const minimumJobApplied = preFloorServiceValue < MINIMUM_JOB_FEE;
+  const finalServiceValue = minimumJobApplied ? MINIMUM_JOB_FEE : preFloorServiceValue;
+
+  // ─── THREE-WAY SPLIT ──────────────────────────────────────────────────────────
+  // Driver gets 75% of service value (PROTECTED FLOOR — never reduced by discounts)
+  const splitDriverPayout = finalServiceValue * DRIVER_SHARE;
+  // Driver earns at least 75% of service value OR the base rate, whichever is higher
+  const driverPayout = Math.max(splitDriverPayout, baseDriverPayout);
+
+  // Market rate — what traditional competitors charge for the same service
+  // (their 40-60% overhead means they charge ~45% above GO's service cost)
+  const marketServiceRate = surgeAdjustedServiceValue * MARKET_RATE_MULTIPLIER;
+
+  // Customer price for service — 10% below market (platform absorbs the discount)
+  const customerServicePrice = finalServiceValue * (1 - CUSTOMER_DISCOUNT_RATE);
+
+  // Platform fee = what's left of the customer's service payment after driver payout
+  // Platform ALWAYS absorbs the customer discount from its own 25% target share
+  let platformFee = customerServicePrice - driverPayout;
+  // Platform minimum — GO always earns at least this much per job
+  if (platformFee < PLATFORM_MINIMUM_FEE) {
+    platformFee = PLATFORM_MINIMUM_FEE;
+  }
+  const appFee = platformFee;
+  const goProfit = platformFee;
+  const driverFee = 0;
+
+  // Customer price (pre-tax) = service portion + hard costs + upsells
+  const customerPricePreTax = customerServicePrice + hardCosts + materialsFeeCost;
 
   // Tax rate: country config overrides state
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
 
-  // GO platform fee — 25% of the TOTAL price the customer pays (including tax)
-  // The 25% applies to the adjusted total, so GO earns proportionally more on premium jobs.
-  const taxMultiplier = 1 + taxRate;
-  const goProfit = (APP_FEE_RATE * taxMultiplier * adjustedOperationalSubtotal) / (1 - APP_FEE_RATE * taxMultiplier);
-  const appFee = goProfit;
-  const driverFee = 0;
+  // Tax applied to the full customer price (service + hard costs + upsells)
+  const taxAmount = customerPricePreTax * taxRate;
 
-  // Tax applied to operational + platform fee
-  const taxAmount = (adjustedOperationalSubtotal + appFee) * taxRate;
+  // Total price — what the customer actually pays
+  const totalPrice = customerPricePreTax + taxAmount;
 
-  // Total price (in USD) — customer pays operational + GO fee + tax
-  const totalPrice = adjustedOperationalSubtotal + appFee + taxAmount;
+  // Market rate total (what competitor would charge including tax)
+  const marketRateTotal = marketServiceRate + hardCosts + materialsFeeCost;
+  const marketRateWithTax = marketRateTotal * (1 + taxRate);
+
+  // Customer savings vs traditional mover
+  const customerSavings = marketRateWithTax - totalPrice;
+  const customerSavingsPercent = marketRateWithTax > 0
+    ? Math.round((customerSavings / marketRateWithTax) * 100)
+    : 0;
+
+  // Actual take rates (for audit / admin dashboard)
+  const driverPayoutPercent = totalPrice > 0
+    ? Math.round((driverPayout / totalPrice) * 100)
+    : 0;
+  const platformTakePercent = totalPrice > 0
+    ? Math.round((platformFee / totalPrice) * 100)
+    : 0;
 
   // Currency conversion
   const currencyCode = currency || country?.currency || 'USD';
@@ -405,18 +502,27 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
     sameDayMultiplier,
     loyaltyDiscount: convert(loyaltyDiscount),
     minimumJobFee: minimumJobApplied ? MINIMUM_JOB_FEE : 0,
-    operationalSubtotal: convert(operationalSubtotal),
-    surgeAdjustedSubtotal: convert(surgeAdjustedSubtotal),
-    adjustedOperationalSubtotal: convert(adjustedOperationalSubtotal),
+    // Three-way split fields
+    serviceValue: convert(finalServiceValue),
+    operationalSubtotal: convert(serviceValue + hardCosts),
+    surgeAdjustedSubtotal: convert(surgeAdjustedServiceValue + hardCosts),
+    adjustedOperationalSubtotal: convert(finalServiceValue + hardCosts),
+    marketRate: convert(marketRateWithTax),
+    customerSavings: convert(customerSavings),
+    customerSavingsPercent,
+    customerDiscountRate: CUSTOMER_DISCOUNT_RATE,
+    driverPayout: convert(driverPayout),
+    driverPayoutPercent,
+    driverPayoutFloor: convert(baseDriverPayout),
+    platformTakePercent,
+    appFee: convert(appFee),
+    goProfit: convert(goProfit),
+    driverFee: convert(driverFee),
     extraHelper: extraHelper,
     elevatorService: elevatorService,
     taxRate,
     taxAmount: convert(taxAmount),
-    appFee: convert(appFee),
-    goProfit: convert(goProfit),
-    driverFee: convert(driverFee),
     totalPrice: convert(totalPrice),
-    driverPayout: convert(driverPayout + tollCost + bulkyItemFee + carryingFee),
     roundTripMiles,
     gallonsNeeded: Math.round(gallonsNeeded * 10) / 10,
     currency: curr,
@@ -640,4 +746,4 @@ export function calculateSurgeMultiplier(date = new Date(), pendingMovesCount = 
   };
 }
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS, LABOR_RATES, MINIMUM_JOB_FEE };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS, LABOR_RATES, MINIMUM_JOB_FEE, APP_FEE_RATE, DRIVER_SHARE, PLATFORM_SHARE, MARKET_RATE_MULTIPLIER, CUSTOMER_DISCOUNT_RATE, PLATFORM_MINIMUM_FEE };

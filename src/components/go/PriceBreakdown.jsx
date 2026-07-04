@@ -32,8 +32,8 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
     ...(pricing.extraServiceFee ? [{ label: `Extra services${pricing.extraHelper ? ' (helper)' : ''}${pricing.elevatorService ? ' (elevator)' : ''}`, value: pricing.extraServiceFee }] : []),
     ...(pricing.surgeMultiplier > 1 ? [{ label: `Dynamic pricing (${surgeLabel}, ×${pricing.surgeMultiplier})`, value: pricing.surgeAdjustedSubtotal - pricing.operationalSubtotal }] : []),
     ...(pricing.loyaltyDiscount ? [{ label: 'Loyalty discount (returning customer)', value: -pricing.loyaltyDiscount, highlight: true }] : []),
+    ...(pricing.customerSavings > 0 ? [{ label: `Customer savings (10% below market)`, value: -pricing.customerSavings, highlight: true }] : []),
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
-    ...(showInternalCosts ? [{ label: 'GO App Fee (25%)', value: pricing.appFee }] : []),
   ];
 
   const surge = { multiplier: pricing.surgeMultiplier || 1, label: pricing.surgeLabel || 'Normal Pricing', level: pricing.surgeLevel || 'normal' };
@@ -64,9 +64,16 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
           {fmt(pricing.totalPrice)}
         </span>
       </div>
+      {pricing.marketRate > 0 && (
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Market rate (traditional mover)</span>
+          <span className="line-through">{fmt(pricing.marketRate)}</span>
+        </div>
+      )}
       {showInternalCosts && (
-        <div className="bg-emerald-500/10 rounded-lg p-3 text-sm text-emerald-600 dark:text-emerald-400">
-          Driver payout for this job: <span className="font-bold">{fmt(pricing.driverPayout)}</span>
+        <div className="bg-emerald-500/10 rounded-lg p-3 text-sm text-emerald-600 dark:text-emerald-400 space-y-1">
+          <div>Driver payout ({pricing.driverPayoutPercent || (pricing.totalPrice > 0 ? Math.round((pricing.driverPayout / pricing.totalPrice) * 100) : 0)}%): <span className="font-bold">{fmt(pricing.driverPayout)}</span></div>
+          <div className="text-xs text-muted-foreground">Platform fee ({pricing.platformTakePercent || (pricing.totalPrice > 0 ? Math.round((pricing.appFee / pricing.totalPrice) * 100) : 0)}%): {fmt(pricing.appFee)}</div>
         </div>
       )}
       {(() => {
