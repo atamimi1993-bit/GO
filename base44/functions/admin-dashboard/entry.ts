@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     // Whitelist of allowed actions to prevent unexpected code paths
     const ALLOWED_ACTIONS = [
       'overview', 'approve_driver', 'reject_driver', 'update_lead_status',
-      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials', 'metrics_overview', 'background_checks',
+      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials', 'metrics_overview', 'background_checks', 'moves_by_city',
     ];
     if (!ALLOWED_ACTIONS.includes(action)) {
       return Response.json({ error: 'Invalid action' }, { status: 400 });
@@ -150,6 +150,41 @@ Deno.serve(async (req) => {
         payout_ids.map((pid) => ({ id: pid, status: 'paid' }))
       );
       return Response.json({ success: true, processed: payout_ids.length, updated });
+    }
+
+    // Moves by city — completed moves grouped by city extracted from pickup_address
+    if (action === 'moves_by_city') {
+      const allMoves = await base44.asServiceRole.entities.MoveRequest.list('-created_date', 500);
+      const completed = allMoves.filter((m) => m.status === 'completed');
+
+      // Extract city from pickup_address (typically "123 Main St, City, ST 12345")
+      const extractCity = (address) => {
+        if (!address) return null;
+        const parts = address.split(',').map((p) => p.trim()).filter(Boolean);
+        // If 3+ parts: street, city, state zip → city is parts[1]
+        // If 2 parts: street, city state zip → city is parts[1] minus state/zip
+        if (parts.length >= 3) return parts[1];
+        if (parts.length === 2) {
+          // Try to strip the state abbreviation + zip from the second part
+          const cleaned = parts[1].replace(/\s*[A-Z]{2}\s*\d{5}.*$/, '').trim();
+          return cleaned || parts[1];
+        }
+        return null;
+      };
+
+      const cities = {};
+      for (const m of completed) {
+        const city = extractCity(m.pickup_address);
+        if (!city) continue;
+        const key = city;
+        if (!cities[key]) cities[key] = { city: key, completed_moves: 0, revenue: 0 };
+        cities[key].completed_moves += 1;
+        cities[key].revenue += m.total_price || 0;
+      }
+
+      const sorted = Object.values(cities).sort((a, b) => b.completed_moves - a.completed_moves).slice(0, 15);
+      const totalCompleted = sorted.reduce((s, c) => s + c.completed_moves, 0);
+      return Response.json({ cities: sorted, totalCompleted });
     }
 
     // Per-driver performance: total earnings + active jobs

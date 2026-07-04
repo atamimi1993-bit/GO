@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import StatCard from '@/components/admin/StatCard';
+const MovesByCityChart = lazy(() => import('@/components/admin/MovesByCityChart'));
 const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
 const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
 const MoveStatusTracker = lazy(() => import('@/components/admin/MoveStatusTracker'));
@@ -30,7 +31,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import {
   ShieldCheck, DollarSign, Truck, Package, Users, CheckCircle2,
-  Loader2, UserCheck, UserX, Wallet, TrendingUp, AlertCircle, MapPin,
+  Loader2, UserCheck, UserX, Wallet, TrendingUp, AlertCircle, MapPin, Building2,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -185,6 +186,18 @@ export default function Admin() {
         <Suspense fallback={<SectionSkeleton />}>
           <DriverTopPerformers />
         </Suspense>
+
+        {/* Moves by city — growth by market */}
+        <div className="bg-card border rounded-2xl p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Building2 size={20} className="text-emerald-600" />
+            <h2 className="font-display font-bold text-lg">Completed Moves by City</h2>
+            <span className="text-xs text-muted-foreground ml-auto">Where we're growing fastest</span>
+          </div>
+          <Suspense fallback={<SectionSkeleton />}>
+            <MovesByCityChart />
+          </Suspense>
+        </div>
 
         {/* Growth summary — monthly revenue, completed moves, driver payouts */}
         <Suspense fallback={<SectionSkeleton />}>
