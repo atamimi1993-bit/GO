@@ -61,7 +61,7 @@ export default function AppLayout() {
     <div className="h-dvh flex flex-col bg-background">
       <OfflineBanner />
       {/* Mobile-only minimal header */}
-      <header className="md:hidden shrink-0 bg-card border-b border-border sticky top-0 z-50 flex items-center justify-between px-4 h-14" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <header className="md:hidden shrink-0 bg-card border-b border-border sticky top-0 z-50 flex items-center justify-between px-4 min-h-[56px]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <Link to="/" aria-label="GO Home" className="flex items-center">
           <Logo size="sm" />
         </Link>
@@ -141,7 +141,7 @@ export default function AppLayout() {
       <main
         ref={mainRef}
         data-scroll-container
-        className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pb-6 overscroll-y-none overflow-y-auto md:h-auto md:overflow-visible"
+        className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pb-6 overscroll-y-none overflow-y-auto overflow-x-hidden md:h-auto md:overflow-visible"
         style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }}
       >
         <Outlet context={{ scrollRef: mainRef }} />

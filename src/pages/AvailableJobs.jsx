@@ -72,8 +72,9 @@ export default function AvailableJobs() {
       }
     } catch {}
 
-    // Optimistic removal
+    // Optimistic removal + immediate accepted banner
     setJobs(prev => prev.filter(j => j.id !== job.id));
+    setAcceptedJob({ ...job, status: 'accepted', assigned_driver_id: driverProfile.id, assigned_driver_name: driverProfile.full_name, _optimistic: true });
     try {
       // Fetch the driver's trucks to get actual MPG and fuel type
       const trucks = await base44.entities.Truck.filter({ driver_profile_id: driverProfile.id });
@@ -122,8 +123,9 @@ export default function AvailableJobs() {
       toast({ title: 'Job accepted!', description: "You've been assigned to this move." });
       setAcceptedJob({ ...job, status: 'accepted', assigned_driver_id: driverProfile.id, assigned_driver_name: driverProfile.full_name, ...updatedPricing });
     } catch {
-      // Restore job on failure, re-sorted by created_date
+      // Restore job on failure, re-sorted by created_date; clear optimistic accepted banner
       setJobs(prev => [...prev, job].sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0)));
+      setAcceptedJob(null);
       toast({ title: 'Error', description: 'Could not accept job.', variant: 'destructive' });
     }
     setAccepting(null);

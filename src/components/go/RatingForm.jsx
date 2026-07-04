@@ -49,6 +49,8 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
       toast({ title: 'Select a rating', description: 'Please tap a star to rate.', variant: 'destructive' });
       return;
     }
+    // Optimistic UI: set submitted state and fire onSubmitted BEFORE the API call
+    // so the parent list updates immediately. Reverted in the catch block on failure.
     setSubmitting(true);
     setSubmitted(true);
     let optimisticCalled = false;

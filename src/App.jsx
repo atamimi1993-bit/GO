@@ -71,7 +71,7 @@ const PageTransition = ({ children }) => {
       transition={isPop
         ? { type: 'tween', duration: 0.25, ease: 'easeOut' }
         : { type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
-      style={{ position: 'relative', width: '100%', overflowX: 'hidden', willChange: 'transform' }}
+      style={{ position: 'relative', width: '100%', overflowX: 'hidden', willChange: 'transform', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
     >
       {children}
     </motion.div>
