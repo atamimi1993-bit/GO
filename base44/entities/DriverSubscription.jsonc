@@ -1,0 +1,99 @@
+{
+  "name": "DriverSubscription",
+  "type": "object",
+  "properties": {
+    "driver_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "driver_name": {
+      "type": "string"
+    },
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "free",
+        "pro",
+        "elite"
+      ],
+      "default": "free"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "cancelled",
+        "trialing"
+      ],
+      "default": "active"
+    },
+    "current_period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "cancelled_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "jobs_this_month": {
+      "type": "number",
+      "default": 0
+    },
+    "jobs_limit": {
+      "type": "number",
+      "default": 3
+    }
+  },
+  "required": [
+    "driver_email",
+    "tier"
+  ],
+  "rls": {
+    "create": {
+      "data.driver_email": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.driver_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.driver_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

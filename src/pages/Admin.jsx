@@ -32,6 +32,7 @@ const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPip
 const DriverRecruiter = lazy(() => import('@/components/admin/DriverRecruiter'));
 const LeadContactAssistant = lazy(() => import('@/components/admin/LeadContactAssistant'));
 const DriverCoach = lazy(() => import('@/components/admin/DriverCoach'));
+const AdManagement = lazy(() => import('@/components/admin/AdManagement'));
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -307,6 +308,11 @@ export default function Admin() {
         {/* AI Driver Performance Coach — analyzes metrics, sends coaching tips */}
         <Suspense fallback={<SectionSkeleton />}>
           <DriverCoach />
+        </Suspense>
+
+        {/* Ad Space Management — sell and manage ad placements */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <AdManagement />
         </Suspense>
 
         {/* Pending vehicle listing approvals */}

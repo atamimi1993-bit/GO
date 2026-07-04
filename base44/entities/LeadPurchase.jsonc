@@ -1,0 +1,87 @@
+{
+  "name": "LeadPurchase",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string"
+    },
+    "lead_name": {
+      "type": "string"
+    },
+    "lead_location": {
+      "type": "string"
+    },
+    "lead_contact": {
+      "type": "string"
+    },
+    "driver_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "driver_name": {
+      "type": "string"
+    },
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "price_paid": {
+      "type": "number",
+      "default": 5
+    },
+    "stripe_session_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "purchased",
+        "contacted",
+        "converted",
+        "expired"
+      ],
+      "default": "purchased"
+    },
+    "converted_move_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "lead_id",
+    "lead_name",
+    "driver_email"
+  ],
+  "rls": {
+    "create": {
+      "data.driver_email": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.driver_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.driver_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

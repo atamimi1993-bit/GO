@@ -1,0 +1,106 @@
+{
+  "name": "AdSlot",
+  "type": "object",
+  "properties": {
+    "advertiser_name": {
+      "type": "string"
+    },
+    "advertiser_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "target_url": {
+      "type": "string"
+    },
+    "placement": {
+      "type": "string",
+      "enum": [
+        "homepage_banner",
+        "sidebar",
+        "in_app",
+        "move_confirmation",
+        "email"
+      ],
+      "default": "homepage_banner"
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "all",
+        "customers",
+        "drivers",
+        "business"
+      ],
+      "default": "all"
+    },
+    "price_monthly": {
+      "type": "number",
+      "default": 99
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "paused",
+        "expired"
+      ],
+      "default": "pending"
+    },
+    "starts_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ends_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "impressions": {
+      "type": "number",
+      "default": 0
+    },
+    "clicks": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "advertiser_name",
+    "advertiser_email",
+    "title",
+    "placement"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -56,6 +56,8 @@ const ReportDamage = lazy(() => import('@/pages/ReportDamage'));
 const DriverDetail = lazy(() => import('@/pages/DriverDetail'));
 const Overseer = lazy(() => import('@/pages/Overseer'));
 const ScheduleOptimizer = lazy(() => import('@/pages/ScheduleOptimizer'));
+const DriverUpgrade = lazy(() => import('@/pages/DriverUpgrade'));
+const LeadMarketplace = lazy(() => import('@/pages/LeadMarketplace'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -140,6 +142,8 @@ const AuthenticatedApp = () => {
           <Route path="/rentals/:id" element={<PageTransition><RentalDetail /></PageTransition>} />
           <Route path="/driver-report" element={<PageTransition><DriverReport /></PageTransition>} />
           <Route path="/scheduler" element={<PageTransition><ScheduleOptimizer /></PageTransition>} />
+          <Route path="/driver-upgrade" element={<PageTransition><DriverUpgrade /></PageTransition>} />
+          <Route path="/lead-marketplace" element={<PageTransition><LeadMarketplace /></PageTransition>} />
           <Route path="/driver/:id" element={<PageTransition><DriverDetail /></PageTransition>} />
           <Route path="/report-damage/:id" element={<PageTransition><ReportDamage /></PageTransition>} />
 

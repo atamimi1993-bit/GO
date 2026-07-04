@@ -120,6 +120,90 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Driver subscription checkout
+    if (event.type === 'checkout.session.completed' && session?.metadata?.type === 'driver_subscription') {
+      const meta = session.metadata || {};
+      const driverEmail = meta.driver_email;
+      const tier = meta.tier;
+      if (driverEmail && tier) {
+        const stripe2 = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+        let subDetail = null;
+        try { subDetail = await stripe2.subscriptions.retrieve(session.subscription); } catch (e) { console.error('Sub retrieve failed:', e.message); }
+        const subData = {
+          driver_email: driverEmail,
+          driver_name: meta.driver_name || '',
+          driver_profile_id: meta.driver_profile_id || '',
+          tier,
+          stripe_subscription_id: session.subscription,
+          stripe_customer_id: session.customer,
+          status: 'active',
+          jobs_limit: tier === 'elite' ? 999999 : 999999,
+          current_period_start: subDetail ? new Date(subDetail.current_period_start * 1000).toISOString() : null,
+          current_period_end: subDetail ? new Date(subDetail.current_period_end * 1000).toISOString() : null,
+        };
+        const existing = await base44.asServiceRole.entities.DriverSubscription.filter({ driver_email: driverEmail });
+        if (existing.length > 0) {
+          await base44.asServiceRole.entities.DriverSubscription.update(existing[0].id, subData);
+        } else {
+          await base44.asServiceRole.entities.DriverSubscription.create(subData);
+        }
+        console.log('Driver subscription activated: ' + driverEmail + ' tier=' + tier);
+      }
+    }
+
+    // Lead purchase checkout
+    if (event.type === 'checkout.session.completed' && session?.metadata?.type === 'lead_purchase') {
+      const meta = session.metadata || {};
+      const leadId = meta.lead_id;
+      const driverEmail = meta.driver_email;
+      if (leadId && driverEmail) {
+        const leads = await base44.asServiceRole.entities.Lead.filter({ id: leadId });
+        const lead = leads.length > 0 ? leads[0] : null;
+        const purchaseData = {
+          lead_id: leadId,
+          lead_name: lead?.lead_name || 'Unknown',
+          lead_location: lead?.location || '',
+          lead_contact: lead?.contact_info || '',
+          driver_email: driverEmail,
+          price_paid: session.amount_total ? session.amount_total / 100 : 5,
+          stripe_session_id: session.id,
+          status: 'purchased',
+        };
+        await base44.asServiceRole.entities.LeadPurchase.create(purchaseData);
+        await base44.asServiceRole.entities.Lead.update(leadId, { assignment_status: 'matched', status: 'contacted' });
+        console.log('Lead ' + leadId + ' purchased by ' + driverEmail);
+      }
+    }
+
+    // Ad space subscription checkout
+    if (event.type === 'checkout.session.completed' && session?.metadata?.type === 'ad_space') {
+      const meta = session.metadata || {};
+      const advertiserEmail = meta.advertiser_email;
+      if (advertiserEmail) {
+        const stripe3 = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+        let subDetail2 = null;
+        try { subDetail2 = await stripe3.subscriptions.retrieve(session.subscription); } catch (e) { console.error('Sub retrieve failed:', e.message); }
+        const adData = {
+          advertiser_name: meta.advertiser_name,
+          advertiser_email: advertiserEmail,
+          title: meta.title,
+          description: meta.description || '',
+          image_url: meta.image_url || '',
+          target_url: meta.target_url || '',
+          placement: meta.placement,
+          audience: meta.audience || 'all',
+          price_monthly: 99,
+          stripe_subscription_id: session.subscription,
+          stripe_customer_id: session.customer,
+          status: 'active',
+          starts_at: subDetail2 ? new Date(subDetail2.current_period_start * 1000).toISOString() : new Date().toISOString(),
+          ends_at: subDetail2 ? new Date(subDetail2.current_period_end * 1000).toISOString() : null,
+        };
+        await base44.asServiceRole.entities.AdSlot.create(adData);
+        console.log('Ad space activated for ' + advertiserEmail);
+      }
+    }
+
     // Business subscription lifecycle
     if (event.type === 'checkout.session.completed' && session?.mode === 'subscription') {
       const meta = session.metadata || {};
@@ -165,20 +249,43 @@ Deno.serve(async (req) => {
 
     if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
       const sub = event.data.object;
-      const existing = await base44.asServiceRole.entities.BusinessSubscription.filter({
-        stripe_subscription_id: sub.id,
-      });
-      if (existing.length > 0) {
-        const updateData = {
-          status: sub.status,
-          current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-        };
-        if (sub.canceled_at) {
-          updateData.cancelled_at = new Date(sub.canceled_at * 1000).toISOString();
+      const updateData = {
+        status: sub.status,
+        current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
+        current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+      };
+      if (sub.canceled_at) {
+        updateData.cancelled_at = new Date(sub.canceled_at * 1000).toISOString();
+      }
+
+      // Business subscriptions
+      const bizSubs = await base44.asServiceRole.entities.BusinessSubscription.filter({ stripe_subscription_id: sub.id });
+      if (bizSubs.length > 0) {
+        await base44.asServiceRole.entities.BusinessSubscription.update(bizSubs[0].id, updateData);
+        console.log('Business subscription ' + sub.id + ' updated: ' + sub.status);
+      }
+
+      // Driver subscriptions
+      const driverSubs = await base44.asServiceRole.entities.DriverSubscription.filter({ stripe_subscription_id: sub.id });
+      if (driverSubs.length > 0) {
+        const driverUpdate = { ...updateData };
+        if (sub.status === 'canceled' || sub.status === 'deleted') {
+          driverUpdate.tier = 'free';
+          driverUpdate.jobs_limit = 3;
         }
-        await base44.asServiceRole.entities.BusinessSubscription.update(existing[0].id, updateData);
-        console.log('Subscription ' + sub.id + ' updated: ' + sub.status);
+        await base44.asServiceRole.entities.DriverSubscription.update(driverSubs[0].id, driverUpdate);
+        console.log('Driver subscription ' + sub.id + ' updated: ' + sub.status);
+      }
+
+      // Ad slot subscriptions
+      const adSubs = await base44.asServiceRole.entities.AdSlot.filter({ stripe_subscription_id: sub.id });
+      if (adSubs.length > 0) {
+        const adUpdate = { ...updateData };
+        if (sub.status === 'canceled' || sub.status === 'deleted') {
+          adUpdate.status = 'expired';
+        }
+        await base44.asServiceRole.entities.AdSlot.update(adSubs[0].id, adUpdate);
+        console.log('Ad slot subscription ' + sub.id + ' updated: ' + sub.status);
       }
     }
 
