@@ -8,6 +8,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import AdBanner from '@/components/go/AdBanner';
 import HomeStats from '@/components/go/HomeStats';
 import Testimonials from '@/components/go/Testimonials';
+import FaqSection from '@/components/go/FaqSection';
 import { Gift } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -82,6 +83,9 @@ export default function Home() {
 
       {/* Testimonials */}
       <Testimonials />
+
+      {/* FAQ */}
+      <FaqSection />
 
       {/* Why GO */}
       <section>
