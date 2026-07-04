@@ -21,6 +21,7 @@ const Home = lazy(() => import('@/pages/Home'));
 const NewMove = lazy(() => import('@/pages/NewMove'));
 const MyMoves = lazy(() => import('@/pages/MyMoves'));
 const MoveDetail = lazy(() => import('@/pages/MoveDetail'));
+const MoveInventory = lazy(() => import('@/pages/MoveInventory'));
 const DriverHub = lazy(() => import('@/pages/DriverHub'));
 const DriverRegister = lazy(() => import('@/pages/DriverRegister'));
 const AvailableJobs = lazy(() => import('@/pages/AvailableJobs'));
@@ -87,6 +88,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
         <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
+        <Route path="/move/:id/inventory" element={<PageTransition><MoveInventory /></PageTransition>} />
         <Route path="/storage" element={<PageTransition><Storage /></PageTransition>} />
         <Route path="/help" element={<PageTransition><HelpCenter /></PageTransition>} />
       </Route>

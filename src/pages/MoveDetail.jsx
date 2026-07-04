@@ -143,7 +143,12 @@ export default function MoveDetail() {
       {move.assigned_driver_name && (
         <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5 mb-4">
           <h3 className="font-display font-bold text-sm mb-2 text-emerald-800 dark:text-emerald-200">Assigned Driver</h3>
-          <p className="font-medium">{move.assigned_driver_name}</p>
+          <p className="font-medium mb-3">{move.assigned_driver_name}</p>
+          {['accepted', 'in_progress'].includes(move.status) && (
+            <Button size="sm" variant="outline" onClick={() => navigate(`/move/${move.id}/inventory`)}>
+              <Package size={14} className="mr-1" /> Manage Items & Price
+            </Button>
+          )}
         </div>
       )}
 
