@@ -10,6 +10,7 @@ const MoveHeatMap = lazy(() => import('@/components/admin/MoveHeatMap'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const FleetManagement = lazy(() => import('@/components/admin/FleetManagement'));
 const PromoCodeManager = lazy(() => import('@/components/admin/PromoCodeManager'));
+const LaunchChecklist = lazy(() => import('@/components/admin/LaunchChecklist'));
 
 export default function OperationsTab({ scrollRef }) {
   const [showMap, setShowMap] = useState(false);
@@ -17,6 +18,11 @@ export default function OperationsTab({ scrollRef }) {
 
   return (
     <div className="space-y-6">
+      {/* Launch checklist — pre-launch verification */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <LaunchChecklist />
+      </Suspense>
+
       {/* Route batching metrics */}
       <div className="bg-card border rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-4">
