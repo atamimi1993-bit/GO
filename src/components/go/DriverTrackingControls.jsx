@@ -84,7 +84,10 @@ export default function DriverTrackingControls({ driverProfile }) {
           });
           setLastPing(ping);
           if (milestone === 'delivered') {
-            toast({ title: 'Move marked as delivered!' });
+            await base44.entities.MoveRequest.update(activeMove.id, { status: 'completed' });
+            setActiveMove({ ...activeMove, status: 'completed' });
+            stopTracking();
+            toast({ title: 'Move marked as delivered!', description: 'The customer has been notified.' });
           }
         } catch {
           toast({ title: 'Failed to send location update', variant: 'destructive' });
