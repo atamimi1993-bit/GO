@@ -40,6 +40,7 @@ const Leaderboard = lazy(() => import('@/pages/Leaderboard'));
 const DriverDashboard = lazy(() => import('@/pages/DriverDashboard'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const FinancialDashboard = lazy(() => import('@/pages/FinancialDashboard'));
+const MetricsDashboard = lazy(() => import('@/pages/MetricsDashboard'));
 const GrowthDashboard = lazy(() => import('@/pages/GrowthDashboard'));
 const Rentals = lazy(() => import('@/pages/Rentals'));
 const RentalDetail = lazy(() => import('@/pages/RentalDetail'));
@@ -131,6 +132,7 @@ const AuthenticatedApp = () => {
             <Route path="/tracking" element={<PageTransition><TrackingHub /></PageTransition>} />
             <Route path="/revenue" element={<PageTransition><Revenue /></PageTransition>} />
             <Route path="/financials" element={<PageTransition><FinancialDashboard /></PageTransition>} />
+            <Route path="/metrics" element={<PageTransition><MetricsDashboard /></PageTransition>} />
             <Route path="/growth" element={<PageTransition><GrowthDashboard /></PageTransition>} />
           </Route>
         </Route>

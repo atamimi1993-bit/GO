@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     // Whitelist of allowed actions to prevent unexpected code paths
     const ALLOWED_ACTIONS = [
       'overview', 'approve_driver', 'reject_driver', 'update_lead_status',
-      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials',
+      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials', 'metrics_overview',
     ];
     if (!ALLOWED_ACTIONS.includes(action)) {
       return Response.json({ error: 'Invalid action' }, { status: 400 });
@@ -266,6 +266,69 @@ Deno.serve(async (req) => {
         cancellationRevenue: series.reduce((s, r) => s + r.cancellation_revenue, 0),
       };
       return Response.json({ series, totals });
+    }
+
+    // Metrics overview — completed moves per month, top driver regions, total move-fee revenue
+    if (action === 'metrics_overview') {
+      const [allMoves, allDrivers] = await Promise.all([
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
+      ]);
+
+      const driverMap = {};
+      for (const d of allDrivers) driverMap[d.id] = d;
+
+      const monthKey = (iso) => {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+      };
+
+      // Monthly completed moves + move-fee revenue
+      const months = {};
+      const ensureMonth = (key) => {
+        if (!key) return;
+        if (!months[key]) months[key] = { month: key, completed_moves: 0, move_fee_revenue: 0, total_revenue: 0 };
+      };
+
+      for (const m of allMoves) {
+        if (m.status !== 'completed') continue;
+        const key = monthKey(m.move_date || m.created_date);
+        if (!key) continue;
+        ensureMonth(key);
+        months[key].completed_moves += 1;
+        months[key].move_fee_revenue += m.app_fee || (m.total_price || 0) * 0.25;
+        months[key].total_revenue += m.total_price || 0;
+      }
+
+      const monthlySeries = Object.values(months).sort((a, b) => a.month.localeCompare(b.month));
+
+      // Top driver regions by completed moves and revenue
+      const regions = {};
+      for (const m of allMoves) {
+        if (m.status !== 'completed' || !m.assigned_driver_id) continue;
+        const driver = driverMap[m.assigned_driver_id];
+        const region = driver?.service_area || 'Unknown';
+        if (!regions[region]) regions[region] = { region, completed_moves: 0, revenue: 0, move_fee_revenue: 0, driver_count: new Set() };
+        regions[region].completed_moves += 1;
+        regions[region].revenue += m.total_price || 0;
+        regions[region].move_fee_revenue += m.app_fee || (m.total_price || 0) * 0.25;
+        if (driver) regions[region].driver_count.add(driver.id);
+      }
+
+      const topRegions = Object.values(regions)
+        .map((r) => ({ ...r, driver_count: r.driver_count.size }))
+        .sort((a, b) => b.completed_moves - a.completed_moves)
+        .slice(0, 10);
+
+      const totals = {
+        totalCompletedMoves: monthlySeries.reduce((s, r) => s + r.completed_moves, 0),
+        totalMoveFeeRevenue: monthlySeries.reduce((s, r) => s + r.move_fee_revenue, 0),
+        totalRevenue: monthlySeries.reduce((s, r) => s + r.total_revenue, 0),
+      };
+
+      return Response.json({ monthlySeries, topRegions, totals });
     }
 
     // Export all moves with financial details for spreadsheet use
