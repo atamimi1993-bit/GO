@@ -19,6 +19,7 @@ const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPa
 const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApprovalPanel'));
 const InstantPayoutCard = lazy(() => import('@/components/admin/InstantPayoutCard'));
 const TaxReportPanel = lazy(() => import('@/components/admin/TaxReportPanel'));
+const BackgroundCheckPanel = lazy(() => import('@/components/admin/BackgroundCheckPanel'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 import { Button } from '@/components/ui/button';
@@ -132,7 +133,7 @@ export default function Admin() {
     );
   }
 
-  const { stats, movesByStatus, recentMoves, pendingDrivers, recentPayouts, recentUsers } = data;
+  const { stats, movesByStatus, recentMoves, pendingDrivers, allDrivers, recentPayouts, recentUsers } = data;
   const fmt = (n) => `$${(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
@@ -343,6 +344,11 @@ export default function Admin() {
         {/* 1099 Tax Report */}
         <Suspense fallback={<SectionSkeleton />}>
           <TaxReportPanel />
+        </Suspense>
+
+        {/* Background Check Management */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <BackgroundCheckPanel drivers={allDrivers} />
         </Suspense>
 
         {/* Recent users */}

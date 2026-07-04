@@ -120,6 +120,68 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Business subscription lifecycle
+    if (event.type === 'checkout.session.completed' && session?.mode === 'subscription') {
+      const meta = session.metadata || {};
+      const businessEmail = meta.business_email;
+      if (businessEmail) {
+        const subId = session.subscription;
+        const customerId = session.customer;
+        let subscription = null;
+        try {
+          const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+          subscription = await stripe.subscriptions.retrieve(subId);
+        } catch (e) {
+          console.error('Failed to retrieve subscription:', e.message);
+        }
+
+        const planTier = meta.plan_tier || 'starter';
+        const planName = meta.plan_name || 'Business Plan';
+        const subData = {
+          business_email: businessEmail,
+          business_name: meta.business_name || '',
+          business_account_id: meta.business_account_id || null,
+          plan_name: planName,
+          plan_tier: planTier,
+          stripe_subscription_id: subId,
+          stripe_customer_id: customerId,
+          status: 'active',
+          current_period_start: subscription ? new Date(subscription.current_period_start * 1000).toISOString() : null,
+          current_period_end: subscription ? new Date(subscription.current_period_end * 1000).toISOString() : null,
+        };
+
+        const existing = await base44.asServiceRole.entities.BusinessSubscription.filter({
+          business_email: businessEmail,
+          stripe_subscription_id: subId,
+        });
+        if (existing.length > 0) {
+          await base44.asServiceRole.entities.BusinessSubscription.update(existing[0].id, subData);
+        } else {
+          await base44.asServiceRole.entities.BusinessSubscription.create(subData);
+        }
+        console.log('Business subscription activated for ' + businessEmail);
+      }
+    }
+
+    if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
+      const sub = event.data.object;
+      const existing = await base44.asServiceRole.entities.BusinessSubscription.filter({
+        stripe_subscription_id: sub.id,
+      });
+      if (existing.length > 0) {
+        const updateData = {
+          status: sub.status,
+          current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
+          current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+        };
+        if (sub.canceled_at) {
+          updateData.cancelled_at = new Date(sub.canceled_at * 1000).toISOString();
+        }
+        await base44.asServiceRole.entities.BusinessSubscription.update(existing[0].id, updateData);
+        console.log('Subscription ' + sub.id + ' updated: ' + sub.status);
+      }
+    }
+
     return Response.json({ received: true });
   } catch (error) {
     console.error('Webhook error:', error.message);

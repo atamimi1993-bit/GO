@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Building2, Loader2, Check, FileText } from 'lucide-react';
+import { ArrowLeft, Building2, Loader2, Check, FileText, Crown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import MobileSelect from '@/components/go/MobileSelect';
 
 const INDUSTRIES = [
@@ -164,6 +165,19 @@ export default function BusinessAccount() {
         <FileText size={14} />
         <span>Monthly invoice accounts are reviewed within 1 business day.</span>
       </div>
+
+      <Link to="/business-plans" className="block mt-6">
+        <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
+          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+            <Crown className="text-emerald-600 dark:text-emerald-400" size={24} />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-display font-bold text-sm">Upgrade to a Business Plan</h3>
+            <p className="text-xs text-muted-foreground">Get priority dispatch, discounted rates, and dedicated support with a monthly subscription.</p>
+          </div>
+          <ArrowLeft size={18} className="text-muted-foreground rotate-180 shrink-0" />
+        </div>
+      </Link>
     </div>
   );
 }

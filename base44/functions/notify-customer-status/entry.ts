@@ -108,6 +108,20 @@ Deno.serve(async (req) => {
       return Response.json({ sent: false, error: err.message }, { status: 500 });
     }
 
+    // In-app push notification
+    try {
+      await base44.asServiceRole.entities.AppNotification.create({
+        user_email: move.customer_email,
+        title: info.headline,
+        body: info.message,
+        type: move.status === 'completed' ? 'success' : move.status === 'cancelled' ? 'warning' : 'info',
+        read: false,
+        link: move.id ? `/move/${move.id}` : null,
+      });
+    } catch (notifErr) {
+      console.error('Failed to create in-app notification:', notifErr.message);
+    }
+
     // When the move is confirmed (accepted), automatically send the insurance certificate
     if (move.status === 'accepted') {
       try {

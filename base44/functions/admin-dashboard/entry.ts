@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     // Whitelist of allowed actions to prevent unexpected code paths
     const ALLOWED_ACTIONS = [
       'overview', 'approve_driver', 'reject_driver', 'update_lead_status',
-      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials', 'metrics_overview',
+      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth', 'export_financials', 'metrics_overview', 'background_checks',
     ];
     if (!ALLOWED_ACTIONS.includes(action)) {
       return Response.json({ error: 'Invalid action' }, { status: 400 });
@@ -542,6 +542,7 @@ Deno.serve(async (req) => {
 
     const pendingDrivers = drivers.filter((d) => d.status === 'pending_review');
     const approvedDrivers = drivers.filter((d) => d.status === 'approved');
+    const allDrivers = drivers;
 
     return Response.json({
       stats: {
@@ -559,6 +560,7 @@ Deno.serve(async (req) => {
       movesByStatus,
       recentMoves: moves.slice(0, 10),
       pendingDrivers,
+      allDrivers,
       recentPayouts: payouts.slice(0, 10),
       recentUsers: users.slice(0, 10),
       leads,

@@ -76,6 +76,15 @@ Deno.serve(async (req) => {
           subject,
           body: htmlBody,
         });
+        // In-app push notification
+        await base44.asServiceRole.entities.AppNotification.create({
+          user_email: driver.email,
+          title: 'New Job Available',
+          body: `${move.pickup_address || 'Pickup'} → ${move.dropoff_address || 'Dropoff'} on ${moveDate}`,
+          type: 'job',
+          read: false,
+          link: '/available-jobs',
+        });
         results.push({ driver_id: driver.id, email: driver.email, sent: true });
       } catch (err) {
         console.error(`Failed to email driver ${driver.id}:`, err.message);

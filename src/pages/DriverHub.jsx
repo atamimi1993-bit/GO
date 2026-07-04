@@ -17,6 +17,8 @@ import AdBanner from '@/components/go/AdBanner';
 import DriverMonthlyChart from '@/components/go/DriverMonthlyChart';
 import DriverAvailabilityCalendar from '@/components/go/DriverAvailabilityCalendar';
 const StripeConnectCard = lazy(() => import('@/components/go/StripeConnectCard'));
+const BackgroundCheckStatus = lazy(() => import('@/components/go/BackgroundCheckStatus'));
+const ContinuousTracker = lazy(() => import('@/components/go/ContinuousTracker'));
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
 import DriverDisputeCenter from '@/components/go/DriverDisputeCenter';
 
@@ -193,6 +195,18 @@ export default function DriverHub() {
       <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
         <ComplianceManager driverProfile={profile} onUpdated={setProfile} />
       </Suspense>
+
+      {/* Background check status */}
+      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <BackgroundCheckStatus driverProfile={profile} onUpdated={setProfile} />
+      </Suspense>
+
+      {/* Continuous GPS tracker for active jobs */}
+      {activeJobs.length > 0 && (
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <ContinuousTracker driverProfile={profile} activeJobs={activeJobs} />
+        </Suspense>
+      )}
 
       {/* Signed contract */}
       {contract && (

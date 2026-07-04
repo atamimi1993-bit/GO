@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import BottomTabBar from '@/components/go/BottomTabBar';
 import OfflineBanner from '@/components/go/OfflineBanner';
+import NotificationCenter from '@/components/go/NotificationCenter';
 
 const navItems = [
   { label: 'Home', path: '/', icon: Home },
@@ -82,9 +83,10 @@ export default function AppLayout() {
             </nav>
           </div>
 
-          {/* Right: Role label + profile + logout */}
+          {/* Right: Notifications + role label + profile + logout */}
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-[160px]">
+            {user && <NotificationCenter user={user} />}
+            <span className="hidden sm:block text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-[160px]">
               {roleLabel}
             </span>
             <Link to="/profile">
