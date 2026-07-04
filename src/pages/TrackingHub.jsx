@@ -13,20 +13,30 @@ export default function TrackingHub() {
   const [recentMoves, setRecentMoves] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
-    const moves = await base44.entities.MoveRequest.list('-created_date', 50);
-    setActiveMoves(moves.filter((m) => ['accepted', 'in_progress'].includes(m.status)));
-    setRecentMoves(moves.filter((m) => m.status === 'completed').slice(0, 3));
+  const load = useCallback(async (isRetry = false) => {
+    try {
+      const moves = await base44.entities.MoveRequest.list('-created_date', 50);
+      setActiveMoves(moves.filter((m) => ['accepted', 'in_progress'].includes(m.status)));
+      setRecentMoves(moves.filter((m) => m.status === 'completed').slice(0, 3));
+    } catch (err) {
+      if (String(err.message || '').includes('Rate limit') && !isRetry) {
+        await new Promise((r) => setTimeout(r, 2000));
+        return load(true);
+      }
+      throw err;
+    }
   }, []);
 
   useEffect(() => {
-    load().finally(() => setLoading(false));
+    let debounceTimer;
+    load().catch(() => {}).finally(() => setLoading(false));
     const unsub = base44.entities.MoveRequest.subscribe((event) => {
       if (event.type === 'create' || event.type === 'update') {
-        load();
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => load().catch(() => {}), 800);
       }
     });
-    return unsub;
+    return () => { unsub(); clearTimeout(debounceTimer); };
   }, [load]);
 
   if (loading) {
