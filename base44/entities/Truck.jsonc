@@ -58,6 +58,12 @@
     "photo_url": {
       "type": "string"
     },
+    "exterior_photo_url": {
+      "type": "string"
+    },
+    "interior_photo_url": {
+      "type": "string"
+    },
     "verified": {
       "type": "boolean",
       "default": false
@@ -71,6 +77,8 @@
     "make",
     "model",
     "size_category",
-    "license_plate"
+    "license_plate",
+    "exterior_photo_url",
+    "interior_photo_url"
   ]
 }

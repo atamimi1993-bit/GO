@@ -27,6 +27,7 @@ export default function DriverRegister() {
   const [truck, setTruck] = useState({
     make: '', model: '', year: '', license_plate: '', size_category: 'medium',
     registration_doc_url: '', inspection_doc_url: '',
+    exterior_photo_url: '', interior_photo_url: '',
   });
 
   useEffect(() => {
@@ -56,6 +57,10 @@ export default function DriverRegister() {
     e.preventDefault();
     if (!form.full_name || !form.email || !form.phone || !form.license_number) {
       toast({ title: 'Please fill in all required fields', variant: 'destructive' });
+      return;
+    }
+    if (!truck.exterior_photo_url || !truck.interior_photo_url) {
+      toast({ title: 'Vehicle photos required', description: 'Please upload both exterior and interior photos of your truck.', variant: 'destructive' });
       return;
     }
     setStep('contract');
@@ -186,6 +191,12 @@ export default function DriverRegister() {
           </div>
           <FileUploadField label="Vehicle Registration Document" field="registration_doc_url" target="truck" />
           <FileUploadField label="Vehicle Inspection Document" field="inspection_doc_url" target="truck" />
+
+          <div className="bg-muted/50 rounded-xl p-4 space-y-3">
+            <p className="text-xs text-muted-foreground">Clear photos of your truck are required to verify vehicle quality before approval.</p>
+            <FileUploadField label="Vehicle Exterior Photo *" field="exterior_photo_url" target="truck" accept=".jpg,.png,.jpeg" />
+            <FileUploadField label="Vehicle Interior Photo *" field="interior_photo_url" target="truck" accept=".jpg,.png,.jpeg" />
+          </div>
         </div>
 
         <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600" disabled={saving}>
