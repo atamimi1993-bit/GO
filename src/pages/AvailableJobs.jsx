@@ -39,6 +39,20 @@ export default function AvailableJobs() {
   const handleAccept = async (job) => {
     if (!driverProfile) return;
     setAccepting(job.id);
+
+    // Check driver availability for the job date
+    try {
+      const avail = await base44.entities.DriverAvailability.filter({
+        driver_profile_id: driverProfile.id,
+        date: job.move_date,
+      });
+      if (avail.length > 0 && avail[0].status === 'unavailable') {
+        toast({ title: 'Date conflict', description: `You marked yourself unavailable on ${job.move_date}. Update your calendar first.`, variant: 'destructive' });
+        setAccepting(null);
+        return;
+      }
+    } catch {}
+
     // Optimistic removal
     setJobs(prev => prev.filter(j => j.id !== job.id));
     try {

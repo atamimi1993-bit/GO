@@ -56,6 +56,13 @@ Deno.serve(async (req) => {
             cancellation_fee_paid: true,
           });
           console.log('Marked move ' + moveRequestId + ' as cancelled with fee paid');
+        } else if (paymentType === 'tip') {
+          const tipAmount = session.amount_total ? session.amount_total / 100 : 0;
+          await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
+            tip_paid: true,
+            tip_amount: tipAmount,
+          });
+          console.log('Tip of ' + tipAmount + ' paid for move ' + moveRequestId);
         } else {
           await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
             paid: true,

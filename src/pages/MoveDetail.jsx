@@ -16,6 +16,9 @@ import PriceConfirmation from '@/components/go/PriceConfirmation';
 import PaymentMethods from '@/components/go/PaymentMethods';
 import OnSiteChecklist from '@/components/go/OnSiteChecklist';
 import CancelMoveButton from '@/components/go/CancelMoveButton';
+import MoveChat from '@/components/go/MoveChat';
+import RescheduleButton from '@/components/go/RescheduleButton';
+import TipButton from '@/components/go/TipButton';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/go/PageHeader';
 import { format, parseISO } from 'date-fns';
@@ -164,6 +167,11 @@ export default function MoveDetail() {
       toast({ title: 'Move cancelled', description: 'The $250 cancellation fee has been paid.' });
     } else if (params.get('cancellation') === 'cancelled') {
       toast({ title: 'Cancellation incomplete', description: 'The move was not cancelled.' });
+    }
+    if (params.get('tip') === 'success') {
+      toast({ title: 'Tip sent!', description: 'Thank you for your generosity.' });
+    } else if (params.get('tip') === 'cancelled') {
+      toast({ title: 'Tip cancelled', description: 'No charge was made.' });
     }
   }, [toast]);
 
@@ -512,6 +520,16 @@ export default function MoveDetail() {
         <RatingSection move={move} />
       )}
 
+      {/* Reschedule request — either party can propose a new date/time */}
+      {move.assigned_driver_id && !['completed', 'cancelled'].includes(move.status) && currentUser && (
+        <RescheduleButton move={move} currentUser={currentUser} driverProfile={driverProfile} onRescheduled={load} />
+      )}
+
+      {/* Tip driver — only on completed moves with an assigned driver */}
+      {move.status === 'completed' && move.assigned_driver_id && !move.tip_paid && (
+        <TipButton move={move} />
+      )}
+
       {/* Cancel move — free before driver acceptance, $250 fee after */}
       {!['completed', 'cancelled'].includes(move.status) && (
         <div className="mt-4">
@@ -532,6 +550,11 @@ export default function MoveDetail() {
             </p>
           </div>
         </div>
+      )}
+
+      {/* In-app messaging — available once a driver is assigned */}
+      {move.assigned_driver_id && move.status !== 'cancelled' && currentUser && (
+        <MoveChat move={move} currentUser={currentUser} driverProfile={driverProfile} />
       )}
 
       {/* Report damaged or lost item */}

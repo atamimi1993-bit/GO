@@ -12,6 +12,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 import AdBanner from '@/components/go/AdBanner';
 import DriverMonthlyChart from '@/components/go/DriverMonthlyChart';
+import DriverAvailabilityCalendar from '@/components/go/DriverAvailabilityCalendar';
 const StripeConnectCard = lazy(() => import('@/components/go/StripeConnectCard'));
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
 
@@ -145,6 +146,9 @@ export default function DriverHub() {
 
       {/* Monthly performance chart */}
       <DriverMonthlyChart driverProfile={profile} />
+
+      {/* Availability calendar — block off unavailable dates */}
+      <DriverAvailabilityCalendar driverProfile={profile} />
 
       <div className="flex gap-3 mb-6">
         <Link to="/available-jobs" className="flex-1">

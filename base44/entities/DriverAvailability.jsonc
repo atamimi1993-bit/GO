@@ -1,0 +1,33 @@
+{
+  "name": "DriverAvailability",
+  "type": "object",
+  "properties": {
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "driver_name": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "unavailable",
+        "tentative"
+      ],
+      "default": "unavailable"
+    },
+    "note": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "driver_profile_id",
+    "date",
+    "status"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "name": "RescheduleRequest",
+  "type": "object",
+  "properties": {
+    "move_request_id": {
+      "type": "string"
+    },
+    "requested_by_id": {
+      "type": "string"
+    },
+    "requested_by_name": {
+      "type": "string"
+    },
+    "requested_by_role": {
+      "type": "string",
+      "enum": [
+        "customer",
+        "driver"
+      ],
+      "default": "customer"
+    },
+    "original_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "original_time": {
+      "type": "string"
+    },
+    "proposed_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "proposed_time": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "responded_by_id": {
+      "type": "string"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "move_request_id",
+    "requested_by_id",
+    "requested_by_role",
+    "proposed_date"
+  ]
+}

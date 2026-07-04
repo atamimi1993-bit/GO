@@ -269,6 +269,17 @@
     "onsite_verified": {
       "type": "boolean",
       "default": false
+    },
+    "tip_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "tip_paid": {
+      "type": "boolean",
+      "default": false
+    },
+    "tip_session_id": {
+      "type": "string"
     }
   },
   "required": [
