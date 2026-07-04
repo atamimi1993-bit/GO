@@ -35,7 +35,7 @@ export default function NewMove() {
   const [form, setForm] = useState({
     pickup_address: '', dropoff_address: '', move_date: '', move_time: '',
     distance_miles: '', country_code: 'US', currency: 'USD', distance_unit: 'mi',
-    pickup_state: '', job_type: 'residential',
+    pickup_state: '', job_type: 'residential', tolls: '',
     notes: '', needs_storage: false,
     customer_name: '', customer_email: '', customer_phone: '',
   });
@@ -79,6 +79,7 @@ export default function NewMove() {
         currency: form.currency,
         distanceUnit: form.distance_unit,
         jobType: form.job_type,
+        tolls: Number(form.tolls) || 0,
       })
     : null;
 
@@ -131,6 +132,7 @@ export default function NewMove() {
       currency: form.currency,
       distanceUnit: form.distance_unit,
       jobType: form.job_type,
+      tolls: Number(form.tolls) || 0,
     });
     setPricing(price);
   };
@@ -159,6 +161,7 @@ export default function NewMove() {
         notes: form.notes,
         base_cost: pricing.baseCost,
         fuel_cost: pricing.fuelCost,
+        tolls: Number(form.tolls) || 0,
         tax_rate: pricing.taxRate,
         tax_amount: pricing.taxAmount,
         app_fee: pricing.appFee,
@@ -278,6 +281,10 @@ export default function NewMove() {
               <div>
                 <Label>Distance ({form.distance_unit})</Label>
                 <Input type="number" placeholder="e.g. 25" value={form.distance_miles} onChange={e => setForm({ ...form, distance_miles: e.target.value })} />
+              </div>
+              <div>
+                <Label>Tolls (optional)</Label>
+                <Input type="number" placeholder="e.g. 15.00" value={form.tolls} onChange={e => setForm({ ...form, tolls: e.target.value })} />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

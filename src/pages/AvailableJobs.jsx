@@ -57,6 +57,7 @@ export default function AvailableJobs() {
           jobType: job.job_type,
           truckMpg: truck.mpg,
           fuelType: truck.fuel_type,
+          tolls: job.tolls,
         });
         updatedPricing = {
           fuel_cost: recalc.fuelCost,

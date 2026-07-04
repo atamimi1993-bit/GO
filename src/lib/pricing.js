@@ -170,7 +170,7 @@ const DRIVER_RATES = {
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
-export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType }) {
+export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls }) {
   const truck = TRUCK_CONFIG[truckSize] || TRUCK_CONFIG.medium;
 
   // Convert metric inputs to imperial for internal calculation
@@ -195,8 +195,11 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const driverRate = rateTable[truckSize] || rateTable.medium;
   const driverPayout = driverRate.basePay + (roundTripMiles * driverRate.perMile) + (weightInLbs * driverRate.perLb);
 
-  // Operational subtotal = everything it costs to do the job (base + fuel + driver labor)
-  const operationalSubtotal = baseCost + fuelCost + driverPayout;
+  // Tolls — passthrough cost the customer pays, driver gets reimbursed
+  const tollCost = Number(tolls) || 0;
+
+  // Operational subtotal = everything it costs to do the job (base + fuel + driver labor + tolls)
+  const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost;
 
   // GO platform fee — 20% of the FULL operational cost (GO's profit scales with every dollar)
   const appFee = operationalSubtotal * APP_FEE_RATE;
@@ -226,13 +229,14 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   return {
     baseCost: convert(baseCost),
     fuelCost: convert(fuelCost),
+    tolls: convert(tollCost),
     taxRate,
     taxAmount: convert(taxAmount),
     appFee: convert(appFee),
     goProfit: convert(goProfit),
     driverFee: convert(driverFee),
     totalPrice: convert(totalPrice),
-    driverPayout: convert(driverPayout),
+    driverPayout: convert(driverPayout + tollCost),
     roundTripMiles,
     gallonsNeeded: Math.round(gallonsNeeded * 10) / 10,
     currency: curr,

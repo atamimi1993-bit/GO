@@ -92,6 +92,10 @@
       "type": "number",
       "default": 0
     },
+    "tolls": {
+      "type": "number",
+      "default": 0
+    },
     "tax_rate": {
       "type": "number",
       "default": 0
