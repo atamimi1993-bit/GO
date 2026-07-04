@@ -77,6 +77,7 @@ export default function NewMove() {
         countryCode: form.country_code,
         currency: form.currency,
         distanceUnit: form.distance_unit,
+        jobType: form.job_type,
       })
     : null;
 
@@ -127,6 +128,7 @@ export default function NewMove() {
       countryCode: form.country_code,
       currency: form.currency,
       distanceUnit: form.distance_unit,
+      jobType: form.job_type,
     });
     setPricing(price);
   };
@@ -427,7 +429,8 @@ export default function NewMove() {
                     setTruckSize(v);
                     setPricing(calculateMovePrice({
                       totalWeightLbs: totalWeight, distanceMiles: Number(form.distance_miles), truckSize: v,
-                      countryCode: form.country_code, currency: form.currency, distanceUnit: form.distance_unit
+                      countryCode: form.country_code, currency: form.currency, distanceUnit: form.distance_unit,
+                      jobType: form.job_type
                     }));
                   }}
                   options={Object.entries(TRUCK_SIZE_LABELS).map(([k, v]) => ({ value: k, label: v }))}

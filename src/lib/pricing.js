@@ -131,11 +131,12 @@ const COUNTRY_LIST = Object.entries(COUNTRY_CONFIG)
 
 const APP_FEE_RATE = 0.25;
 const DRIVER_SHARE_RATE = 0.15;
+const FREIGHT_DRIVER_SHARE_RATE = 0.35;
 const MI_TO_KM = 1.60934;
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
-export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit }) {
+export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType }) {
   const truck = TRUCK_CONFIG[truckSize] || TRUCK_CONFIG.medium;
 
   // Convert metric inputs to imperial for internal calculation
@@ -163,9 +164,10 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const appFee = subtotal * APP_FEE_RATE;
   const driverFee = 0;
 
-  // Total and driver payout (in USD) — drivers earn 15% of the total job price
+  // Total and driver payout (in USD) — freight/CDL drivers earn 35%, others earn 15%
   const totalPrice = subtotal + taxAmount + appFee;
-  const driverPayout = totalPrice * DRIVER_SHARE_RATE;
+  const isFreight = jobType === 'freight' || jobType === 'corporate_logistics';
+  const driverPayout = totalPrice * (isFreight ? FREIGHT_DRIVER_SHARE_RATE : DRIVER_SHARE_RATE);
 
   // Currency conversion
   const currencyCode = currency || country?.currency || 'USD';
