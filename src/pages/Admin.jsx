@@ -47,6 +47,7 @@ export default function Admin() {
   const { toast } = useToast();
   const [processingId, setProcessingId] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [showCharts, setShowCharts] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const queryClient = useQueryClient();
@@ -201,20 +202,33 @@ export default function Admin() {
           <MoveCalendar scrollRef={scrollRef} />
         </Suspense>
 
-        {/* Performance charts */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <EarningsCharts />
-        </Suspense>
-
-        {/* Driver performance */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <DriverPerformance />
-        </Suspense>
-
-        {/* Top performers ranking */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <DriverTopPerformers />
-        </Suspense>
+        {/* Performance charts (deferred for mobile performance) */}
+        <div className="bg-card border rounded-2xl p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp size={20} className="text-emerald-600" />
+            <h2 className="font-display font-bold text-lg">Performance Charts</h2>
+          </div>
+          {!showCharts ? (
+            <div className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">Load earnings, driver performance, and top performer charts.</p>
+              <Button onClick={() => setShowCharts(true)} variant="outline">
+                <TrendingUp size={16} className="mr-1" /> Load Charts
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Suspense fallback={<SectionSkeleton />}>
+                <EarningsCharts />
+              </Suspense>
+              <Suspense fallback={<SectionSkeleton />}>
+                <DriverPerformance />
+              </Suspense>
+              <Suspense fallback={<SectionSkeleton />}>
+                <DriverTopPerformers />
+              </Suspense>
+            </>
+          )}
+        </div>
 
         {/* Marketing & promotions */}
         <Suspense fallback={<SectionSkeleton />}>

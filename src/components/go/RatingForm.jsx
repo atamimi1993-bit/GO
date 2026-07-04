@@ -58,8 +58,18 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
             type="button"
             role="radio"
             aria-checked={stars === n}
+            tabIndex={stars === n ? 0 : -1}
             aria-label={`${n} star${n !== 1 ? 's' : ''} - ${['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][n - 1]}`}
             onClick={() => setStars(n)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                setStars(Math.min(5, (stars || 0) + 1));
+              } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                setStars(Math.max(1, (stars || 0) - 1));
+              }
+            }}
             className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <Star

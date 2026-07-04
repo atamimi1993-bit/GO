@@ -55,7 +55,7 @@ export default function useFocusTrap(containerRef, active) {
     container.addEventListener('keydown', handleKeyDown);
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
-      if (previouslyFocusedRef.current && typeof previouslyFocusedRef.current.focus === 'function') {
+      if (previouslyFocusedRef.current?.isConnected && typeof previouslyFocusedRef.current.focus === 'function') {
         previouslyFocusedRef.current.focus();
       }
     };
