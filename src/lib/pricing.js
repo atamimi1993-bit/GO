@@ -157,6 +157,9 @@ const FEE_PER_50FT = 1;          // $1 per 50ft of distance from street to door
 const EXTRA_HELPER_FEE = 50;     // additional mover for the job
 const ELEVATOR_SERVICE_FEE = 30; // buildings requiring elevator reservation
 
+// Cancellation fee — charged when a customer cancels after a driver has accepted
+const CANCELLATION_FEE = 250;
+
 // Driver payout rates based on truck size + job type
 // GO covers gas and miles; driver earns a rate for their labor + equipment
 const DRIVER_RATES = {
@@ -323,4 +326,4 @@ const US_STATES = [
   { code: 'WV', name: 'West Virginia' }, { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' },
 ];
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE };

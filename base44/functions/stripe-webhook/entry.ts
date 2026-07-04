@@ -50,6 +50,12 @@ Deno.serve(async (req) => {
             deposit_paid: true,
           });
           console.log('Marked deposit paid for move ' + moveRequestId);
+        } else if (paymentType === 'cancellation_fee') {
+          await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
+            status: 'cancelled',
+            cancellation_fee_paid: true,
+          });
+          console.log('Marked move ' + moveRequestId + ' as cancelled with fee paid');
         } else {
           await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
             paid: true,

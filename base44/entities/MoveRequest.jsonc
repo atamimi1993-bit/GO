@@ -252,6 +252,17 @@
     "referral_code": {
       "type": "string"
     },
+    "cancellation_fee": {
+      "type": "number",
+      "default": 250
+    },
+    "cancellation_fee_paid": {
+      "type": "boolean",
+      "default": false
+    },
+    "cancellation_session_id": {
+      "type": "string"
+    },
     "onsite_photo_url": {
       "type": "string"
     },

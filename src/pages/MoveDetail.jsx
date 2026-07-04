@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield, Wallet, CalendarClock, Video } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield, Wallet, CalendarClock, Video, AlertTriangle } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import RouteLogForm from '@/components/go/RouteLogForm';
@@ -15,6 +15,7 @@ import AssignedDriverCard from '@/components/go/AssignedDriverCard';
 import PriceConfirmation from '@/components/go/PriceConfirmation';
 import PaymentMethods from '@/components/go/PaymentMethods';
 import OnSiteChecklist from '@/components/go/OnSiteChecklist';
+import CancelMoveButton from '@/components/go/CancelMoveButton';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/go/PageHeader';
 import { format, parseISO } from 'date-fns';
@@ -158,6 +159,11 @@ export default function MoveDetail() {
       toast({ title: 'Payment successful!', description: 'Your move has been paid.' });
     } else if (params.get('payment') === 'cancelled') {
       toast({ title: 'Payment cancelled', description: 'You can pay later from this page.' });
+    }
+    if (params.get('cancellation') === 'success') {
+      toast({ title: 'Move cancelled', description: 'The $250 cancellation fee has been paid.' });
+    } else if (params.get('cancellation') === 'cancelled') {
+      toast({ title: 'Cancellation incomplete', description: 'The move was not cancelled.' });
     }
   }, [toast]);
 
@@ -504,6 +510,28 @@ export default function MoveDetail() {
       {/* Customer rates driver on completed moves */}
       {move.status === 'completed' && move.assigned_driver_id && (
         <RatingSection move={move} />
+      )}
+
+      {/* Cancel move — free before driver acceptance, $250 fee after */}
+      {!['completed', 'cancelled'].includes(move.status) && (
+        <div className="mt-4">
+          <CancelMoveButton move={move} onCancelled={load} />
+        </div>
+      )}
+
+      {/* Cancelled status banner */}
+      {move.status === 'cancelled' && (
+        <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mt-4 flex items-center gap-3">
+          <AlertTriangle className="text-red-600 dark:text-red-400 shrink-0" size={20} />
+          <div>
+            <p className="text-sm font-medium text-red-700 dark:text-red-400">Move Cancelled</p>
+            <p className="text-xs text-muted-foreground">
+              {move.cancellation_fee_paid
+                ? `A $${move.cancellation_fee || 250} cancellation fee was charged.`
+                : 'This move has been cancelled.'}
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Report damaged or lost item */}
