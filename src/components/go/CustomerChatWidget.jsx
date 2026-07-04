@@ -84,7 +84,7 @@ export default function CustomerChatWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          aria-label="Open GO Assistant chat"
+          aria-label="Open GO Assistant"
           className="fixed bottom-20 md:bottom-6 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
         >
           <MessageSquare size={24} />

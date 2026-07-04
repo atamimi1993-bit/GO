@@ -192,8 +192,8 @@ export default function Overseer() {
           <h1 className="text-xl font-display font-bold">App Overseer</h1>
           <p className="text-muted-foreground text-sm">Live AI monitoring — scans for issues, fixes data inconsistencies, prevents crashes.</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={loadConversation} title="Refresh">
-          <RefreshCw size={18} />
+        <Button variant="ghost" size="icon" onClick={loadConversation} title="Refresh" aria-label="Refresh conversation">
+          <RefreshCw size={18} aria-hidden="true" />
         </Button>
       </div>
 

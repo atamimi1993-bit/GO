@@ -64,7 +64,7 @@ export default function BottomTabBar() {
             to={tab.path}
             aria-label={tab.label}
             aria-current={active ? 'page' : undefined}
-            aria-disabled={navigating}
+            aria-disabled={navigating ? true : undefined}
             onClick={(e) => {
               if (active) {
                 if (location.pathname === tab.path) {
@@ -83,7 +83,7 @@ export default function BottomTabBar() {
             className={`flex-1 min-w-[44px] flex flex-col items-center justify-center py-3 min-h-[56px] gap-0.5 text-xs font-medium transition-colors select-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 outline-none rounded-lg ${active ? 'text-primary' : 'text-muted-foreground'}`}
           >
             <tab.icon size={22} strokeWidth={active ? 2.5 : 1.8} aria-hidden="true" />
-            <span>{tab.label}</span>
+            <span className="text-[11px] sm:text-xs">{tab.label}</span>
           </Link>
         );
       })}

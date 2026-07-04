@@ -113,11 +113,10 @@ export default function NotificationCenter({ user }) {
         <>
           <div
             className="fixed inset-0 z-40"
-            role="button"
-            tabIndex={0}
+            role="presentation"
             aria-label="Close notifications"
             onClick={() => setOpen(false)}
-            onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(false); } }}
+            onKeyDown={(e) => { if (e.key === 'Escape') { e.preventDefault(); setOpen(false); } }}
           />
           <div
             ref={dropdownRef}

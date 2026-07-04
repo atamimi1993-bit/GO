@@ -192,8 +192,8 @@ export default function ScheduleOptimizer() {
           <h1 className="text-xl font-display font-bold">Schedule Optimizer</h1>
           <p className="text-muted-foreground text-sm">AI calendar management — detects conflicts, finds optimal dates, auto-adjusts schedules.</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={loadConversation} title="Refresh">
-          <RefreshCw size={18} />
+        <Button variant="ghost" size="icon" onClick={loadConversation} title="Refresh" aria-label="Refresh conversation">
+          <RefreshCw size={18} aria-hidden="true" />
         </Button>
       </div>
 
