@@ -12,6 +12,7 @@ import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
 import MarketingPanel from '@/components/admin/MarketingPanel';
 import ExpenseReviewPanel from '@/components/admin/ExpenseReviewPanel';
+import AdminWorldMap from '@/components/admin/AdminWorldMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -124,6 +125,9 @@ export default function Admin() {
           <StatCard icon={AlertCircle} label="Cancelled" value={movesByStatus.cancelled} accent="red" />
           <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
         </div>
+
+        {/* Global operations map */}
+        <AdminWorldMap />
 
         {/* Move calendar */}
         <MoveCalendar scrollRef={scrollRef} />
