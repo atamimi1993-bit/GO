@@ -14,7 +14,7 @@ const COLOR_MAP = {
   indigo: 'from-indigo-600 to-indigo-800',
 };
 
-export default function AdBanner() {
+export default function AdBanner({ audience = 'customers' }) {
   const [ads, setAds] = useState([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [dismissed, setDismissed] = useState(false);
@@ -22,7 +22,7 @@ export default function AdBanner() {
   useEffect(() => {
     (async () => {
       try {
-        const activeAds = await base44.entities.PromotionalAd.filter({ active: true }, '-created_date', 5);
+        const activeAds = await base44.entities.PromotionalAd.filter({ active: true, audience }, '-created_date', 5);
         // Filter to ads whose campaign window is current
         const now = new Date();
         const valid = activeAds.filter((ad) => {

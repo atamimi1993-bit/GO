@@ -10,6 +10,7 @@ import DriverNavigationCard from '@/components/go/DriverNavigationCard';
 import ComplianceManager from '@/components/go/ComplianceManager';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
+import AdBanner from '@/components/go/AdBanner';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
 
 export default function DriverHub() {
@@ -115,6 +116,11 @@ export default function DriverHub() {
           </div>
         </div>
       )}
+
+      {/* Driver promos */}
+      <div className="mb-6">
+        <AdBanner audience="drivers" />
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-6">

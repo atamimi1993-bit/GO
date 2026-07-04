@@ -23,7 +23,7 @@ export default function Home() {
     <PullToRefresh scrollRef={scrollRef} onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['currentUser'] }); }}>
     <div className="space-y-16">
       {/* Promotional Ad Banner */}
-      <AdBanner />
+      <AdBanner audience="customers" />
 
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900 rounded-3xl overflow-hidden px-8 py-16 md:py-24 text-white">
