@@ -24,6 +24,7 @@ const MyMoves = lazy(() => import('@/pages/MyMoves'));
 const TrackingHub = lazy(() => import('@/pages/TrackingHub'));
 const MoveDetail = lazy(() => import('@/pages/MoveDetail'));
 const DriverHub = lazy(() => import('@/pages/DriverHub'));
+const DriversWanted = lazy(() => import('@/pages/DriversWanted'));
 const DriverRegister = lazy(() => import('@/pages/DriverRegister'));
 const AvailableJobs = lazy(() => import('@/pages/AvailableJobs'));
 const MyTrucks = lazy(() => import('@/pages/MyTrucks'));
@@ -100,6 +101,7 @@ const AuthenticatedApp = () => {
           <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
           <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
           <Route path="/driver-hub" element={<PageTransition><DriverHub /></PageTransition>} />
+          <Route path="/drivers-wanted" element={<PageTransition><DriversWanted /></PageTransition>} />
           <Route path="/driver-register" element={<PageTransition><DriverRegister /></PageTransition>} />
           <Route path="/available-jobs" element={<PageTransition><AvailableJobs /></PageTransition>} />
           <Route path="/my-trucks" element={<PageTransition><MyTrucks /></PageTransition>} />

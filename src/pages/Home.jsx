@@ -10,6 +10,7 @@ import HomeStats from '@/components/go/HomeStats';
 import Testimonials from '@/components/go/Testimonials';
 import FaqSection from '@/components/go/FaqSection';
 import { Gift } from 'lucide-react';
+import DriverRecruitmentBanner from '@/components/go/DriverRecruitmentBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
@@ -77,6 +78,9 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* Driver recruitment banner */}
+      <DriverRecruitmentBanner />
 
       {/* Stats */}
       <HomeStats />

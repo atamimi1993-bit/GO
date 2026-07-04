@@ -10,6 +10,7 @@ const DriverNavigationCard = lazy(() => import('@/components/go/DriverNavigation
 const ComplianceManager = lazy(() => import('@/components/go/ComplianceManager'));
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
+import DriverReferralCard from '@/components/go/DriverReferralCard';
 import AdBanner from '@/components/go/AdBanner';
 import DriverMonthlyChart from '@/components/go/DriverMonthlyChart';
 import DriverAvailabilityCalendar from '@/components/go/DriverAvailabilityCalendar';
@@ -124,6 +125,9 @@ export default function DriverHub() {
       <div className="mb-6">
         <AdBanner audience="drivers" />
       </div>
+
+      {/* Refer a driver */}
+      <DriverReferralCard driverProfile={profile} />
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-6">

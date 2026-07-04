@@ -96,6 +96,9 @@
     "stripe_payouts_enabled": {
       "type": "boolean",
       "default": false
+    },
+    "referral_code": {
+      "type": "string"
     }
   },
   "required": [
