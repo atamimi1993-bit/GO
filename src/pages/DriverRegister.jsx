@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Upload, Loader2, FileText, Truck } from 'lucide-react';
+import { ArrowLeft, Upload, Loader2, FileText, Truck, Gift } from 'lucide-react';
 import MobileSelect from '@/components/go/MobileSelect';
 import { Switch } from '@/components/ui/switch';
 import ContractSign from '@/components/go/ContractSign';
@@ -13,16 +13,20 @@ import PageHeader from '@/components/go/PageHeader';
 
 export default function DriverRegister() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState({});
   const [step, setStep] = useState('form');
   const [signedContract, setSignedContract] = useState(null);
+  const [referralCode, setReferralCode] = useState(searchParams.get('ref') || '');
   const [form, setForm] = useState({
     full_name: '', email: '', phone: '', license_number: '', license_expiry: '',
     service_area: '', company_name: '',
     cdl_certified: false, cdl_class: 'None',
     license_doc_url: '', insurance_doc_url: '', profile_photo_url: '',
+    referred_by_code: searchParams.get('ref') || '',
+    sign_on_bonus_eligible: true,
   });
   const [truck, setTruck] = useState({
     make: '', model: '', year: '', license_plate: '', size_category: 'medium',
@@ -83,7 +87,24 @@ export default function DriverRegister() {
           company_name: form.company_name || undefined,
         });
       }
-      toast({ title: 'Application submitted!', description: 'Your profile and signed contract are under review.' });
+      // Create a pending Referral record if referred by another driver
+      if (form.referred_by_code) {
+        try {
+          const referrers = await base44.entities.DriverProfile.filter({ referral_code: form.referred_by_code });
+          if (referrers.length > 0 && referrers[0].email !== form.email) {
+            await base44.entities.Referral.create({
+              referral_code: form.referred_by_code,
+              referrer_email: referrers[0].email,
+              referred_email: form.email,
+              status: 'pending',
+              bonus_points: 0,
+            });
+          }
+        } catch (err) {
+          console.error('Failed to create referral record:', err);
+        }
+      }
+      toast({ title: 'Application submitted!', description: form.referred_by_code ? 'Your profile and signed contract are under review. Sign-on & referral bonuses will be awarded after your first completed job!' : 'Your profile and signed contract are under review.' });
     } catch {
       toast({ title: 'Submission failed', description: 'Please try again from Driver Hub.', variant: 'destructive' });
     }
@@ -117,6 +138,16 @@ export default function DriverRegister() {
       {step === 'form' ? (
         <>
       <p className="text-muted-foreground text-sm mb-6">Fill in your details and upload required documents.</p>
+
+      {referralCode && (
+        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <Gift size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Referred by: {referralCode}</p>
+            <p className="text-xs text-muted-foreground">You'll receive a $250 sign-on bonus after your first completed job!</p>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="bg-card border rounded-2xl p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

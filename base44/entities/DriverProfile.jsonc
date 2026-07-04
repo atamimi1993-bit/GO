@@ -99,6 +99,13 @@
     },
     "referral_code": {
       "type": "string"
+    },
+    "referred_by_code": {
+      "type": "string"
+    },
+    "sign_on_bonus_eligible": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

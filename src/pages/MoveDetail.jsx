@@ -111,6 +111,11 @@ export default function MoveDetail() {
         console.error('Invoice email failed:', err);
       }
       toast({ title: 'Delivery confirmed!', description: 'Your move summary and invoice have been emailed to you.' });
+      try {
+        await base44.functions.invoke('award-driver-bonuses', { move_request_id: move.id });
+      } catch (err) {
+        console.error('Driver bonus award failed:', err);
+      }
       await load();
     } catch (err) {
       setMove(prev => ({ ...prev, status: 'in_progress' }));
