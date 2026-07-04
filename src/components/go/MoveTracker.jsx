@@ -49,6 +49,10 @@ export default function MoveTracker({ moveId }) {
         <Navigation size={16} className="text-emerald-500" /> Live Tracking
       </div>
 
+      <div aria-live="polite" aria-atomic="false" className="sr-only">
+        {latestPing && `Driver milestone: ${MILESTONES.find(m => m.key === latestPing.milestone)?.label || latestPing.milestone}`}
+      </div>
+
       {latestPing && latestPing.lat ? (
         <div role="region" aria-label="Live driver tracking map" className="h-64 w-full">
           <MapContainer

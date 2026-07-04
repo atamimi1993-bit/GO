@@ -44,10 +44,10 @@ export default function DriverRegister() {
       return;
     }
     setSaving(true);
-    navigate('/driver-hub');
     try {
       await base44.entities.DriverProfile.create(form);
       toast({ title: 'Application submitted!', description: 'Your profile is under review.' });
+      navigate('/driver-hub');
     } catch {
       toast({ title: 'Error', description: 'Could not save. Please try again.', variant: 'destructive' });
     }

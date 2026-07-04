@@ -38,6 +38,8 @@ export default function MyMoves() {
         setMoves((prev) => [event.data, ...prev.filter(m => !m._optimistic)]);
       } else if (event.type === 'update') {
         setMoves((prev) => prev.map(m => m.id === event.data.id ? event.data : m));
+        const announcer = document.getElementById('move-status-announcer');
+        if (announcer) announcer.textContent = `Move status updated to ${event.data.status?.replace('_', ' ')}`;
       }
     });
     return unsub;
@@ -50,6 +52,7 @@ export default function MyMoves() {
   return (
     <PullToRefresh onRefresh={loadMoves}>
     <div>
+      <div aria-live="polite" aria-atomic="true" className="sr-only" id="move-status-announcer"></div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-display font-bold">My Moves</h1>

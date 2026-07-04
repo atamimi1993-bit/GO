@@ -33,6 +33,8 @@ export default function AvailableJobs() {
   const handleAccept = async (job) => {
     if (!driverProfile) return;
     setAccepting(job.id);
+    // Optimistic removal
+    setJobs(prev => prev.filter(j => j.id !== job.id));
     try {
       await base44.entities.MoveRequest.update(job.id, {
         status: 'accepted',
@@ -45,9 +47,10 @@ export default function AvailableJobs() {
         amount: job.driver_payout,
         status: 'pending',
       });
-      setJobs(jobs.filter(j => j.id !== job.id));
-      toast({ title: 'Job accepted!', description: `You've been assigned to this move.` });
+      toast({ title: 'Job accepted!', description: "You've been assigned to this move." });
     } catch {
+      // Restore job on failure
+      setJobs(prev => [job, ...prev]);
       toast({ title: 'Error', description: 'Could not accept job.', variant: 'destructive' });
     }
     setAccepting(null);

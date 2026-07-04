@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useNavigationType } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Suspense, lazy } from 'react';
@@ -30,11 +30,21 @@ const Storage = lazy(() => import('@/pages/Storage'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const Profile = lazy(() => import('@/pages/Profile'));
 
-const PageTransition = ({ children }) => (
-  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
-    {children}
-  </motion.div>
-);
+const PageTransition = ({ children }) => {
+  const navType = useNavigationType();
+  const isPop = navType === 'POP';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: isPop ? -20 : 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: isPop ? 20 : -20 }}
+      transition={{ duration: 0.2 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const AuthenticatedApp = () => {
   const location = useLocation();
