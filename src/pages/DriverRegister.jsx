@@ -144,7 +144,7 @@ export default function DriverRegister() {
           <Gift size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
           <div>
             <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Referred by: {referralCode}</p>
-            <p className="text-xs text-muted-foreground">You'll receive a $250 sign-on bonus after your first completed job!</p>
+            <p className="text-xs text-muted-foreground">You'll receive a sign-on bonus based on your vehicle type — up to $500 for box truck drivers — after your first completed job!</p>
           </div>
         </div>
       )}

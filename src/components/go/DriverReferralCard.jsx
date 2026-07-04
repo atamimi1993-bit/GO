@@ -2,15 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2, Copy, Share2, Gift, Users, Check, Truck } from 'lucide-react';
+import { Loader2, Copy, Share2, Gift, Users, Check, Truck, ChevronDown } from 'lucide-react';
 
-const DRIVER_REFERRAL_BONUS = 250;
+const VEHICLE_BONUSES = [
+  { category: 'Motorcycle', bonus: 100 },
+  { category: 'Sedan', bonus: 150 },
+  { category: 'SUV', bonus: 200 },
+  { category: 'Van', bonus: 250 },
+  { category: 'Truck', bonus: 350 },
+  { category: 'Box Truck', bonus: 500 },
+];
+const MAX_BONUS = 500;
 
 export default function DriverReferralCard({ driverProfile }) {
   const [referralCode, setReferralCode] = useState(null);
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [showTiers, setShowTiers] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -49,7 +58,7 @@ export default function DriverReferralCard({ driverProfile }) {
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/drivers-wanted?ref=${referralCode}`;
-    const shareText = `Join GO as a driver and earn on your own schedule! Use my referral code ${referralCode} to get started. Complete your first job and we both earn a $${DRIVER_REFERRAL_BONUS} bonus!`;
+    const shareText = `Join GO as a driver and earn on your own schedule! Use my referral code ${referralCode} to get started. Complete your first job and we both earn a bonus — up to $${MAX_BONUS} for box truck drivers!`;
     if (navigator.share) {
       try {
         await navigator.share({ title: 'Drive with GO', text: shareText, url: shareUrl });
@@ -76,11 +85,36 @@ export default function DriverReferralCard({ driverProfile }) {
     <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 mb-6 text-white shadow-lg">
       <div className="flex items-center gap-2 mb-3">
         <Truck size={20} />
-        <h2 className="font-display font-bold text-lg">Refer a Driver, Earn ${DRIVER_REFERRAL_BONUS}</h2>
+        <h2 className="font-display font-bold text-lg">Refer a Driver, Earn Up To ${MAX_BONUS}</h2>
       </div>
       <p className="text-sm text-white/90 mb-4">
-        Share your code with other drivers. When they complete their first job, you both earn a <strong>${DRIVER_REFERRAL_BONUS} bonus</strong>!
+        Share your code with other drivers. When they complete their first job, you both earn a bonus — the amount depends on their vehicle type!
       </p>
+
+      {/* Bonus tier table */}
+      <button
+        onClick={() => setShowTiers(!showTiers)}
+        className="w-full bg-white/10 hover:bg-white/15 rounded-xl p-3 border border-white/20 mb-4 flex items-center justify-between transition-colors"
+      >
+        <span className="text-sm font-medium flex items-center gap-2">
+          <Gift size={15} /> Bonus amounts by vehicle
+        </span>
+        <ChevronDown size={16} className={`transition-transform ${showTiers ? 'rotate-180' : ''}`} />
+      </button>
+      {showTiers && (
+        <div className="bg-white/10 rounded-xl border border-white/20 mb-4 overflow-hidden">
+          {VEHICLE_BONUSES.map((v, i) => (
+            <div
+              key={v.category}
+              className={`flex items-center justify-between px-4 py-2 text-sm ${i !== VEHICLE_BONUSES.length - 1 ? 'border-b border-white/10' : ''} ${v.bonus === MAX_BONUS ? 'bg-white/10' : ''}`}
+            >
+              <span className="text-white/90">{v.category}</span>
+              <span className={`font-bold ${v.bonus === MAX_BONUS ? 'text-emerald-300' : 'text-white'}`}>${v.bonus}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="bg-white/15 backdrop-blur rounded-xl p-4 border border-white/20">
         <p className="text-xs text-white/70 mb-1">Your Driver Referral Code</p>
         <div className="flex items-center justify-between gap-2">

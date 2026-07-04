@@ -1,7 +1,15 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-const SIGN_ON_BONUS = 250;
-const DRIVER_REFERRAL_BONUS = 250;
+// Vehicle-based bonus tiers — larger vehicles earn bigger bonuses
+const VEHICLE_BONUSES = {
+  motorcycle:  { sign_on: 100, referral: 100 },
+  sedan:       { sign_on: 150, referral: 150 },
+  suv:         { sign_on: 200, referral: 200 },
+  van:         { sign_on: 250, referral: 250 },
+  truck:       { sign_on: 350, referral: 350 },
+  box_truck:   { sign_on: 500, referral: 500 },
+};
+const DEFAULT_BONUS = { sign_on: 250, referral: 250 };
 
 Deno.serve(async (req) => {
   try {
@@ -53,6 +61,12 @@ Deno.serve(async (req) => {
     const payouts = [];
     let referrerEmail = null;
 
+    // Determine bonus amounts based on the driver's vehicle category
+    const vehicleCategory = driver.vehicle_category || 'truck';
+    const bonusTier = VEHICLE_BONUSES[vehicleCategory] || DEFAULT_BONUS;
+    const signOnBonus = bonusTier.sign_on;
+    const driverReferralBonus = bonusTier.referral;
+
     // --- Sign-on bonus ---
     if (driver.sign_on_bonus_eligible) {
       try {
@@ -65,17 +79,17 @@ Deno.serve(async (req) => {
           const payout = await base44.asServiceRole.entities.DriverPayout.create({
             driver_profile_id: driverId,
             move_request_id,
-            amount: SIGN_ON_BONUS,
+            amount: signOnBonus,
             currency: move.currency || 'USD',
             status: 'pending',
-            notes: 'Sign-on bonus — first completed job',
+            notes: `Sign-on bonus (${vehicleCategory}) — first completed job`,
             deduction_reason: 'sign_on_bonus',
           });
-          payouts.push({ type: 'sign_on_bonus', amount: SIGN_ON_BONUS, payout_id: payout.id });
+          payouts.push({ type: 'sign_on_bonus', amount: signOnBonus, vehicle_category: vehicleCategory, payout_id: payout.id });
 
           await base44.asServiceRole.entities.DriverProfile.update(driverId, {
             sign_on_bonus_eligible: false,
-            total_earnings: (driver.total_earnings || 0) + SIGN_ON_BONUS,
+            total_earnings: (driver.total_earnings || 0) + signOnBonus,
           });
         }
       } catch (err) {
@@ -106,17 +120,17 @@ Deno.serve(async (req) => {
             const refPayout = await base44.asServiceRole.entities.DriverPayout.create({
               driver_profile_id: referrer.id,
               move_request_id,
-              amount: DRIVER_REFERRAL_BONUS,
+              amount: driverReferralBonus,
               currency: move.currency || 'USD',
               status: 'pending',
-              notes: `Driver referral bonus — referred ${driver.full_name}`,
+              notes: `Driver referral bonus (${vehicleCategory}) — referred ${driver.full_name}`,
               deduction_reason: 'driver_referral_bonus',
             });
-            payouts.push({ type: 'driver_referral_bonus', amount: DRIVER_REFERRAL_BONUS, payout_id: refPayout.id, referrer: referrer.email });
+            payouts.push({ type: 'driver_referral_bonus', amount: driverReferralBonus, vehicle_category: vehicleCategory, payout_id: refPayout.id, referrer: referrer.email });
 
             // Update referrer's earnings
             await base44.asServiceRole.entities.DriverProfile.update(referrer.id, {
-              total_earnings: (referrer.total_earnings || 0) + DRIVER_REFERRAL_BONUS,
+              total_earnings: (referrer.total_earnings || 0) + driverReferralBonus,
             });
 
             // Create/update Referral record
@@ -127,7 +141,7 @@ Deno.serve(async (req) => {
             if (existingRef.length > 0) {
               await base44.asServiceRole.entities.Referral.update(existingRef[0].id, {
                 status: 'rewarded',
-                bonus_points: DRIVER_REFERRAL_BONUS,
+                bonus_points: driverReferralBonus,
                 move_request_id,
               });
             } else {
@@ -137,7 +151,7 @@ Deno.serve(async (req) => {
                 referred_email: driver.email,
                 move_request_id,
                 status: 'rewarded',
-                bonus_points: DRIVER_REFERRAL_BONUS,
+                bonus_points: driverReferralBonus,
               });
             }
 
@@ -145,12 +159,12 @@ Deno.serve(async (req) => {
             try {
               await base44.asServiceRole.integrations.Core.SendEmail({
                 to: referrer.email,
-                subject: `You earned a $${DRIVER_REFERRAL_BONUS} driver referral bonus! 🎉`,
+                subject: `You earned a $${driverReferralBonus} driver referral bonus! 🎉`,
                 body: [
                   `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;color:#1f2937;">`,
                   `<h2 style="color:#16a34a;">Driver Referral Bonus Earned!</h2>`,
                   `<p>A driver you referred — <strong>${driver.full_name}</strong> — just completed their first move with GO.</p>`,
-                  `<p>You've earned a <strong>$${DRIVER_REFERRAL_BONUS} referral bonus</strong>, added to your pending payouts.</p>`,
+                  `<p>You've earned a <strong>$${driverReferralBonus} referral bonus</strong> (based on their ${vehicleCategory.replace('_', ' ')} vehicle), added to your pending payouts.</p>`,
                   `<p style="color:#6b7280;margin-top:24px;">Keep sharing your code to earn more!</p>`,
                   `</div>`,
                 ].join('\n'),
