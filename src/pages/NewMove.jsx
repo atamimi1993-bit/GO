@@ -9,10 +9,11 @@ import MobileSelect from '@/components/go/MobileSelect';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import ItemForm from '@/components/go/ItemForm';
+import QuickAddItems from '@/components/go/QuickAddItems';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import LiabilityAgreement from '@/components/go/LiabilityAgreement';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { calculateMovePrice, recommendTruckSize, TRUCK_SIZE_LABELS, COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES } from '@/lib/pricing';
+import { calculateMovePrice, recommendTruckSize, formatCurrency, TRUCK_SIZE_LABELS, COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES } from '@/lib/pricing';
 
 const JOB_TYPES = [
   { value: 'residential', label: 'Residential Move' },
@@ -63,6 +64,21 @@ export default function NewMove() {
   const handleRemoveItem = (idx) => {
     setItems(items.filter((_, i) => i !== idx));
   };
+
+  const handleUpdateQuantity = (idx, quantity) => {
+    setItems(items.map((item, i) => i === idx ? { ...item, quantity: Math.max(1, Number(quantity) || 1) } : item));
+  };
+
+  const liveEstimate = items.length > 0 && form.distance_miles
+    ? calculateMovePrice({
+        totalWeightLbs: totalWeight,
+        distanceMiles: Number(form.distance_miles),
+        truckSize: recommendTruckSize(totalWeight),
+        countryCode: form.country_code,
+        currency: form.currency,
+        distanceUnit: form.distance_unit,
+      })
+    : null;
 
   const handleUploadPDF = async (e) => {
     const file = e.target.files?.[0];
@@ -314,6 +330,9 @@ export default function NewMove() {
             </label>
           </div>
 
+          {/* Quick Add Catalog */}
+          <QuickAddItems onAdd={handleAddItem} existingItems={items} />
+
           {/* Manual add */}
           <ItemForm onAdd={handleAddItem} />
 
@@ -322,21 +341,53 @@ export default function NewMove() {
             <div className="bg-card border rounded-2xl overflow-hidden">
               <div className="px-4 py-3 bg-muted border-b flex justify-between items-center">
                 <span className="text-sm font-medium">{items.length} item{items.length > 1 ? 's' : ''}</span>
-                <span className="text-sm font-bold text-emerald-600">{totalWeight.toLocaleString()} lbs total</span>
+                <span className="text-sm font-bold text-emerald-600">{totalWeight.toLocaleString()} lbs total · {TRUCK_SIZE_LABELS[recommendTruckSize(totalWeight)]?.split('(')[0]?.trim()} truck</span>
               </div>
               <div className="divide-y max-h-64 overflow-y-auto">
                 {items.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-3">
-                    <div>
-                      <p className="text-sm font-medium">{item.quantity}x {item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.weight_lbs} lbs each · {item.category}{item.special_handling ? ' · ⚠️ Fragile' : ''}</p>
+                  <div key={i} className="flex items-center justify-between px-4 py-3 gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">{item.weight_lbs} lbs each · {item.category}{item.special_handling ? ' · ⚠️ Fragile' : ''} · {(item.weight_lbs * item.quantity).toLocaleString()} lbs total</p>
                     </div>
-                    <button onClick={() => handleRemoveItem(i)} className="text-muted-foreground hover:text-destructive min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label={`Remove ${item.name}`}>
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Input
+                        type="number"
+                        min={1}
+                        value={item.quantity}
+                        onChange={e => handleUpdateQuantity(i, e.target.value)}
+                        className="w-14 h-9 text-center text-sm"
+                        aria-label={`Quantity for ${item.name}`}
+                      />
+                      <button onClick={() => handleRemoveItem(i)} className="text-muted-foreground hover:text-destructive min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label={`Remove ${item.name}`}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Live Estimate Bar */}
+          {liveEstimate && (
+            <div className="sticky bottom-4 z-10 bg-emerald-600 text-white rounded-2xl p-4 shadow-lg">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs text-emerald-100">Grand Total Estimate</p>
+                  <p className="text-2xl font-display font-black">{formatCurrency(liveEstimate.totalPrice, form.currency)}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-xs text-emerald-100">{totalWeight.toLocaleString()} lbs · {form.distance_miles} {form.distance_unit}</p>
+                  <p className="text-sm font-medium">{TRUCK_SIZE_LABELS[recommendTruckSize(totalWeight)]?.split('(')[0]?.trim()} truck</p>
+                </div>
+              </div>
+              <p className="text-xs text-emerald-100 mt-2">Final price is confirmed on the next step — this estimate includes base cost, fuel, tax, and fees.</p>
+            </div>
+          )}
+          {!liveEstimate && items.length > 0 && !form.distance_miles && (
+            <div className="bg-muted rounded-xl p-4 text-center text-sm text-muted-foreground">
+              Enter a distance on the Details step to see your live estimate.
             </div>
           )}
         </div>
