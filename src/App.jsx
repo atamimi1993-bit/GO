@@ -52,6 +52,7 @@ const Rentals = lazy(() => import('@/pages/Rentals'));
 const RentalDetail = lazy(() => import('@/pages/RentalDetail'));
 const NewRental = lazy(() => import('@/pages/NewRental'));
 const DriverReport = lazy(() => import('@/pages/DriverReport'));
+const ReportDamage = lazy(() => import('@/pages/ReportDamage'));
 const DriverDetail = lazy(() => import('@/pages/DriverDetail'));
 const Overseer = lazy(() => import('@/pages/Overseer'));
 
@@ -138,6 +139,7 @@ const AuthenticatedApp = () => {
           <Route path="/rentals/:id" element={<PageTransition><RentalDetail /></PageTransition>} />
           <Route path="/driver-report" element={<PageTransition><DriverReport /></PageTransition>} />
           <Route path="/driver/:id" element={<PageTransition><DriverDetail /></PageTransition>} />
+          <Route path="/report-damage/:id" element={<PageTransition><ReportDamage /></PageTransition>} />
 
           {/* Admin-only: AI oversight agent */}
           <Route element={<AdminRoute />}>
