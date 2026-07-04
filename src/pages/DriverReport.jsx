@@ -49,14 +49,14 @@ export default function DriverReport() {
       const profile = profiles[0];
       setDriverProfile(profile);
 
-      const [myMoves, myPayouts, myRatings] = await Promise.all([
-        base44.entities.MoveRequest.filter({ assigned_driver_id: profile.id }, '-created_date', 500),
+      const [allMoves, allPayouts, allRatings] = await Promise.all([
+        base44.entities.MoveRequest.list('-created_date', 500),
         base44.entities.DriverPayout.filter({ driver_profile_id: profile.id }, '-created_date', 200),
         base44.entities.Rating.filter({ direction: 'customer_to_driver', ratee_id: profile.id }, '-created_date', 50),
       ]);
-      setMoves(myMoves);
-      setPayouts(myPayouts);
-      setRatings(myRatings);
+      setMoves(allMoves.filter((m) => m.assigned_driver_id === profile.id));
+      setPayouts(allPayouts);
+      setRatings(allRatings);
     } catch {
       // ignore
     } finally {
