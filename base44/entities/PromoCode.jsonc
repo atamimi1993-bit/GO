@@ -1,0 +1,36 @@
+{
+  "name": "PromoCode",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "discount_percent": {
+      "type": "number",
+      "default": 0
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "max_uses": {
+      "type": "number",
+      "default": 0
+    },
+    "uses_count": {
+      "type": "number",
+      "default": 0
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code",
+    "discount_percent"
+  ]
+}

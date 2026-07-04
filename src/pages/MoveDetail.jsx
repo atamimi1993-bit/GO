@@ -9,6 +9,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
+import PromoCodeInput from '@/components/go/PromoCodeInput';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO } from 'date-fns';
 
@@ -81,6 +82,7 @@ export default function MoveDetail() {
   const [invoiceSent, setInvoiceSent] = useState(false);
   const [contract, setContract] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [promoData, setPromoData] = useState(null);
   const { toast } = useToast();
 
   const handleConfirmDelivery = async () => {
@@ -108,7 +110,10 @@ export default function MoveDetail() {
     }
     try {
       setPaying(true);
-      const res = await base44.functions.invoke('create-move-checkout', { move_request_id: id });
+      const res = await base44.functions.invoke('create-move-checkout', {
+        move_request_id: id,
+        promo_code: promoData?.promo?.code || undefined,
+      });
       window.location.href = res.data.url;
     } catch {
       toast({ title: 'Payment error', description: 'Could not start checkout. Please try again.', variant: 'destructive' });
@@ -234,13 +239,34 @@ export default function MoveDetail() {
       <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} currencyCode={currencyCode} />
 
       {!move.paid && move.status !== 'cancelled' && (
-        <Button
-          onClick={handlePay}
-          disabled={paying}
-          className="w-full mt-4 bg-emerald-500 hover:bg-emerald-600"
-        >
-          {paying ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</> : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{move.total_price?.toFixed(curr.decimals)}</>}
-        </Button>
+        <>
+          <PromoCodeInput move={move} onApplied={setPromoData} />
+          {promoData && (
+            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 mt-2 space-y-1">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Original Total</span>
+                <span className="line-through text-muted-foreground">{curr.symbol}{promoData.original_total.toFixed(curr.decimals)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-emerald-600 dark:text-emerald-400">Discount ({promoData.promo.discount_percent}%)</span>
+                <span className="text-emerald-600 dark:text-emerald-400">−{curr.symbol}{promoData.discount_amount.toFixed(curr.decimals)}</span>
+              </div>
+              <div className="flex justify-between font-bold pt-1 border-t border-emerald-500/20">
+                <span>New Total</span>
+                <span className="text-emerald-600 dark:text-emerald-400">{curr.symbol}{promoData.discounted_total.toFixed(curr.decimals)}</span>
+              </div>
+            </div>
+          )}
+          <Button
+            onClick={handlePay}
+            disabled={paying}
+            className="w-full mt-2 bg-emerald-500 hover:bg-emerald-600"
+          >
+            {paying
+              ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</>
+              : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{(promoData?.discounted_total || move.total_price)?.toFixed(curr.decimals)}</>}
+          </Button>
+        </>
       )}
 
       {move.paid && (
