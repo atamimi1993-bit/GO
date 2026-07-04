@@ -255,6 +255,8 @@ export default function NewMove() {
         app_fee: pricing.appFee,
         driver_fee: pricing.driverFee,
         total_price: pricing.totalPrice,
+        surge_multiplier: pricing.surgeMultiplier || 1,
+        surge_label: pricing.surgeLabel || undefined,
         driver_payout: pricing.driverPayout,
         liability_signed: true,
         liability_signed_date: new Date().toISOString(),

@@ -14,7 +14,7 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
   const [creditTier, setCreditTier] = useState(move.credit_tier || 'good');
   const [termMonths, setTermMonths] = useState(move.installment_term_months || 12);
   const [paying, setPaying] = useState(false);
-  const [addInsurance, setAddInsurance] = useState(false);
+  const [insuranceTier, setInsuranceTier] = useState(null);
   const [promoData, setPromoData] = useState(null);
   const { toast } = useToast();
 
@@ -40,7 +40,7 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
         move_request_id: move.id,
         promo_code: promoData?.promo?.code || undefined,
         payment_option: selectedOption,
-        add_insurance: addInsurance,
+        insurance_tier: insuranceTier || undefined,
       };
       if (selectedOption === 'installment_plan') {
         payload.credit_tier = creditTier;
@@ -56,8 +56,13 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
 
   const halfAmount = round2(baseTotal / 2);
 
-  // Insurance fee: 2% of move total, $25 minimum, $200 maximum
-  const insuranceFee = Math.min(200, Math.max(25, round2(baseTotal * 0.02)));
+  const INSURANCE_TIERS = [
+    { key: 'basic', name: 'Basic', fee: 15, coverage: '$1,000' },
+    { key: 'premium', name: 'Premium', fee: 35, coverage: '$5,000', recommended: true },
+    { key: 'platinum', name: 'Platinum', fee: 75, coverage: '$10,000' },
+  ];
+  const selectedInsurance = INSURANCE_TIERS.find(t => t.key === insuranceTier);
+  const insuranceFee = selectedInsurance?.fee || 0;
 
   const OPTIONS = [
     {
@@ -216,20 +221,38 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
         </div>
       )}
 
-      {/* Insurance upsell */}
-      <div className={`border-2 rounded-2xl p-4 transition-all ${addInsurance ? 'border-emerald-500 bg-emerald-500/5' : 'border-border'}`}>
-        <button type="button" onClick={() => setAddInsurance(!addInsurance)} className="w-full text-left">
-          <div className="flex items-center gap-3">
-            <div className={`rounded-xl p-2 shrink-0 ${addInsurance ? 'bg-emerald-500 text-white' : 'bg-muted'}`}>
-              <Shield size={18} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm">Damage Protection Insurance</p>
-              <p className="text-xs text-muted-foreground">Covers up to $5,000 if your belongings are damaged or lost during the move</p>
-            </div>
-            <span className="font-display font-bold text-emerald-600 dark:text-emerald-400 text-sm shrink-0">+{fmt(insuranceFee)}</span>
-          </div>
-        </button>
+      {/* Insurance upsell — tiered */}
+      <div className="border-2 border-border rounded-2xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Shield size={16} className="text-emerald-500" />
+          <h3 className="font-display font-bold text-sm">Damage Protection Insurance</h3>
+          {insuranceTier && (
+            <button type="button" onClick={() => setInsuranceTier(null)} className="ml-auto text-xs text-muted-foreground hover:text-destructive">Remove</button>
+          )}
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {INSURANCE_TIERS.map(tier => {
+            const isSelected = insuranceTier === tier.key;
+            return (
+              <button
+                key={tier.key}
+                type="button"
+                onClick={() => setInsuranceTier(isSelected ? null : tier.key)}
+                className={`text-center border-2 rounded-xl p-3 transition-all relative ${
+                  isSelected ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-emerald-300'
+                }`}
+              >
+                {tier.recommended && (
+                  <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap">BEST VALUE</span>
+                )}
+                <p className="font-medium text-sm">{tier.name}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Covers up to</p>
+                <p className="text-[10px] text-muted-foreground">{tier.coverage}</p>
+                <p className="font-display font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-1">+{fmt(tier.fee)}</p>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Summary + pay button */}
@@ -258,9 +281,9 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
             <span className="text-blue-600 dark:text-blue-400">{fmt(installmentPlan.monthlyPayment)}</span>
           </div>
         )}
-        {addInsurance && (
+        {selectedInsurance && (
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span className="flex items-center gap-1"><Shield size={12} /> Damage Protection</span>
+            <span className="flex items-center gap-1"><Shield size={12} /> {selectedInsurance.name} Protection</span>
             <span>+{fmt(insuranceFee)}</span>
           </div>
         )}
@@ -274,10 +297,10 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
         {paying
           ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</>
           : selectedOption === 'installment_plan'
-            ? <><CreditCard size={16} className="mr-1" /> Pay First Installment — {installmentPlan ? fmt(installmentPlan.monthlyPayment + (addInsurance ? insuranceFee : 0)) : ''}</>
+            ? <><CreditCard size={16} className="mr-1" /> Pay First Installment — {installmentPlan ? fmt(installmentPlan.monthlyPayment + insuranceFee) : ''}</>
             : selectedOption === 'full'
-              ? <><CreditCard size={16} className="mr-1" /> Pay in Full — {fmt(baseTotal + (addInsurance ? insuranceFee : 0))}</>
-              : <><CreditCard size={16} className="mr-1" /> Pay at Pickup — {fmt(halfAmount + (addInsurance ? insuranceFee : 0))}</>}
+              ? <><CreditCard size={16} className="mr-1" /> Pay in Full — {fmt(baseTotal + insuranceFee)}</>
+              : <><CreditCard size={16} className="mr-1" /> Pay at Pickup — {fmt(halfAmount + insuranceFee)}</>}
       </Button>
       <PaymentMethods />
     </div>

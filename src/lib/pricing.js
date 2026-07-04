@@ -157,6 +157,13 @@ const FEE_PER_50FT = 1;          // $1 per 50ft of distance from street to door
 const EXTRA_HELPER_FEE = 50;     // additional mover for the job
 const ELEVATOR_SERVICE_FEE = 30; // buildings requiring elevator reservation
 
+// Insurance tiers — damage protection upsell (pure profit for GO)
+const INSURANCE_TIERS = {
+  basic:    { fee: 15, coverage: 1000,  label: 'Basic Protection',    description: 'Covers up to $1,000 in damage' },
+  premium:  { fee: 35, coverage: 5000,  label: 'Premium Protection',  description: 'Covers up to $5,000 in damage' },
+  platinum: { fee: 75, coverage: 10000, label: 'Platinum Protection', description: 'Covers up to $10,000 in damage' },
+};
+
 // Cancellation fee — charged when a customer cancels after a driver has accepted
 const CANCELLATION_FEE = 250;
 
@@ -249,7 +256,7 @@ export function calculateCourierPrice({ distanceMiles, deliveryCategory = 'other
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
-export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0, extraHelper = false, elevatorService = false }) {
+export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0, extraHelper = false, elevatorService = false, pendingMovesCount = 0 }) {
   const truck = TRUCK_CONFIG[truckSize] || TRUCK_CONFIG.medium;
 
   // Convert metric inputs to imperial for internal calculation
@@ -295,22 +302,28 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Operational subtotal = everything it costs to do the job
   const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost + bulkyItemFee + materialsFeeCost + carryingFee + extraServiceFee;
 
+  // Apply surge / dynamic pricing — multiplies the operational cost during peak demand.
+  // The 25% app fee applies to the surge-adjusted total, so GO earns proportionally more.
+  const surge = calculateSurgeMultiplier(new Date(), pendingMovesCount);
+  const surgeMultiplier = surge.multiplier;
+  const adjustedOperationalSubtotal = operationalSubtotal * surgeMultiplier;
+
   // Tax rate: country config overrides state
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
 
   // GO platform fee — 25% of the TOTAL price the customer pays (including tax)
-  // Solving: goProfit = APP_FEE_RATE * (operationalSubtotal + goProfit) * (1 + taxRate)
+  // Solving: goProfit = APP_FEE_RATE * (adjustedOperationalSubtotal + goProfit) * (1 + taxRate)
   const taxMultiplier = 1 + taxRate;
-  const goProfit = (APP_FEE_RATE * taxMultiplier * operationalSubtotal) / (1 - APP_FEE_RATE * taxMultiplier);
+  const goProfit = (APP_FEE_RATE * taxMultiplier * adjustedOperationalSubtotal) / (1 - APP_FEE_RATE * taxMultiplier);
   const appFee = goProfit;
   const driverFee = 0;
 
   // Tax applied to operational + platform fee
-  const taxAmount = (operationalSubtotal + appFee) * taxRate;
+  const taxAmount = (adjustedOperationalSubtotal + appFee) * taxRate;
 
   // Total price (in USD) — customer pays operational + GO fee + tax
-  const totalPrice = operationalSubtotal + appFee + taxAmount;
+  const totalPrice = adjustedOperationalSubtotal + appFee + taxAmount;
 
   // Currency conversion
   const currencyCode = currency || country?.currency || 'USD';
@@ -332,6 +345,12 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
     materialsFee: convert(materialsFeeCost),
     carryingFee: convert(carryingFee),
     extraServiceFee: convert(extraServiceFee),
+    surgeMultiplier: surgeMultiplier,
+    surgeLabel: surge.label,
+    surgeLevel: surge.level,
+    surgeReasons: surge.reasons,
+    operationalSubtotal: convert(operationalSubtotal),
+    surgeAdjustedSubtotal: convert(adjustedOperationalSubtotal),
     extraHelper: extraHelper,
     elevatorService: elevatorService,
     taxRate,
@@ -531,4 +550,4 @@ export function calculateSurgeMultiplier(date = new Date(), pendingMovesCount = 
   };
 }
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS };

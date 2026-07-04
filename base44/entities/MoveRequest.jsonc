@@ -153,6 +153,13 @@
       "type": "number",
       "default": 0
     },
+    "surge_multiplier": {
+      "type": "number",
+      "default": 1
+    },
+    "surge_label": {
+      "type": "string"
+    },
     "driver_payout": {
       "type": "number",
       "default": 0
@@ -367,6 +374,16 @@
     "insurance_fee": {
       "type": "number",
       "default": 0
+    },
+    "insurance_tier": {
+      "type": "string",
+      "enum": [
+        "none",
+        "basic",
+        "premium",
+        "platinum"
+      ],
+      "default": "none"
     },
     "business_account_id": {
       "type": "string"

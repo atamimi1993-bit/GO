@@ -1,5 +1,5 @@
 import React from 'react';
-import { TRUCK_SIZE_LABELS, getCurrency, calculateSurgeMultiplier } from '@/lib/pricing';
+import { TRUCK_SIZE_LABELS, getCurrency } from '@/lib/pricing';
 import { calculateCarbonFootprint, formatCO2 } from '@/lib/carbon';
 import { Leaf, TrendingUp } from 'lucide-react';
 import SurgeBadge from '@/components/go/SurgeBadge';
@@ -23,11 +23,12 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
     ...(pricing.materialsFee ? [{ label: 'Packing materials', value: pricing.materialsFee }] : []),
     ...(pricing.carryingFee ? [{ label: 'Carrying surcharge (steps + distance)', value: pricing.carryingFee }] : []),
     ...(pricing.extraServiceFee ? [{ label: `Extra services${pricing.extraHelper ? ' (helper)' : ''}${pricing.elevatorService ? ' (elevator)' : ''}`, value: pricing.extraServiceFee }] : []),
+    ...(pricing.surgeMultiplier > 1 ? [{ label: `Surge (${pricing.surgeLabel}, ×${pricing.surgeMultiplier})`, value: pricing.surgeAdjustedSubtotal - pricing.operationalSubtotal }] : []),
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
     ...(showInternalCosts ? [{ label: 'GO App Fee (25%)', value: pricing.appFee }] : []),
   ];
 
-  const surge = calculateSurgeMultiplier();
+  const surge = { multiplier: pricing.surgeMultiplier || 1, label: pricing.surgeLabel || 'Normal Pricing', level: pricing.surgeLevel || 'normal' };
 
   return (
     <div className="bg-card border border-border rounded-2xl p-6 space-y-3">

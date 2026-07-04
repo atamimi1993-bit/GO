@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { move_request_id, promo_code, validate_only, payment_plan, pay_balance, pay_installment, payment_option, credit_tier, installment_term_months, add_insurance } = body;
+    const { move_request_id, promo_code, validate_only, payment_plan, pay_balance, pay_installment, payment_option, credit_tier, installment_term_months, add_insurance, insurance_tier } = body;
 
     if (!move_request_id) {
       return Response.json({ error: 'move_request_id is required' }, { status: 400 });
@@ -91,9 +91,16 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid move price' }, { status: 400 });
     }
 
-    // Move insurance: 2% of move total, $25 minimum, $200 maximum
-    // Covers up to $5,000 in damage to belongings during the move
-    const INSURANCE_FEE = Math.min(200, Math.max(25, Math.round(move.total_price * 0.02 * 100) / 100));
+    // Insurance tiers — customer-selected damage protection (pure revenue for GO)
+    const INSURANCE_TIERS = {
+      basic:    { fee: 15, coverage: 1000 },
+      premium:  { fee: 35, coverage: 5000 },
+      platinum: { fee: 75, coverage: 10000 },
+    };
+    const selectedTier = INSURANCE_TIERS[insurance_tier];
+    const INSURANCE_FEE = selectedTier ? selectedTier.fee : 0;
+    const INSURANCE_COVERAGE = selectedTier ? selectedTier.coverage : 0;
+    const hasInsurance = !!selectedTier;
 
     // Validate promo code if provided
     let discountAmount = 0;
@@ -214,12 +221,12 @@ Deno.serve(async (req) => {
           },
           quantity: 1,
         },
-        ...(add_insurance ? [{
+        ...(hasInsurance ? [{
           price_data: {
             currency: currencyCode.toLowerCase(),
             product_data: {
-              name: 'GO Move Insurance — Damage Protection',
-              description: 'Covers up to $5,000 in damage to your belongings during the move',
+              name: 'GO Move Insurance — ' + (insurance_tier.charAt(0).toUpperCase() + insurance_tier.slice(1)) + ' Protection',
+              description: 'Covers up to $' + INSURANCE_COVERAGE.toLocaleString() + ' in damage to your belongings during the move',
             },
             unit_amount: isZeroDecimal ? INSURANCE_FEE : INSURANCE_FEE * 100,
           },
@@ -269,9 +276,10 @@ Deno.serve(async (req) => {
       stripe_session_id: session.id,
     };
 
-    if (add_insurance) {
+    if (hasInsurance) {
       updateData.insurance_selected = true;
       updateData.insurance_fee = INSURANCE_FEE;
+      updateData.insurance_tier = insurance_tier;
     }
 
     // Store payment plan details based on payment type
