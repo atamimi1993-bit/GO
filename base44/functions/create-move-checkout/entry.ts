@@ -121,7 +121,11 @@ Deno.serve(async (req) => {
         : 'GO Move Service';
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'link', 'cashapp', 'afterpay_clearpay', 'klarna'],
+      payment_method_options: {
+        afterpay_clearpay: { limit: 400000 },
+        klarna: { preferred_locale: 'en-US' },
+      },
       line_items: [{
         price_data: {
           currency: currencyCode.toLowerCase(),

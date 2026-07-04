@@ -12,6 +12,7 @@ import DamageReportForm from '@/components/go/DamageReportForm';
 import PromoCodeInput from '@/components/go/PromoCodeInput';
 import AssignedDriverCard from '@/components/go/AssignedDriverCard';
 import PriceConfirmation from '@/components/go/PriceConfirmation';
+import PaymentMethods from '@/components/go/PaymentMethods';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/go/PageHeader';
 import { format, parseISO } from 'date-fns';
@@ -300,6 +301,7 @@ export default function MoveDetail() {
               ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting...</>
               : <><CreditCard size={16} className="mr-1" /> Pay Installment {((move.installments_paid || 0) + 1)} of 3 — {curr.symbol}{(move.installment_amount || move.deposit_amount || 0).toFixed(curr.decimals)}</>}
           </Button>
+          <PaymentMethods />
         </div>
       )}
 
@@ -361,8 +363,9 @@ export default function MoveDetail() {
               : usePaymentPlan
                 ? <><Wallet size={16} className="mr-1" /> Pay Installment 1 of 3 — {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 3).toFixed(curr.decimals)}</>
                 : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{(promoData?.discounted_total || move.total_price || 0).toFixed(curr.decimals)}</>}
-          </Button>
-        </>
+                </Button>
+                <PaymentMethods />
+                </>
       )}
 
       {move.paid && (
