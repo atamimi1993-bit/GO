@@ -19,7 +19,7 @@ import DriverAvailabilityCalendar from '@/components/go/DriverAvailabilityCalend
 const StripeConnectCard = lazy(() => import('@/components/go/StripeConnectCard'));
 const BackgroundCheckStatus = lazy(() => import('@/components/go/BackgroundCheckStatus'));
 const ContinuousTracker = lazy(() => import('@/components/go/ContinuousTracker'));
-import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
+import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation, Receipt } from 'lucide-react';
 import DriverDisputeCenter from '@/components/go/DriverDisputeCenter';
 
 export default function DriverHub() {
@@ -182,6 +182,11 @@ export default function DriverHub() {
         <Link to="/my-payouts">
           <Button variant="outline">
             <DollarSign size={16} className="mr-1" /> Payouts
+          </Button>
+        </Link>
+        <Link to="/driver-expenses">
+          <Button variant="outline">
+            <Receipt size={16} className="mr-1" /> Expenses
           </Button>
         </Link>
       </div>

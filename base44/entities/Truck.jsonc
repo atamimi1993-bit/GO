@@ -70,6 +70,21 @@
     },
     "company_name": {
       "type": "string"
+    },
+    "current_mileage": {
+      "type": "number",
+      "default": 0
+    },
+    "last_maintenance_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "next_maintenance_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "maintenance_notes": {
+      "type": "string"
     }
   },
   "required": [

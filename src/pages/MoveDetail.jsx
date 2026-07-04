@@ -25,6 +25,7 @@ import TipButton from '@/components/go/TipButton';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/go/PageHeader';
 import TemperatureBadge, { SignatureBadge } from '@/components/go/TemperatureBadge';
+import CarbonFootprintBadge from '@/components/go/CarbonFootprintBadge';
 import { format, parseISO } from 'date-fns';
 
 const MoveTracker = lazy(() => import('@/components/go/MoveTracker'));
@@ -59,6 +60,9 @@ function RatingSection({ move }) {
 
   if (!checked || !currentUser) return null;
   if (existingRating) {
+    const reviewPhotos = (() => {
+      try { return JSON.parse(existingRating.photo_urls || '[]'); } catch { return []; }
+    })();
     return (
       <div className="bg-card border rounded-2xl p-5 mt-4">
         <h3 className="font-display font-bold text-sm mb-2">Your Rating</h3>
@@ -67,7 +71,16 @@ function RatingSection({ move }) {
             <Star key={n} size={16} className={n <= (existingRating.stars || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'} />
           ))}
         </div>
-        {existingRating.comment && <p className="text-sm text-muted-foreground select-text">"{existingRating.comment}"</p>}
+        {existingRating.comment && <p className="text-sm text-muted-foreground select-text mb-3">"{existingRating.comment}"</p>}
+        {reviewPhotos.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {reviewPhotos.map((url, i) => (
+              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block w-20 h-20 rounded-lg overflow-hidden border">
+                <img src={url} alt={`Review photo ${i + 1}`} className="w-full h-full object-cover" />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
@@ -313,6 +326,16 @@ export default function MoveDetail() {
           <Package className="text-muted-foreground mt-0.5" size={18} />
           <div><p className="text-xs text-muted-foreground">Total Weight</p><p className="font-medium text-sm">{move.total_weight_lbs?.toLocaleString()} lbs</p></div>
         </div>
+      </div>
+
+      {/* Carbon footprint */}
+      <div className="mb-4">
+        <CarbonFootprintBadge
+          distanceMiles={move.distance_miles || 0}
+          distanceUnit={move.distance_unit || 'mi'}
+          fuelType={move.truck_size_needed === 'small' ? 'gasoline' : 'diesel'}
+          mpg={move.truck_size_needed === 'small' ? 18 : move.truck_size_needed === 'medium' ? 14 : move.truck_size_needed === 'large' ? 10 : 8}
+        />
       </div>
 
       {/* On-site verification badge */}

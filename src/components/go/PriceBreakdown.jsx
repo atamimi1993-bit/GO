@@ -1,5 +1,8 @@
 import React from 'react';
-import { TRUCK_SIZE_LABELS, getCurrency } from '@/lib/pricing';
+import { TRUCK_SIZE_LABELS, getCurrency, calculateSurgeMultiplier } from '@/lib/pricing';
+import { calculateCarbonFootprint, formatCO2 } from '@/lib/carbon';
+import { Leaf, TrendingUp } from 'lucide-react';
+import SurgeBadge from '@/components/go/SurgeBadge';
 
 export default function PriceBreakdown({ pricing, truckSize, currencyCode, showInternalCosts = false }) {
   if (!pricing) return null;
@@ -24,9 +27,14 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
     ...(showInternalCosts ? [{ label: 'GO App Fee (25%)', value: pricing.appFee }] : []),
   ];
 
+  const surge = calculateSurgeMultiplier();
+
   return (
     <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
-      <h3 className="font-display font-bold text-lg mb-1">Price Breakdown</h3>
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="font-display font-bold text-lg">Price Breakdown</h3>
+        {surge.level !== 'normal' && <SurgeBadge surge={surge} compact />}
+      </div>
       <div className="space-y-2">
         {lines.map((line, i) => (
           <div key={i} className="flex justify-between text-sm">
@@ -46,6 +54,20 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
           Driver payout for this job: <span className="font-bold">{fmt(pricing.driverPayout)}</span>
         </div>
       )}
+      {(() => {
+        const carbon = calculateCarbonFootprint({
+          roundTripMiles: pricing.roundTripMiles || pricing.displayDistance || 0,
+          fuelType: 'gasoline',
+          mpg: pricing.gallonsNeeded ? (pricing.roundTripMiles / pricing.gallonsNeeded) : 14,
+        });
+        return (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg p-2">
+            <Leaf size={14} className="text-emerald-500" />
+            <span>Carbon impact: <span className="font-medium">{formatCO2(carbon.co2Kg)}</span></span>
+            {carbon.isGreen && <span className="text-emerald-600 dark:text-emerald-400 font-medium">🌱 Eco-friendly</span>}
+          </div>
+        );
+      })()}
     </div>
   );
 }

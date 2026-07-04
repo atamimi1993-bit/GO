@@ -57,6 +57,7 @@ const DriverDetail = lazy(() => import('@/pages/DriverDetail'));
 const Overseer = lazy(() => import('@/pages/Overseer'));
 const ScheduleOptimizer = lazy(() => import('@/pages/ScheduleOptimizer'));
 const DriverUpgrade = lazy(() => import('@/pages/DriverUpgrade'));
+const DriverExpenses = lazy(() => import('@/pages/DriverExpenses'));
 const LeadMarketplace = lazy(() => import('@/pages/LeadMarketplace'));
 
 const PageTransition = ({ children }) => {
@@ -143,6 +144,7 @@ const AuthenticatedApp = () => {
           <Route path="/driver-report" element={<PageTransition><DriverReport /></PageTransition>} />
           <Route path="/scheduler" element={<PageTransition><ScheduleOptimizer /></PageTransition>} />
           <Route path="/driver-upgrade" element={<PageTransition><DriverUpgrade /></PageTransition>} />
+          <Route path="/driver-expenses" element={<PageTransition><DriverExpenses /></PageTransition>} />
           <Route path="/lead-marketplace" element={<PageTransition><LeadMarketplace /></PageTransition>} />
           <Route path="/driver/:id" element={<PageTransition><DriverDetail /></PageTransition>} />
           <Route path="/report-damage/:id" element={<PageTransition><ReportDamage /></PageTransition>} />

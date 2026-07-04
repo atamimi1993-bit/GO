@@ -445,4 +445,90 @@ export const CREDIT_TIERS = [
 
 export const INSTALLMENT_TERM_OPTIONS = [3, 6, 12, 24, 36, 48];
 
+// ─── Surge / Dynamic Pricing ─────────────────────────────────────────────────
+// Adjusts rates based on demand, time of day, day of week, and season.
+// Multiplier of 1.0 = normal pricing; >1.0 = surge premium.
+
+// Peak moving season: May–September (summer months)
+const PEAK_MONTHS = [5, 6, 7, 8, 9];
+
+// Peak hours: early morning (7-9) and evening (4-7) — higher demand
+const PEAK_HOURS = [
+  { start: 7, end: 9, multiplier: 1.10 },
+  { start: 16, end: 19, multiplier: 1.12 },
+];
+
+// Weekend surcharge
+const WEEKEND_MULTIPLIER = 1.08;
+
+// Max surge cap to protect customers
+const MAX_SURGE = 1.5;
+
+/**
+ * Calculate the current surge multiplier based on time and demand.
+ * @param {Date} date - the date/time to check (defaults to now)
+ * @param {number} pendingMovesCount - number of pending moves (demand indicator)
+ * @returns {{ multiplier: number, reasons: string[], label: string, level: 'normal'|'moderate'|'high'|'peak' }}
+ */
+export function calculateSurgeMultiplier(date = new Date(), pendingMovesCount = 0) {
+  let multiplier = 1.0;
+  const reasons = [];
+
+  // Seasonal surge — summer is peak moving season
+  const month = date.getMonth() + 1;
+  if (PEAK_MONTHS.includes(month)) {
+    multiplier *= 1.1;
+    reasons.push('Peak moving season');
+  }
+
+  // Time of day surge
+  const hour = date.getHours();
+  for (const peak of PEAK_HOURS) {
+    if (hour >= peak.start && hour < peak.end) {
+      multiplier *= peak.multiplier;
+      reasons.push('Peak hours');
+      break;
+    }
+  }
+
+  // Weekend surge
+  const dayOfWeek = date.getDay();
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    multiplier *= WEEKEND_MULTIPLIER;
+    reasons.push('Weekend demand');
+  }
+
+  // Demand-based surge — if there are many pending moves relative to drivers
+  if (pendingMovesCount > 20) {
+    multiplier *= 1.15;
+    reasons.push('High demand');
+  } else if (pendingMovesCount > 10) {
+    multiplier *= 1.08;
+    reasons.push('Moderate demand');
+  }
+
+  // Cap at maximum
+  const finalMultiplier = Math.min(multiplier, MAX_SURGE);
+
+  let level = 'normal';
+  let label = 'Normal Pricing';
+  if (finalMultiplier >= 1.3) {
+    level = 'peak';
+    label = 'Peak Surge';
+  } else if (finalMultiplier >= 1.15) {
+    level = 'high';
+    label = 'High Demand';
+  } else if (finalMultiplier > 1.0) {
+    level = 'moderate';
+    label = 'Moderate Surge';
+  }
+
+  return {
+    multiplier: Math.round(finalMultiplier * 100) / 100,
+    reasons: reasons.length > 0 ? reasons : ['Standard rates'],
+    label,
+    level,
+  };
+}
+
 export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES };

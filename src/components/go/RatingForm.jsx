@@ -1,17 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Star, Loader2 } from 'lucide-react';
+import { Star, Loader2, Camera, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function RatingForm({ move, direction, raterId, raterName, rateeId, rateeName, onSubmitted, onError }) {
   const [stars, setStars] = useState(0);
   const [comment, setComment] = useState('');
+  const [photos, setPhotos] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const fileRef = useRef(null);
   const { toast } = useToast();
 
   const label = direction === 'customer_to_driver' ? 'Rate the Driver' : 'Rate the Customer';
+
+  const handlePhotoSelect = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    if (photos.length + files.length > 5) {
+      toast({ title: 'Too many photos', description: 'Maximum 5 photos per review.', variant: 'destructive' });
+      return;
+    }
+    setUploading(true);
+    try {
+      const uploaded = await Promise.all(
+        files.map(async (file) => {
+          const { file_url } = await base44.integrations.Core.UploadFile({ file });
+          return file_url;
+        })
+      );
+      setPhotos((prev) => [...prev, ...uploaded]);
+    } catch (err) {
+      toast({ title: 'Upload failed', description: 'Could not upload photos. Please try again.', variant: 'destructive' });
+    }
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const removePhoto = (idx) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const handleSubmit = async () => {
     if (stars === 0) {
@@ -32,6 +62,7 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
         ratee_name: rateeName,
         stars,
         comment: comment.trim(),
+        photo_urls: JSON.stringify(photos),
       });
       toast({ title: 'Rating submitted!', description: `Thank you for rating ${rateeName}.` });
     } catch {
@@ -86,6 +117,49 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
         placeholder="Leave a comment (optional)..."
         className="mb-3 min-h-[80px]"
       />
+
+      {/* Photo upload */}
+      <div className="mb-3">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handlePhotoSelect}
+        />
+        <div className="flex items-center gap-2 mb-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading || photos.length >= 5}
+          >
+            {uploading ? <Loader2 size={14} className="animate-spin mr-1" /> : <Camera size={14} className="mr-1" />}
+            {uploading ? 'Uploading...' : 'Add Photos'}
+          </Button>
+          <span className="text-xs text-muted-foreground">{photos.length}/5 photos</span>
+        </div>
+        {photos.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {photos.map((url, idx) => (
+              <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border">
+                <img src={url} alt={`Review ${idx + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(idx)}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center text-white"
+                  aria-label="Remove photo"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <Button onClick={handleSubmit} disabled={submitting} className="w-full bg-emerald-500 hover:bg-emerald-600">
         {submitting ? <Loader2 size={16} className="animate-spin mr-1" /> : <Star size={16} className="mr-1" />}
         Submit Rating

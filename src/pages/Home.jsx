@@ -13,6 +13,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 const HomeStats = lazy(() => import('@/components/go/HomeStats'));
 const CustomerQuickActions = lazy(() => import('@/components/go/CustomerQuickActions'));
 const Testimonials = lazy(() => import('@/components/go/Testimonials'));
+const ReviewGallery = lazy(() => import('@/components/go/ReviewGallery'));
 const DriverRecruitmentBanner = lazy(() => import('@/components/go/DriverRecruitmentBanner'));
 const CustomerChatWidget = lazy(() => import('@/components/go/CustomerChatWidget'));
 
@@ -134,6 +135,11 @@ export default function Home() {
       {/* Testimonials */}
       <Suspense fallback={<LazyFallback />}>
         <Testimonials />
+      </Suspense>
+
+      {/* Customer photo reviews */}
+      <Suspense fallback={<LazyFallback />}>
+        <ReviewGallery />
       </Suspense>
 
       {/* FAQ */}

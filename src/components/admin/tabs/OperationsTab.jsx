@@ -7,12 +7,18 @@ const MoveStatusTracker = lazy(() => import('@/components/admin/MoveStatusTracke
 const MoveCalendar = lazy(() => import('@/components/admin/MoveCalendar'));
 const MoveHeatMap = lazy(() => import('@/components/admin/MoveHeatMap'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
+const FleetManagement = lazy(() => import('@/components/admin/FleetManagement'));
 
 export default function OperationsTab({ scrollRef }) {
   const [showMap, setShowMap] = useState(false);
 
   return (
     <div className="space-y-6">
+      {/* Fleet management */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <FleetManagement />
+      </Suspense>
+
       {/* Move status tracker */}
       <Suspense fallback={<SectionSkeleton />}>
         <MoveStatusTracker />
