@@ -5,7 +5,7 @@ import { Star, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 
-export default function RatingForm({ move, direction, raterId, raterName, rateeId, rateeName, onSubmitted }) {
+export default function RatingForm({ move, direction, raterId, raterName, rateeId, rateeName, onSubmitted, onError }) {
   const [stars, setStars] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
@@ -20,6 +20,7 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
       return;
     }
     setSubmitting(true);
+    onSubmitted?.({ stars, comment: comment.trim(), _optimistic: true });
     try {
       await base44.entities.Rating.create({
         move_request_id: move.id,
@@ -32,9 +33,9 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
         comment: comment.trim(),
       });
       toast({ title: 'Rating submitted!', description: `Thank you for rating ${rateeName}.` });
-      onSubmitted?.();
     } catch {
-      toast({ title: 'Error', description: 'Could not submit rating.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Could not submit rating. Please try again.', variant: 'destructive' });
+      onError?.();
     }
     setSubmitting(false);
   };

@@ -92,6 +92,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
         isolation: 'isolate',
         willChange: 'transform',
         overscrollBehavior: pulling ? 'none' : 'auto',
+        overscrollBehaviorY: 'contain',
         touchAction: pulling ? 'none' : 'pan-y',
       }}
     >

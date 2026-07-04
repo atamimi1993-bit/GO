@@ -117,7 +117,7 @@ export default function DamageReportForm({ move, user, onSubmitted }) {
             key={opt.value}
             type="button"
             onClick={() => setReportType(opt.value)}
-            className={`flex items-center gap-2 justify-center px-3 py-2.5 rounded-xl text-sm font-medium border transition-colors min-h-[44px] ${
+            className={`flex items-center gap-2 justify-center px-3 py-2.5 rounded-xl text-sm font-medium border transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
               reportType === opt.value
                 ? 'bg-red-500/10 border-red-500/40 text-red-700 dark:text-red-300'
                 : 'border-border text-muted-foreground hover:bg-muted'

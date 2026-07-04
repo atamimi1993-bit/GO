@@ -18,10 +18,10 @@ export default function DriverRateConfirmation({ move, onConfirmed }) {
 
   const handleConfirm = async () => {
     setConfirming(true);
+    onConfirmed();
     try {
       await base44.entities.MoveRequest.update(move.id, { driver_rate_confirmed: true });
-      toast({ title: 'Rate confirmed!', description: 'You\'ve accepted the payout for this move.' });
-      onConfirmed();
+      toast({ title: 'Rate confirmed!' });
     } catch (err) {
       toast({ title: 'Could not confirm', description: err.message, variant: 'destructive' });
     }

@@ -17,10 +17,10 @@ export default function PriceConfirmation({ move, onConfirmed }) {
 
   const handleConfirm = async () => {
     setConfirming(true);
+    onConfirmed();
     try {
       await base44.entities.MoveRequest.update(move.id, { customer_price_confirmed: true });
-      toast({ title: 'Price approved!', description: 'You\'ve confirmed the final price for this move.' });
-      onConfirmed();
+      toast({ title: 'Price approved!' });
     } catch (err) {
       toast({ title: 'Could not confirm', description: err.message, variant: 'destructive' });
     }
