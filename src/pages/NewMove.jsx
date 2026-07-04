@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -6,13 +6,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { calculateMovePrice, recommendTruckSize, formatCurrency, COUNTRY_CONFIG } from '@/lib/pricing';
 import StepProgress from '@/components/go/move-steps/StepProgress';
-import CustomerInfoStep from '@/components/go/move-steps/CustomerInfoStep';
-import MoveDetailsStep from '@/components/go/move-steps/MoveDetailsStep';
-import InventoryStep from '@/components/go/move-steps/InventoryStep';
-import PhotoVideoStep from '@/components/go/move-steps/PhotoVideoStep';
-import TimingStep from '@/components/go/move-steps/TimingStep';
-import EstimateStep from '@/components/go/move-steps/EstimateStep';
-import ContractSign from '@/components/go/ContractSign';
+const CustomerInfoStep = lazy(() => import('@/components/go/move-steps/CustomerInfoStep'));
+const MoveDetailsStep = lazy(() => import('@/components/go/move-steps/MoveDetailsStep'));
+const InventoryStep = lazy(() => import('@/components/go/move-steps/InventoryStep'));
+const PhotoVideoStep = lazy(() => import('@/components/go/move-steps/PhotoVideoStep'));
+const TimingStep = lazy(() => import('@/components/go/move-steps/TimingStep'));
+const EstimateStep = lazy(() => import('@/components/go/move-steps/EstimateStep'));
+const ContractSign = lazy(() => import('@/components/go/ContractSign'));
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const STEPS = ['Info', 'Move', 'Items', 'Media', 'Timing', 'Quote', 'Sign'];
@@ -217,11 +217,12 @@ export default function NewMove() {
   return (
     <div className="max-w-2xl mx-auto">
       <div aria-live="polite" aria-atomic="true" className="sr-only">
-        {STEPS[step]} — Step {step + 1} of {STEPS.length}
+        Step {step + 1} of {STEPS.length}: {STEPS[step]}
       </div>
 
       <StepProgress steps={STEPS} currentStep={step} />
 
+      <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>}>
       {step === 0 && <CustomerInfoStep form={form} setForm={setForm} />}
 
       {step === 1 && (
@@ -292,6 +293,7 @@ export default function NewMove() {
           )}
         </div>
       )}
+      </Suspense>
 
       {/* Nav buttons */}
       <div className="flex justify-between mt-8">

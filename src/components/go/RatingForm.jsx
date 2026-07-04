@@ -58,7 +58,7 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
             type="button"
             role="radio"
             aria-checked={stars === n}
-            aria-label={`${n} star${n !== 1 ? 's' : ''}`}
+            aria-label={`${n} star${n !== 1 ? 's' : ''} - ${['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][n - 1]}`}
             onClick={() => setStars(n)}
             className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
@@ -69,6 +69,7 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
           </button>
         ))}
       </div>
+      <span className="sr-only" aria-live="polite">{stars > 0 ? `Selected: ${stars} stars` : 'No rating selected'}</span>
       <Textarea
         value={comment}
         onChange={(e) => setComment(e.target.value)}

@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import {
   ShieldCheck, DollarSign, Truck, Package, Users, CheckCircle2,
-  Loader2, UserCheck, UserX, Wallet, TrendingUp, AlertCircle,
+  Loader2, UserCheck, UserX, Wallet, TrendingUp, AlertCircle, MapPin,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -38,6 +38,7 @@ export default function Admin() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
+  const [showMap, setShowMap] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -127,9 +128,24 @@ export default function Admin() {
         </div>
 
         {/* Global operations map */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
-          <AdminWorldMap />
-        </Suspense>
+        <div className="bg-card border rounded-2xl p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin size={20} className="text-emerald-600" />
+            <h2 className="font-display font-bold text-lg">Global Operations Map</h2>
+          </div>
+          {!showMap ? (
+            <div className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">Load the map to view all active moves and driver locations (geocodes up to 30 addresses).</p>
+              <Button onClick={() => setShowMap(true)} variant="outline">
+                <MapPin size={16} className="mr-1" /> Load Map
+              </Button>
+            </div>
+          ) : (
+            <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+              <AdminWorldMap />
+            </Suspense>
+          )}
+        </div>
 
         {/* Move calendar */}
         <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>

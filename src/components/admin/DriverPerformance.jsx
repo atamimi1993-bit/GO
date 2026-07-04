@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Truck, DollarSign, TrendingUp, Loader2, Star } from 'lucide-react';
+
+const MAX_ROWS = 20;
 
 const fmt = (n) => `$${(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -10,6 +13,7 @@ export default function DriverPerformance() {
   const { toast } = useToast();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showAllDrivers, setShowAllDrivers] = useState(false);
 
   useEffect(() => {
     base44.functions.invoke('admin-dashboard', { action: 'driver_performance' })
@@ -35,6 +39,7 @@ export default function DriverPerformance() {
   if (!data) return null;
 
   const { drivers, totals } = data;
+  const visibleDrivers = showAllDrivers ? drivers : drivers.slice(0, MAX_ROWS);
 
   return (
     <div className="bg-card border rounded-2xl p-5 mb-6">
@@ -87,7 +92,7 @@ export default function DriverPerformance() {
                 </tr>
               </thead>
               <tbody role="rowgroup">
-                {drivers.map((d) => (
+                {visibleDrivers.map((d) => (
                   <tr role="row" key={d.id} className="border-b last:border-0 hover:bg-muted/30">
                     <td role="cell" className="py-3 pr-3">
                       <div className="flex items-center gap-2 min-w-0">
@@ -143,7 +148,7 @@ export default function DriverPerformance() {
 
           {/* Mobile card list view */}
           <div className="sm:hidden space-y-3">
-            {drivers.map((d) => (
+            {visibleDrivers.map((d) => (
               <div key={d.id} className="border rounded-xl p-4 space-y-3">
                 {/* Driver name + status */}
                 <div className="flex items-start justify-between gap-2">
@@ -209,6 +214,11 @@ export default function DriverPerformance() {
               </div>
             ))}
           </div>
+          {drivers.length > MAX_ROWS && !showAllDrivers && (
+            <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => setShowAllDrivers(true)}>
+              Show all {drivers.length} drivers
+            </Button>
+          )}
         </>
       )}
     </div>
