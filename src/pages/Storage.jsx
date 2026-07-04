@@ -13,12 +13,20 @@ export default function Storage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
-  const loadFacilities = async () => {
-    const facilities = await base44.entities.StorageFacility.list('-rating', 50);
-    setFacilities(facilities);
+  const loadFacilities = async (isRetry = false) => {
+    try {
+      const facilities = await base44.entities.StorageFacility.list('-rating', 50);
+      setFacilities(facilities);
+    } catch (err) {
+      if (String(err.message || '').includes('Rate limit') && !isRetry) {
+        await new Promise((r) => setTimeout(r, 2000));
+        return loadFacilities(true);
+      }
+      throw err;
+    }
   };
   useEffect(() => {
-    loadFacilities().finally(() => setLoading(false));
+    loadFacilities().catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const filtered = facilities.filter(f =>
