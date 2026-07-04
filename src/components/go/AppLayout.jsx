@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import BottomTabBar from '@/components/go/BottomTabBar';
 import OfflineBanner from '@/components/go/OfflineBanner';
 import NotificationCenter from '@/components/go/NotificationCenter';
+import TroubleshootWidget from '@/components/go/TroubleshootWidget';
 
 const navItems = [
   { label: 'Home', path: '/', icon: Home },
@@ -148,6 +149,7 @@ export default function AppLayout() {
       <div className="md:hidden">
         <BottomTabBar />
       </div>
+      <TroubleshootWidget />
     </div>
   );
 }
