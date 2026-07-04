@@ -9,12 +9,12 @@ import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail } fro
 import moment from 'moment';
 
 const STATUS_COLORS = {
-  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
   quoted: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  accepted: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300',
+  accepted: 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400',
   in_progress: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
   completed: 'bg-muted text-foreground',
-  cancelled: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
+  cancelled: 'bg-red-500/10 text-red-700 dark:text-red-300',
 };
 
 export default function MoveDetail() {
@@ -96,7 +96,7 @@ export default function MoveDetail() {
 
       {/* Assigned driver */}
       {move.assigned_driver_name && (
-        <div className="bg-emerald-50 dark:bg-emerald-950 border border-emerald-100 dark:border-emerald-900 rounded-2xl p-5 mb-4">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5 mb-4">
           <h3 className="font-display font-bold text-sm mb-2 text-emerald-800 dark:text-emerald-200">Assigned Driver</h3>
           <p className="font-medium">{move.assigned_driver_name}</p>
         </div>

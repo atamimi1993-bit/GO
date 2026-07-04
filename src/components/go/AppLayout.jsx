@@ -64,7 +64,7 @@ export default function AppLayout() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 pb-16 md:pb-0 overscroll-y-none">
+      <main className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-0 overscroll-y-none">
         <Outlet />
       </main>
       <div className="md:hidden">

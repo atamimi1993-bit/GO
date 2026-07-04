@@ -7,10 +7,10 @@ import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 const STATUS_COLORS = {
-  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
   processing: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300',
-  deducted: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
+  paid: 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400',
+  deducted: 'bg-red-500/10 text-red-700 dark:text-red-300',
 };
 
 export default function MyPayouts() {
@@ -46,9 +46,9 @@ export default function MyPayouts() {
       <h1 className="text-2xl font-display font-bold mb-1">Payouts</h1>
       <p className="text-muted-foreground text-sm mb-6">Track your earnings from completed jobs.</p>
 
-      <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-6 text-center">
-        <p className="text-sm text-emerald-700 mb-1">Total Earnings</p>
-        <p className="text-4xl font-display font-black text-emerald-700">${total.toFixed(2)}</p>
+      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 mb-6 text-center">
+        <p className="text-sm text-emerald-600 dark:text-emerald-400 mb-1">Total Earnings</p>
+        <p className="text-4xl font-display font-black text-emerald-600 dark:text-emerald-400">${total.toFixed(2)}</p>
       </div>
 
       {payouts.length === 0 ? (

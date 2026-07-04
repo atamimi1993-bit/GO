@@ -70,13 +70,13 @@ export default function ItemForm({ onAdd }) {
           />
         </div>
         <div className="flex items-end pb-2">
-          <div className="flex items-center gap-2">
+          <label className="min-h-[44px] flex items-center gap-2 cursor-pointer">
             <Checkbox
               checked={item.special_handling}
               onCheckedChange={v => setItem({ ...item, special_handling: v })}
             />
             <Label className="text-xs">Fragile / Special</Label>
-          </div>
+          </label>
         </div>
       </div>
       <Button type="submit" size="sm" className="bg-emerald-500 hover:bg-emerald-600">

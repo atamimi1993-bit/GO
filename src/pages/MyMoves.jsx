@@ -8,12 +8,12 @@ import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 const STATUS_COLORS = {
-  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
   quoted: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  accepted: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300',
+  accepted: 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400',
   in_progress: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
   completed: 'bg-muted text-foreground',
-  cancelled: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
+  cancelled: 'bg-red-500/10 text-red-700 dark:text-red-300',
 };
 
 export default function MyMoves() {

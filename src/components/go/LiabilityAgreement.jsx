@@ -9,7 +9,7 @@ export default function LiabilityAgreement({ onSign }) {
   return (
     <div className="bg-card border border-border rounded-2xl p-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
           <Shield className="text-amber-600 dark:text-amber-400" size={20} />
         </div>
         <h3 className="font-display font-bold text-lg">Liability Agreement</h3>
