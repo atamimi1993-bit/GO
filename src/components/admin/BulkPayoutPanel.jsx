@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import PullToRefresh from '@/components/go/PullToRefresh';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Wallet, Loader2, CheckCircle2, ChevronDown, ChevronUp, DollarSign,
@@ -131,12 +130,11 @@ export default function BulkPayoutPanel({ scrollRef }) {
     .reduce((s, p) => s + p.amount, 0);
 
   return (
-    <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
-      <div className="bg-card border rounded-2xl p-5 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Wallet size={20} className="text-amber-500" />
-          <h2 className="font-display font-bold text-lg">Bulk Payout Processing</h2>
-        </div>
+    <div className="bg-card border rounded-2xl p-5 mb-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Wallet size={20} className="text-amber-500" />
+        <h2 className="font-display font-bold text-lg">Bulk Payout Processing</h2>
+      </div>
 
         {/* Summary bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
@@ -185,6 +183,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
                 <button
                   type="button"
                   aria-label={`${expanded ? 'Collapse' : 'Expand'} payouts for ${group.driver_name}`}
+                  aria-expanded={expanded}
                   onClick={() => toggleExpand(driverId)}
                   className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors text-left focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 outline-none rounded-lg"
                 >
@@ -241,7 +240,6 @@ export default function BulkPayoutPanel({ scrollRef }) {
             );
           })}
         </div>
-      </div>
-    </PullToRefresh>
+    </div>
   );
 }

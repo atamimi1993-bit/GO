@@ -86,7 +86,7 @@ export default function LiveTrackingMap({ move }) {
           </div>
           <div aria-live="polite" className="sr-only">
             {latestPing
-              ? `Driver milestone: ${MILESTONE_LABELS[latestPing.milestone] || latestPing.milestone}. Last updated ${format(new Date(latestPing.created_date), 'MMM d, h:mm a')}.`
+              ? `Driver status: ${MILESTONE_LABELS[latestPing.milestone] || latestPing.milestone}. Coordinates: ${latestPing.lat.toFixed(4)}, ${latestPing.lng.toFixed(4)}. Last updated ${format(new Date(latestPing.created_date), 'MMM d, h:mm a')}.`
               : 'No driver location available yet.'}
           </div>
           <div className="px-5 py-3 flex items-center justify-between">
@@ -109,9 +109,14 @@ export default function LiveTrackingMap({ move }) {
           </div>
         </>
       ) : (
-        <div className="h-32 flex items-center justify-center text-sm text-muted-foreground">
-          Tracking will appear here once the driver starts the move.
-        </div>
+        <>
+          <div className="h-32 flex items-center justify-center text-sm text-muted-foreground">
+            Tracking will appear here once the driver starts the move.
+          </div>
+          <div aria-live="polite" className="sr-only">
+            No tracking data available yet. The driver has not started the move.
+          </div>
+        </>
       )}
 
       <div className="px-5 pb-4">

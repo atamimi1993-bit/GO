@@ -74,7 +74,7 @@ export default function DriverNavigationCard({ job }) {
       </div>
 
       {/* In-app map */}
-      <div className="h-64 w-full bg-muted">
+      <div className="h-64 w-full bg-muted" aria-label={`Pickup: ${pickup} to Dropoff: ${dropoff}`}>
         {geocoding ? (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
             <Loader2 className="animate-spin mb-2" size={24} />
