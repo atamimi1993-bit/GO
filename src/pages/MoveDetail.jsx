@@ -27,6 +27,7 @@ import TemperatureBadge, { SignatureBadge } from '@/components/go/TemperatureBad
 import { format, parseISO } from 'date-fns';
 
 const MoveTracker = lazy(() => import('@/components/go/MoveTracker'));
+const SimpleStatusTracker = lazy(() => import('@/components/go/SimpleStatusTracker'));
 const ProofOfDeliveryCapture = lazy(() => import('@/components/go/ProofOfDeliveryCapture'));
 
 const STATUS_COLORS = {
@@ -369,6 +370,13 @@ export default function MoveDetail() {
       {/* Assigned driver */}
       {move.assigned_driver_name && (
         <AssignedDriverCard move={move} />
+      )}
+
+      {/* Simplified status tracker — quick Loading / In Transit / Delivered view */}
+      {move.assigned_driver_id && ['accepted', 'in_progress', 'completed'].includes(move.status) && (
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <SimpleStatusTracker move={move} />
+        </Suspense>
       )}
 
       {/* Live Tracking */}
