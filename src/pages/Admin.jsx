@@ -26,6 +26,7 @@ const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApproval
 const InstantPayoutCard = lazy(() => import('@/components/admin/InstantPayoutCard'));
 const TaxReportPanel = lazy(() => import('@/components/admin/TaxReportPanel'));
 const BackgroundCheckPanel = lazy(() => import('@/components/admin/BackgroundCheckPanel'));
+const DamageClaimsPanel = lazy(() => import('@/components/admin/DamageClaimsPanel'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 import { Button } from '@/components/ui/button';
@@ -313,6 +314,11 @@ export default function Admin() {
         {/* Bulk payout processing */}
         <Suspense fallback={<SectionSkeleton />}>
           <BulkPayoutPanel scrollRef={scrollRef} />
+        </Suspense>
+
+        {/* Damage claims management */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <DamageClaimsPanel />
         </Suspense>
 
         {/* AI Lead Finder */}
