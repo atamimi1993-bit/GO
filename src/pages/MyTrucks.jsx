@@ -152,11 +152,11 @@ export default function MyTrucks() {
                     {form[doc.field] ? (
                       <span className="text-emerald-600 text-sm">✓ Uploaded</span>
                     ) : (
-                      <label className="cursor-pointer">
+                      <label className="cursor-pointer" htmlFor={`upload-${doc.field}`} aria-label={`Upload ${doc.label.toLowerCase()}`}>
                         <Button variant="outline" size="sm" asChild disabled={uploading[doc.field]}>
                           <span>{uploading[doc.field] ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} className="mr-1" />}Upload</span>
                         </Button>
-                        <input type="file" className="hidden" onChange={e => handleUpload(doc.field, e)} />
+                        <input id={`upload-${doc.field}`} type="file" className="hidden" onChange={e => handleUpload(doc.field, e)} />
                       </label>
                     )}
                   </div>

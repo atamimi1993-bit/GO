@@ -15,8 +15,10 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   const pullDistanceRef = useRef(0);
   const refreshingRef = useRef(false);
   const disabledRef = useRef(disabled);
+  const onRefreshRef = useRef(onRefresh);
 
   useEffect(() => { disabledRef.current = disabled; }, [disabled]);
+  useEffect(() => { onRefreshRef.current = onRefresh; }, [onRefresh]);
 
   const isAtTop = () => {
     if (scrollRef && scrollRef.current) {
@@ -53,7 +55,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
       setPullDistance(THRESHOLD);
       pullDistanceRef.current = THRESHOLD;
       try {
-        await onRefresh();
+        await onRefreshRef.current();
       } finally {
         refreshingRef.current = false;
         setRefreshing(false);

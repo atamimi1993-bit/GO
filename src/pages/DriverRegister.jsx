@@ -61,11 +61,11 @@ export default function DriverRegister() {
         {form[field] ? (
           <span className="text-emerald-600 text-sm font-medium">✓ Uploaded</span>
         ) : (
-          <label className="cursor-pointer">
+          <label className="cursor-pointer" htmlFor={`upload-${field}`} aria-label={`Upload ${label.toLowerCase()}`}>
             <Button variant="outline" size="sm" disabled={uploading[field]} asChild>
               <span>{uploading[field] ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} className="mr-1" />}{uploading[field] ? 'Uploading...' : 'Upload'}</span>
             </Button>
-            <input type="file" accept={accept || '.pdf,.jpg,.png'} className="hidden" onChange={e => handleUpload(field, e)} />
+            <input id={`upload-${field}`} type="file" accept={accept || '.pdf,.jpg,.png'} className="hidden" onChange={e => handleUpload(field, e)} />
           </label>
         )}
       </div>

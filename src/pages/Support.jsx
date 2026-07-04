@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import MessageBubble from '@/components/go/MessageBubble';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Send, Plus, MessageSquare, Loader2, Bot } from 'lucide-react';
+import { ArrowLeft, Send, Plus, MessageSquare, Loader2, Bot, ChevronLeft } from 'lucide-react';
 
 const AGENT_NAME = 'go_support';
 
@@ -17,6 +17,7 @@ export default function Support() {
   const [loadingList, setLoadingList] = useState(true);
   const [sending, setSending] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [mobileView, setMobileView] = useState('list');
   const chatEndRef = useRef(null);
   const listRef = useRef(null);
 
@@ -53,6 +54,7 @@ export default function Support() {
       });
       setConversations(prev => [conv, ...(prev || [])]);
       setActiveId(conv.id);
+      setMobileView('chat');
       setMessages(conv.messages || []);
     } catch { /* ignore */ }
     setCreating(false);
@@ -60,7 +62,13 @@ export default function Support() {
 
   const handleSelect = (conv) => {
     setActiveId(conv.id);
+    setMobileView('chat');
     setMessages(conv.messages || []);
+  };
+
+  const handleBackToList = () => {
+    setMobileView('list');
+    setActiveId(null);
   };
 
   const handleSend = async () => {
@@ -77,6 +85,7 @@ export default function Support() {
         });
         setConversations(prev => [conv, ...(prev || [])]);
         setActiveId(conv.id);
+        setMobileView('chat');
         await base44.agents.addMessage(conv, { role: 'user', content: text });
       } catch { setInput(text); }
       setCreating(false);
@@ -107,7 +116,7 @@ export default function Support() {
 
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Conversation list */}
-        <div ref={listRef} className="hidden sm:block w-56 shrink-0 overflow-y-auto border-r border-border pr-2 space-y-1">
+        <div ref={listRef} className={`${mobileView === 'list' ? 'flex' : 'hidden'} sm:flex w-full sm:w-56 shrink-0 overflow-y-auto border-r border-border pr-2 space-y-1 flex-col`}>
           <Button variant="outline" size="sm" className="w-full mb-2" onClick={handleNewChat} disabled={creating}>
             {creating ? <Loader2 size={14} className="animate-spin mr-1" /> : <Plus size={14} className="mr-1" />} New Chat
           </Button>
@@ -130,7 +139,7 @@ export default function Support() {
         </div>
 
         {/* Chat area */}
-        <div className="flex-1 flex flex-col min-h-0 bg-card border rounded-2xl overflow-hidden">
+        <div className={`${mobileView === 'chat' ? 'flex' : 'hidden'} sm:flex flex-1 flex-col min-h-0 bg-card border rounded-2xl overflow-hidden`}>
           {!activeId ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
               <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-4">
@@ -144,6 +153,11 @@ export default function Support() {
             </div>
           ) : (
             <>
+              <div className="sm:hidden flex items-center gap-2 px-3 py-2 border-b border-border">
+                <button onClick={handleBackToList} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px]">
+                  <ChevronLeft size={18} /> Conversations
+                </button>
+              </div>
               <div className="flex-1 overflow-y-auto px-4 py-4">
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
