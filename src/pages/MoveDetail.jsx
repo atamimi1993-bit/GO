@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star } from 'lucide-react';
+import RatingForm from '@/components/go/RatingForm';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO } from 'date-fns';
 
@@ -20,6 +21,52 @@ const STATUS_COLORS = {
   completed: 'bg-muted text-foreground',
   cancelled: 'bg-red-500/10 text-red-700 dark:text-red-300',
 };
+
+function RatingSection({ move }) {
+  const [existingRating, setExistingRating] = useState(null);
+  const [checked, setChecked] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const u = await base44.auth.me();
+        setCurrentUser(u);
+        const existing = await base44.entities.Rating.filter({ move_request_id: move.id, direction: 'customer_to_driver', rater_id: u.id });
+        if (existing.length > 0) setExistingRating(existing[0]);
+      } catch {}
+      setChecked(true);
+    })();
+  }, [move.id]);
+
+  if (!checked || !currentUser) return null;
+  if (existingRating) {
+    return (
+      <div className="bg-card border rounded-2xl p-5 mt-4">
+        <h3 className="font-display font-bold text-sm mb-2">Your Rating</h3>
+        <div className="flex items-center gap-1 mb-1">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <Star key={n} size={16} className={n <= (existingRating.stars || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'} />
+          ))}
+        </div>
+        {existingRating.comment && <p className="text-sm text-muted-foreground select-text">"{existingRating.comment}"</p>}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-4">
+      <RatingForm
+        move={move}
+        direction="customer_to_driver"
+        raterId={currentUser.id}
+        raterName={move.customer_name || currentUser.full_name || currentUser.email}
+        rateeId={move.assigned_driver_id}
+        rateeName={move.assigned_driver_name || 'Driver'}
+        onSubmitted={() => { setExistingRating({ stars: 5 }); window.location.reload(); }}
+      />
+    </div>
+  );
+}
 
 export default function MoveDetail() {
   const { id } = useParams();
@@ -180,6 +227,11 @@ export default function MoveDetail() {
           <h3 className="font-display font-bold text-sm mb-1">Notes</h3>
           <p className="text-sm text-muted-foreground select-text">{move.notes}</p>
         </div>
+      )}
+
+      {/* Customer rates driver on completed moves */}
+      {move.status === 'completed' && move.assigned_driver_id && (
+        <RatingSection move={move} />
       )}
     </div>
     </PullToRefresh>

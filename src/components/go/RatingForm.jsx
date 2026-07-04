@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Star, Loader2 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { useToast } from '@/components/ui/use-toast';
+
+export default function RatingForm({ move, direction, raterId, raterName, rateeId, rateeName, onSubmitted }) {
+  const [stars, setStars] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const label = direction === 'customer_to_driver' ? 'Rate the Driver' : 'Rate the Customer';
+
+  const handleSubmit = async () => {
+    if (stars === 0) {
+      toast({ title: 'Select a rating', description: 'Please tap a star to rate.', variant: 'destructive' });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await base44.entities.Rating.create({
+        move_request_id: move.id,
+        direction,
+        rater_id: raterId,
+        rater_name: raterName,
+        ratee_id: rateeId,
+        ratee_name: rateeName,
+        stars,
+        comment: comment.trim(),
+      });
+      toast({ title: 'Rating submitted!', description: `Thank you for rating ${rateeName}.` });
+      onSubmitted?.();
+    } catch {
+      toast({ title: 'Error', description: 'Could not submit rating.', variant: 'destructive' });
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="bg-card border rounded-2xl p-5">
+      <h4 className="font-display font-bold text-sm mb-1">{label}</h4>
+      <p className="text-xs text-muted-foreground mb-3">
+        {move.pickup_address} → {move.dropoff_address}
+      </p>
+      <div className="flex items-center gap-1 mb-4">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setStars(n)}
+            onMouseEnter={() => setHover(n)}
+            onMouseLeave={() => setHover(0)}
+            className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label={`Rate ${n} stars`}
+          >
+            <Star
+              size={28}
+              className={(hover || stars) >= n ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}
+            />
+          </button>
+        ))}
+      </div>
+      <Textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Leave a comment (optional)..."
+        className="mb-3 min-h-[80px]"
+      />
+      <Button onClick={handleSubmit} disabled={submitting} className="w-full bg-emerald-500 hover:bg-emerald-600">
+        {submitting ? <Loader2 size={16} className="animate-spin mr-1" /> : <Star size={16} className="mr-1" />}
+        Submit Rating
+      </Button>
+    </div>
+  );
+}

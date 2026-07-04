@@ -1,0 +1,42 @@
+{
+  "name": "Rating",
+  "type": "object",
+  "properties": {
+    "move_request_id": {
+      "type": "string"
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "customer_to_driver",
+        "driver_to_customer"
+      ],
+      "default": "customer_to_driver"
+    },
+    "rater_id": {
+      "type": "string"
+    },
+    "rater_name": {
+      "type": "string"
+    },
+    "ratee_id": {
+      "type": "string"
+    },
+    "ratee_name": {
+      "type": "string"
+    },
+    "stars": {
+      "type": "number",
+      "default": 5
+    },
+    "comment": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "move_request_id",
+    "direction",
+    "rater_id",
+    "stars"
+  ]
+}

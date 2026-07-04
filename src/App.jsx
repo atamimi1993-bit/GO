@@ -33,6 +33,7 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const Support = lazy(() => import('@/pages/Support'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const FreightDashboard = lazy(() => import('@/pages/FreightDashboard'));
+const Revenue = lazy(() => import('@/pages/Revenue'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -101,6 +102,7 @@ const AuthenticatedApp = () => {
           <Route path="/support" element={<PageTransition><Support /></PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
           <Route path="/freight-dashboard" element={<PageTransition><FreightDashboard /></PageTransition>} />
+          <Route path="/revenue" element={<PageTransition><Revenue /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
         </Route>
       </Route>
