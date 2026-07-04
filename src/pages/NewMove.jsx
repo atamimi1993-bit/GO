@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useBlocker } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -38,13 +38,33 @@ export default function NewMove() {
   const [items, setItems] = useState([]);
   const [media, setMedia] = useState([]);
   const [mediaAnalysis, setMediaAnalysis] = useState(null);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
   const totalWeight = items.reduce((sum, item) => sum + (item.weight_lbs * item.quantity), 0);
 
   const hasData = form.pickup_address || form.customer_name || items.length > 0 || media.length > 0;
-  const blocker = useBlocker(({ currentLocation, nextLocation }) =>
-    hasData && step > 0 && currentLocation.pathname !== nextLocation.pathname
-  );
+
+  useEffect(() => {
+    if (!hasData) return;
+    const handler = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [hasData]);
+
+  const handleBack = useCallback(() => {
+    if (step === 0) {
+      if (hasData) {
+        setShowLeaveDialog(true);
+      } else {
+        navigate('/');
+      }
+    } else {
+      setStep(step - 1);
+    }
+  }, [step, hasData, navigate]);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -270,7 +290,7 @@ export default function NewMove() {
 
       {/* Nav buttons */}
       <div className="flex justify-between mt-8">
-        <Button variant="ghost" onClick={() => step === 0 ? navigate('/') : setStep(step - 1)}>
+        <Button variant="ghost" onClick={handleBack}>
           <ArrowLeft size={16} className="mr-1" /> Back
         </Button>
         {step < 5 && (
@@ -284,16 +304,16 @@ export default function NewMove() {
         )}
       </div>
 
-      {blocker.state === 'blocked' && (
-        <AlertDialog open onOpenChange={() => blocker.reset()}>
+      {showLeaveDialog && (
+        <AlertDialog open onOpenChange={() => setShowLeaveDialog(false)}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Leave without saving?</AlertDialogTitle>
               <AlertDialogDescription>Your move details will be lost if you leave now.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => blocker.reset()}>Stay</AlertDialogCancel>
-              <AlertDialogAction onClick={() => blocker.proceed()}>Leave</AlertDialogAction>
+              <AlertDialogCancel onClick={() => setShowLeaveDialog(false)}>Stay</AlertDialogCancel>
+              <AlertDialogAction onClick={() => navigate('/')}>Leave</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
