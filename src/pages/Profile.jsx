@@ -11,6 +11,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import StripeConnectCard from '@/components/go/StripeConnectCard';
 import LoyaltyCard from '@/components/go/LoyaltyCard';
 import ReferralCard from '@/components/go/ReferralCard';
+import DriverProfileDashboard from '@/components/go/DriverProfileDashboard';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ export default function Profile() {
         </AlertDialog>
       </div>
 
+      <DriverProfileDashboard />
       <LoyaltyCard />
       <ReferralCard />
       <StripeConnectCard />
