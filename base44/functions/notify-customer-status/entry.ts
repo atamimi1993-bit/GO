@@ -67,6 +67,17 @@ Deno.serve(async (req) => {
       return Response.json({ skipped: true, reason: `No notification template for status: ${move.status}` });
     }
 
+    // Dedup: skip if we already notified this customer for this exact status on this move
+    const notifLink = move.id ? `/move/${move.id}` : null;
+    const existing = await base44.asServiceRole.entities.AppNotification.filter({
+      user_email: move.customer_email,
+      link: notifLink,
+      title: info.headline,
+    }).catch(() => []);
+    if (existing.length > 0) {
+      return Response.json({ skipped: true, reason: 'Duplicate — customer already notified for this status' });
+    }
+
     const moveDate = move.move_date
       ? new Date(move.move_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
       : null;
@@ -135,6 +146,22 @@ Deno.serve(async (req) => {
         });
       } catch (certErr) {
         console.error('Failed to send insurance certificate:', certErr.message);
+        // Flag for admin visibility instead of silent failure
+        try {
+          const admins = await base44.asServiceRole.entities.User.filter({ role: 'admin' }).catch(() => []);
+          for (const admin of admins) {
+            await base44.asServiceRole.entities.AppNotification.create({
+              user_email: admin.email,
+              title: 'Insurance certificate failed to send',
+              body: `Move ${move.id} (${move.pickup_address} → ${move.dropoff_address}) was accepted but the insurance certificate email failed: ${certErr.message}`,
+              type: 'alert',
+              read: false,
+              link: notifLink,
+            });
+          }
+        } catch (flagErr) {
+          console.error('Failed to flag insurance cert failure:', flagErr.message);
+        }
       }
     }
 
