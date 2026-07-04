@@ -1,0 +1,58 @@
+{
+  "name": "Abandoned Booking Follow-up",
+  "description": "Sends a follow-up email when a move request stays in 'pending' status for 24 hours",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "MoveRequest",
+      "events": [
+        "create",
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"pending\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "abandoned_booking",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "wait_24_hours": {
+          "wait": "PT24H",
+          "then": "send_followup",
+          "x-base44": {
+            "title": "Wait 24 hours",
+            "description": "Give user time to complete"
+          }
+        }
+      },
+      {
+        "send_followup": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "send-lifecycle-email",
+            "args": {
+              "sequence_type": "abandoned_booking",
+              "user_email": "${ .trigger.data.customer_email }",
+              "user_name": "${ .trigger.data.customer_name }",
+              "move_data": {
+                "pickup_address": "${ .trigger.data.pickup_address }",
+                "dropoff_address": "${ .trigger.data.dropoff_address }",
+                "move_date": "${ .trigger.data.move_date }"
+              }
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send follow-up",
+            "description": "Remind about booking"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Welcome Email on First Booking",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "MoveRequest"
+    }
+  },
+  "description": "Sends a welcome email when a user creates their first move request",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "welcome_first_booking",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "send_welcome": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "send-lifecycle-email",
+            "args": {
+              "sequence_type": "welcome",
+              "user_email": "${ .trigger.data.customer_email }",
+              "user_name": "${ .trigger.data.customer_name }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send welcome email",
+            "description": "Welcome new user"
+          }
+        }
+      }
+    ]
+  }
+}

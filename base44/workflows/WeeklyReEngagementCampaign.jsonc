@@ -1,0 +1,47 @@
+{
+  "name": "Weekly Re-engagement Campaign",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 10 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Sends re-engagement emails to users who haven't booked in 90 days, runs weekly on Mondays at 10am",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_re_engagement",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "send_reengagement": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "send-lifecycle-email",
+            "args": {
+              "sequence_type": "re_engagement"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send re-engagement emails",
+            "description": "Weekly to inactive users"
+          }
+        }
+      }
+    ]
+  }
+}

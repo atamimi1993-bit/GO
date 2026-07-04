@@ -31,6 +31,7 @@ const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 const DriverRecruiter = lazy(() => import('@/components/admin/DriverRecruiter'));
 const LeadContactAssistant = lazy(() => import('@/components/admin/LeadContactAssistant'));
+const DriverCoach = lazy(() => import('@/components/admin/DriverCoach'));
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -301,6 +302,11 @@ export default function Admin() {
         {/* AI Driver Recruiter — finds platforms, generates job postings & outreach */}
         <Suspense fallback={<SectionSkeleton />}>
           <DriverRecruiter />
+        </Suspense>
+
+        {/* AI Driver Performance Coach — analyzes metrics, sends coaching tips */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <DriverCoach />
         </Suspense>
 
         {/* Pending vehicle listing approvals */}

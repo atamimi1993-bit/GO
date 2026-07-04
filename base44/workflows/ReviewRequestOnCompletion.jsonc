@@ -1,0 +1,56 @@
+{
+  "name": "Review Request on Move Completion",
+  "description": "Sends a review request email 2 hours after a move is completed",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "MoveRequest",
+      "events": [
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"completed\" and .trigger.old_data.status != \"completed\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "review_request",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "wait_2_hours": {
+          "wait": "PT2H",
+          "then": "send_review",
+          "x-base44": {
+            "title": "Wait 2 hours",
+            "description": "Let customer settle"
+          }
+        }
+      },
+      {
+        "send_review": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "send-lifecycle-email",
+            "args": {
+              "sequence_type": "review_request",
+              "user_email": "${ .trigger.data.customer_email }",
+              "user_name": "${ .trigger.data.customer_name }",
+              "move_data": {
+                "pickup_address": "${ .trigger.data.pickup_address }",
+                "dropoff_address": "${ .trigger.data.dropoff_address }"
+              }
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send review request",
+            "description": "Ask for rating"
+          }
+        }
+      }
+    ]
+  }
+}

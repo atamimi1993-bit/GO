@@ -14,6 +14,7 @@ const HomeStats = lazy(() => import('@/components/go/HomeStats'));
 const CustomerQuickActions = lazy(() => import('@/components/go/CustomerQuickActions'));
 const Testimonials = lazy(() => import('@/components/go/Testimonials'));
 const DriverRecruitmentBanner = lazy(() => import('@/components/go/DriverRecruitmentBanner'));
+const CustomerChatWidget = lazy(() => import('@/components/go/CustomerChatWidget'));
 
 const LazyFallback = () => <div className="animate-pulse bg-muted rounded-2xl h-32 w-full" />;
 
@@ -197,6 +198,7 @@ export default function Home() {
         </p>
       </footer>
     </div>
+      <CustomerChatWidget />
     </PullToRefresh>
   );
 }
