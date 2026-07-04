@@ -20,6 +20,7 @@ const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Home = lazy(() => import('@/pages/Home'));
 const NewMove = lazy(() => import('@/pages/NewMove'));
 const MyMoves = lazy(() => import('@/pages/MyMoves'));
+const TrackingHub = lazy(() => import('@/pages/TrackingHub'));
 const MoveDetail = lazy(() => import('@/pages/MoveDetail'));
 const DriverHub = lazy(() => import('@/pages/DriverHub'));
 const DriverRegister = lazy(() => import('@/pages/DriverRegister'));
@@ -88,6 +89,7 @@ const AuthenticatedApp = () => {
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
           <Route path="/my-moves" element={<PageTransition><MyMoves /></PageTransition>} />
+          <Route path="/tracking" element={<PageTransition><TrackingHub /></PageTransition>} />
           <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
           <Route path="/driver-hub" element={<PageTransition><DriverHub /></PageTransition>} />
           <Route path="/driver-register" element={<PageTransition><DriverRegister /></PageTransition>} />
