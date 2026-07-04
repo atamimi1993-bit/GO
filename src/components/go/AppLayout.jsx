@@ -47,8 +47,8 @@ export default function AppLayout() {
           </nav>
 
           <div className="flex md:hidden items-center gap-2">
-            <Link to="/profile">
-              <Button variant="ghost" size="icon">
+            <Link to="/profile" aria-label="My Account">
+              <Button variant="ghost" size="icon" aria-label="My Account">
                 <User size={20} />
               </Button>
             </Link>

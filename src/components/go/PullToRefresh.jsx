@@ -9,10 +9,9 @@ export default function PullToRefresh({ onRefresh, children }) {
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
-  const containerRef = useRef(null);
 
   const handleTouchStart = (e) => {
-    if (containerRef.current?.scrollTop <= 0 && !refreshing) {
+    if ((window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) <= 0 && !refreshing) {
       startY.current = e.touches[0].clientY;
       setPulling(true);
     }
@@ -45,7 +44,6 @@ export default function PullToRefresh({ onRefresh, children }) {
 
   return (
     <div
-      ref={containerRef}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

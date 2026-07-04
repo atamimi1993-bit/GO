@@ -59,6 +59,10 @@ export default function MyTrucks() {
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!form.make || !form.model || !form.license_plate) return;
+    const optimisticTruck = { ...form, id: 'optimistic-' + Date.now(), driver_profile_id: driverProfile.id, year: Number(form.year), capacity_lbs: Number(form.capacity_lbs), mpg: Number(form.mpg), verified: false };
+    setTrucks(prev => [...prev, optimisticTruck]);
+    setOpen(false);
+    setForm({ make: '', model: '', year: '', size_category: 'medium', capacity_lbs: '', license_plate: '', fuel_type: 'gasoline', mpg: '', company_name: '', registration_doc_url: '', inspection_doc_url: '', insurance_doc_url: '', photo_url: '' });
     setSaving(true);
     try {
       const truck = await base44.entities.Truck.create({
@@ -68,11 +72,10 @@ export default function MyTrucks() {
         capacity_lbs: Number(form.capacity_lbs),
         mpg: Number(form.mpg),
       });
-      setTrucks([...trucks, truck]);
-      setOpen(false);
-      setForm({ make: '', model: '', year: '', size_category: 'medium', capacity_lbs: '', license_plate: '', fuel_type: 'gasoline', mpg: '', company_name: '', registration_doc_url: '', inspection_doc_url: '', insurance_doc_url: '', photo_url: '' });
+      setTrucks(prev => prev.map(t => t.id === optimisticTruck.id ? truck : t));
       toast({ title: 'Truck added!' });
     } catch {
+      setTrucks(prev => prev.filter(t => t.id !== optimisticTruck.id));
       toast({ title: 'Error', variant: 'destructive' });
     }
     setSaving(false);
