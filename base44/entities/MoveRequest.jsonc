@@ -160,6 +160,18 @@
       "type": "number",
       "default": 0
     },
+    "extra_helper": {
+      "type": "boolean",
+      "default": false
+    },
+    "elevator_service": {
+      "type": "boolean",
+      "default": false
+    },
+    "extra_service_fee": {
+      "type": "number",
+      "default": 0
+    },
     "assigned_driver_id": {
       "type": "string"
     },

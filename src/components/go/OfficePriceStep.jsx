@@ -22,6 +22,8 @@ export default function OfficePriceStep({ move, items, totalWeight, bulkyCount, 
     dropoffSteps: move.dropoff_steps || 0,
     pickupDistanceFromStreet: pickupDistance,
     dropoffDistanceFromStreet: move.dropoff_distance_from_street || 0,
+    extraHelper: move.extra_helper,
+    elevatorService: move.elevator_service,
   });
 
   const originalPrice = move.total_price || 0;
@@ -34,6 +36,7 @@ export default function OfficePriceStep({ move, items, totalWeight, bulkyCount, 
     ...(pricing.bulkyItemFee ? [{ label: `Bulky items (${bulkyCount})`, value: pricing.bulkyItemFee }] : []),
     ...(pricing.materialsFee ? [{ label: 'Packing materials', value: pricing.materialsFee }] : []),
     ...(pricing.carryingFee ? [{ label: 'Carrying (steps + distance)', value: pricing.carryingFee }] : []),
+    ...(pricing.extraServiceFee ? [{ label: `Extra services${pricing.extraHelper ? ' (helper)' : ''}${pricing.elevatorService ? ' (elevator)' : ''}`, value: pricing.extraServiceFee }] : []),
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
     { label: 'GO fee (25%)', value: pricing.appFee },
   ];

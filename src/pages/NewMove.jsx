@@ -38,6 +38,7 @@ export default function NewMove() {
     pickup_steps: 0, dropoff_steps: 0,
     pickup_distance_from_street: 0, dropoff_distance_from_street: 0,
     materials_fee: 0,
+    extra_helper: false, elevator_service: false,
   });
   const [items, setItems] = useState([]);
   const [media, setMedia] = useState([]);
@@ -107,6 +108,8 @@ export default function NewMove() {
         dropoffSteps: form.dropoff_steps,
         pickupDistanceFromStreet: form.pickup_distance_from_street,
         dropoffDistanceFromStreet: form.dropoff_distance_from_street,
+        extraHelper: form.extra_helper,
+        elevatorService: form.elevator_service,
       })
     : null;
 
@@ -189,6 +192,9 @@ export default function NewMove() {
         bulky_item_fee: pricing.bulkyItemFee,
         materials_fee: pricing.materialsFee,
         carrying_fee: pricing.carryingFee,
+        extra_helper: form.extra_helper || false,
+        elevator_service: form.elevator_service || false,
+        extra_service_fee: pricing.extraServiceFee,
         pickup_steps: form.pickup_steps || 0,
         dropoff_steps: form.dropoff_steps || 0,
         pickup_distance_from_street: form.pickup_distance_from_street || 0,

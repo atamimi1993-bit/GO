@@ -196,6 +196,7 @@ export default function MoveDetail() {
     taxAmount: move.tax_amount, appFee: move.app_fee, driverFee: move.driver_fee,
     totalPrice: move.total_price, driverPayout: move.driver_payout,
     bulkyItemFee: move.bulky_item_fee, materialsFee: move.materials_fee, carryingFee: move.carrying_fee,
+    extraServiceFee: move.extra_service_fee, extraHelper: move.extra_helper, elevatorService: move.elevator_service,
     tolls: move.tolls,
     currency: curr,
     displayDistance: (move.distance_miles || 0) * 2,

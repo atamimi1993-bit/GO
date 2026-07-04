@@ -2,8 +2,8 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import MobileSelect from '@/components/go/MobileSelect';
-import { MapPin, Ruler, Loader2, Sparkles, Footprints } from 'lucide-react';
-import { COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES } from '@/lib/pricing';
+import { MapPin, Ruler, Loader2, Sparkles, Footprints, UserPlus, ArrowUpDown } from 'lucide-react';
+import { COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE } from '@/lib/pricing';
 
 const JOB_TYPES = [
   { value: 'residential', label: 'Residential Move' },
@@ -185,6 +185,51 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange }) 
               />
               <p className="text-xs text-muted-foreground mt-1">How far is the door from where the truck parks?</p>
             </div>
+          </div>
+
+          {/* Extra service add-ons */}
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Sparkles size={16} /> Extra Services (optional)
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, extra_helper: !form.extra_helper })}
+              aria-label="Toggle extra helper"
+              aria-pressed={form.extra_helper}
+              className={`w-full flex items-center gap-3 rounded-xl border p-3 text-left transition-colors ${form.extra_helper ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:bg-muted'}`}
+            >
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${form.extra_helper ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-muted text-muted-foreground'}`}>
+                <UserPlus size={18} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Extra Helper</p>
+                <p className="text-xs text-muted-foreground">Add an additional mover to speed up your job</p>
+              </div>
+              <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 shrink-0">+${EXTRA_HELPER_FEE}</span>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${form.extra_helper ? 'border-emerald-500' : 'border-muted-foreground/30'}`}>
+                {form.extra_helper && <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />}
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, elevator_service: !form.elevator_service })}
+              aria-label="Toggle elevator service"
+              aria-pressed={form.elevator_service}
+              className={`w-full flex items-center gap-3 rounded-xl border p-3 text-left transition-colors ${form.elevator_service ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:bg-muted'}`}
+            >
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${form.elevator_service ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-muted text-muted-foreground'}`}>
+                <ArrowUpDown size={18} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Elevator / Lift Service</p>
+                <p className="text-xs text-muted-foreground">For buildings requiring elevator reservation or freight lift</p>
+              </div>
+              <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 shrink-0">+${ELEVATOR_SERVICE_FEE}</span>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${form.elevator_service ? 'border-emerald-500' : 'border-muted-foreground/30'}`}>
+                {form.elevator_service && <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />}
+              </div>
+            </button>
           </div>
         </div>
 

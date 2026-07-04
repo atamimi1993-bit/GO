@@ -19,6 +19,7 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
     ...(pricing.bulkyItemFee ? [{ label: 'Bulky item surcharge', value: pricing.bulkyItemFee }] : []),
     ...(pricing.materialsFee ? [{ label: 'Packing materials', value: pricing.materialsFee }] : []),
     ...(pricing.carryingFee ? [{ label: 'Carrying surcharge (steps + distance)', value: pricing.carryingFee }] : []),
+    ...(pricing.extraServiceFee ? [{ label: `Extra services${pricing.extraHelper ? ' (helper)' : ''}${pricing.elevatorService ? ' (elevator)' : ''}`, value: pricing.extraServiceFee }] : []),
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
     ...(showInternalCosts ? [{ label: 'GO App Fee (25%)', value: pricing.appFee }] : []),
   ];

@@ -153,6 +153,10 @@ const BULKY_WEIGHT_THRESHOLD = 75;
 const FEE_PER_STEP = 3;          // $3 per step (pickup + dropoff combined)
 const FEE_PER_50FT = 1;          // $1 per 50ft of distance from street to door
 
+// Extra service add-ons — flat fees the customer can toggle
+const EXTRA_HELPER_FEE = 50;     // additional mover for the job
+const ELEVATOR_SERVICE_FEE = 30; // buildings requiring elevator reservation
+
 // Driver payout rates based on truck size + job type
 // GO covers gas and miles; driver earns a rate for their labor + equipment
 const DRIVER_RATES = {
@@ -178,7 +182,7 @@ const DRIVER_RATES = {
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
-export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0 }) {
+export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType, tolls, bulkyItemCount = 0, materialsFee = 0, pickupSteps = 0, dropoffSteps = 0, pickupDistanceFromStreet = 0, dropoffDistanceFromStreet = 0, extraHelper = false, elevatorService = false }) {
   const truck = TRUCK_CONFIG[truckSize] || TRUCK_CONFIG.medium;
 
   // Convert metric inputs to imperial for internal calculation
@@ -218,8 +222,11 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const totalDistanceFromStreet = (Number(pickupDistanceFromStreet) || 0) + (Number(dropoffDistanceFromStreet) || 0);
   const carryingFee = (totalSteps * FEE_PER_STEP) + (Math.floor(totalDistanceFromStreet / 50) * FEE_PER_50FT);
 
+  // Extra service add-ons — customer-selected optional services
+  const extraServiceFee = (extraHelper ? EXTRA_HELPER_FEE : 0) + (elevatorService ? ELEVATOR_SERVICE_FEE : 0);
+
   // Operational subtotal = everything it costs to do the job
-  const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost + bulkyItemFee + materialsFeeCost + carryingFee;
+  const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost + bulkyItemFee + materialsFeeCost + carryingFee + extraServiceFee;
 
   // GO platform fee — 25% of the FULL operational cost (base + fuel + driver labor + tolls)
   const appFee = operationalSubtotal * APP_FEE_RATE;
@@ -253,6 +260,9 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
     bulkyItemFee: convert(bulkyItemFee),
     materialsFee: convert(materialsFeeCost),
     carryingFee: convert(carryingFee),
+    extraServiceFee: convert(extraServiceFee),
+    extraHelper: extraHelper,
+    elevatorService: elevatorService,
     taxRate,
     taxAmount: convert(taxAmount),
     appFee: convert(appFee),
@@ -313,4 +323,4 @@ const US_STATES = [
   { code: 'WV', name: 'West Virginia' }, { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' },
 ];
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE };
