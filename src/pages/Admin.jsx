@@ -17,6 +17,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
 import SectionSkeleton from '@/components/admin/SectionSkeleton';
+import HighValueMoveBadge, { isHighValueMove } from '@/components/admin/HighValueMoveBadge';
 const MarketingPanel = lazy(() => import('@/components/admin/MarketingPanel'));
 const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'));
 const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
@@ -351,22 +352,29 @@ export default function Admin() {
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Recent moves */}
           <div className="bg-card border rounded-2xl p-5">
-            <h2 className="font-display font-bold text-lg mb-4">Recent Moves</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-bold text-lg">Recent Moves</h2>
+              <span className="text-xs text-muted-foreground">High-value moves highlighted in orange</span>
+            </div>
             <div className="space-y-2">
               {recentMoves.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-6">No moves yet.</p>
-              ) : recentMoves.map((m) => (
-                <div key={m.id} className="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-muted/50">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{m.pickup_address} → {m.dropoff_address}</p>
-                    <p className="text-xs text-muted-foreground">{m.customer_name || 'Unknown'} · {format(parseISO(m.move_date), 'MMM d, yyyy')}</p>
+              ) : recentMoves.map((m) => {
+                const highValue = isHighValueMove(m);
+                return (
+                  <div key={m.id} className={`flex items-center justify-between gap-2 p-2 rounded-lg border ${highValue ? 'bg-orange-500/5 border-orange-500/30 ring-1 ring-orange-500/20' : 'border-transparent hover:bg-muted/50'}`}>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{m.pickup_address} → {m.dropoff_address}</p>
+                      <p className="text-xs text-muted-foreground">{m.customer_name || 'Unknown'} · {format(parseISO(m.move_date), 'MMM d, yyyy')}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {highValue && <HighValueMoveBadge move={m} />}
+                      <span className={`text-sm font-semibold ${highValue ? 'text-orange-600 dark:text-orange-400' : ''}`}>{fmt(m.total_price)}</span>
+                      <Badge className={STATUS_COLORS[m.status]}>{m.status?.replace('_', ' ')}</Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-sm font-semibold">{fmt(m.total_price)}</span>
-                    <Badge className={STATUS_COLORS[m.status]}>{m.status?.replace('_', ' ')}</Badge>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
