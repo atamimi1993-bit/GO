@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
+import { sanitizeString } from "@/lib/sanitize";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,8 +24,27 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    // Rate limit check
     try {
-      await base44.auth.loginViaEmailPassword(email, password);
+      const rateCheck = await base44.functions.invoke('check-rate-limit', {
+        form_name: 'login',
+        identifier: email,
+      });
+      if (!rateCheck.data?.allowed) {
+        setError(`Too many attempts. Please try again in ${rateCheck.data?.windowMinutes || 15} minutes.`);
+        setLoading(false);
+        return;
+      }
+    } catch {
+      // Fail open — don't block on rate limit errors
+    }
+
+    // Sanitize email
+    const cleanEmail = sanitizeString(email);
+
+    try {
+      await base44.auth.loginViaEmailPassword(cleanEmail, password);
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Invalid email or password");

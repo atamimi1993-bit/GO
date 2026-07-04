@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { calculateMovePrice, recommendTruckSize, formatCurrency, COUNTRY_CONFIG, BULKY_WEIGHT_THRESHOLD } from '@/lib/pricing';
+import { sanitizeObject, DEFAULT_SKIP_KEYS } from '@/lib/sanitize';
 import StepProgress from '@/components/go/move-steps/StepProgress';
 const CustomerInfoStep = lazy(() => import('@/components/go/move-steps/CustomerInfoStep'));
 const MoveDetailsStep = lazy(() => import('@/components/go/move-steps/MoveDetailsStep'));
@@ -195,8 +196,24 @@ export default function NewMove() {
 
   const handleSign = async (contractRecord) => {
     setSaving(true);
+
+    // Rate limit check
     try {
-      const moveData = {
+      const rateCheck = await base44.functions.invoke('check-rate-limit', {
+        form_name: 'new_move',
+        identifier: form.customer_email,
+      });
+      if (!rateCheck.data?.allowed) {
+        toast({ title: 'Too many requests', description: `Please wait ${rateCheck.data?.windowMinutes || 30} minutes before trying again.`, variant: 'destructive' });
+        setSaving(false);
+        return;
+      }
+    } catch {
+      // Fail open
+    }
+
+    try {
+      const moveData = sanitizeObject({
         customer_name: form.customer_name,
         customer_email: form.customer_email,
         customer_phone: form.customer_phone,
@@ -243,7 +260,7 @@ export default function NewMove() {
         liability_signed_date: new Date().toISOString(),
         referral_code: form.referral_code || undefined,
         status: 'pending',
-      };
+      }, DEFAULT_SKIP_KEYS);
       navigate('/my-moves', { state: { optimisticMove: { ...moveData, _optimistic: true } } });
       const move = await base44.entities.MoveRequest.create(moveData);
       if (items.length > 0) {

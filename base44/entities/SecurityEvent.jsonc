@@ -1,0 +1,68 @@
+{
+  "name": "SecurityEvent",
+  "type": "object",
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "rate_limit_exceeded",
+        "failed_login",
+        "suspicious_input",
+        "unauthorized_access",
+        "blocked_request"
+      ],
+      "default": "rate_limit_exceeded"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "endpoint": {
+      "type": "string"
+    },
+    "form_name": {
+      "type": "string"
+    },
+    "details": {
+      "type": "string"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "resolved": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "event_type",
+    "ip_address"
+  ],
+  "rls": {
+    "create": null,
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

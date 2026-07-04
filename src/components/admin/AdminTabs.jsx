@@ -1,5 +1,5 @@
 import React, { useState, Suspense, lazy } from 'react';
-import { LayoutDashboard, Map, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Map, DollarSign, Users, TrendingUp, Shield } from 'lucide-react';
 import SectionSkeleton from '@/components/admin/SectionSkeleton';
 import OverviewTab from '@/components/admin/tabs/OverviewTab';
 import OperationsTab from '@/components/admin/tabs/OperationsTab';
@@ -7,6 +7,7 @@ import OperationsTab from '@/components/admin/tabs/OperationsTab';
 const FinancialTab = lazy(() => import('@/components/admin/tabs/FinancialTab'));
 const DriversLeadsTab = lazy(() => import('@/components/admin/tabs/DriversLeadsTab'));
 const GrowthMarketingTab = lazy(() => import('@/components/admin/tabs/GrowthMarketingTab'));
+const SecurityPanel = lazy(() => import('@/components/admin/SecurityPanel'));
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -14,6 +15,7 @@ const TABS = [
   { id: 'financial', label: 'Financial', icon: DollarSign },
   { id: 'drivers', label: 'Drivers & Leads', icon: Users },
   { id: 'growth', label: 'Growth', icon: TrendingUp },
+  { id: 'security', label: 'Security', icon: Shield },
 ];
 
 export default function AdminTabs({ data, isFetching, processingId, onDriverAction, onUpdateLeadStatus, onRefresh, scrollRef }) {
@@ -75,6 +77,11 @@ export default function AdminTabs({ data, isFetching, processingId, onDriverActi
         {activeTab === 'growth' && (
           <Suspense fallback={<SectionSkeleton />}>
             <GrowthMarketingTab {...tabProps} />
+          </Suspense>
+        )}
+        {activeTab === 'security' && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <SecurityPanel />
           </Suspense>
         )}
       </div>
