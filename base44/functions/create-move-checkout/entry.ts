@@ -10,9 +10,9 @@ const ZERO_DECIMAL_CURRENCIES = [
 
 // Installment plan rate table — APR % (longer terms = higher rates, lower credit = higher rates)
 const INSTALLMENT_RATES = {
-  excellent: { 3: 5.99, 6: 6.99, 12: 8.99, 24: 10.99, 36: 13.99, 48: 16.99 },
-  good:      { 3: 9.99, 6: 11.99, 12: 14.99, 24: 17.99, 36: 21.99, 48: 25.99 },
-  fair:      { 3: 14.99, 6: 17.99, 12: 21.99, 24: 25.99, 36: 28.99, 48: 31.99 },
+  excellent: { 3: 0.00, 6: 1.99, 12: 3.99, 24: 5.99, 36: 6.99, 48: 8.00 },
+  good:      { 3: 3.99, 6: 5.99, 12: 7.99, 24: 9.99, 36: 11.99, 48: 14.00 },
+  fair:      { 3: 8.99, 6: 10.99, 12: 12.99, 24: 15.99, 36: 18.99, 48: 22.00 },
 };
 
 function getInstallmentAPR(termMonths, creditTier) {
