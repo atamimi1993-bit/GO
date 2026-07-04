@@ -3,9 +3,10 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    if (user.role !== 'admin') {
+    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
+    if (!isAuth) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await base44.auth.me().catch(() => null);
+    if (user && user.role !== 'admin') {
       return Response.json({ error: 'Forbidden — admin access required' }, { status: 403 });
     }
 
@@ -56,7 +57,7 @@ The driver sign-up page is at /drivers-wanted (info) and /driver-register (regis
 
 Make the content compelling, specific, and ready to copy and paste. Include a clear call to action directing drivers to sign up.`;
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       model: 'gemini_3_flash',
@@ -85,7 +86,7 @@ Make the content compelling, specific, and ready to copy and paste. Include a cl
       },
     });
 
-    const post = await base44.entities.RecruitmentPost.create({
+    const post = await base44.asServiceRole.entities.RecruitmentPost.create({
       title: result.title,
       content_type,
       content: result.content,

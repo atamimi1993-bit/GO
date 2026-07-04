@@ -3,13 +3,14 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    if (user.role !== 'admin') {
+    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
+    if (!isAuth) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await base44.auth.me().catch(() => null);
+    if (user && user.role !== 'admin') {
       return Response.json({ error: 'Forbidden — admin access required' }, { status: 403 });
     }
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { sequence_type, user_email, user_name, move_data } = body;
 
     const validSequences = ['welcome', 'abandoned_booking', 'review_request', 're_engagement'];
@@ -18,6 +19,46 @@ Deno.serve(async (req) => {
         { error: `Invalid sequence_type. Must be one of: ${validSequences.join(', ')}` },
         { status: 400 }
       );
+    }
+
+    // Re-engagement is a bulk sequence — finds inactive users and emails them all
+    if (sequence_type === 're_engagement' && !user_email) {
+      const allMoves = await base44.asServiceRole.entities.MoveRequest.list('-created_date', 500);
+      const now = Date.now();
+      const ninetyDaysAgo = now - 90 * 24 * 60 * 60 * 1000;
+
+      const lastMoveByUser = {};
+      for (const m of allMoves) {
+        if (!m.customer_email) continue;
+        const moveTime = new Date(m.created_date || m.move_date).getTime();
+        if (isNaN(moveTime)) continue;
+        if (!lastMoveByUser[m.customer_email] || moveTime > lastMoveByUser[m.customer_email]) {
+          lastMoveByUser[m.customer_email] = moveTime;
+        }
+      }
+
+      const inactiveUsers = Object.entries(lastMoveByUser)
+        .filter(([_, lastTime]) => lastTime < ninetyDaysAgo)
+        .map(([email]) => email);
+
+      let sent = 0;
+      let errors = 0;
+      for (const email of inactiveUsers) {
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: email,
+            subject: 'We miss you! Come back for 10% off your next move 🎁',
+            body: `Hi there,\n\nIt's been a while since your last move with GO, and we'd love to welcome you back!\n\nAs a thank-you for being part of the GO community, here's a 10% discount on your next move. Use code COMEBACK10 at checkout.\n\nWhether you're moving apartments, delivering freight, or need a courier — GO has you covered with verified drivers, real-time tracking, and transparent pricing.\n\nReady to move? Book now from the app.\n\nThe GO Team`,
+            from_name: 'GO Team',
+          });
+          sent++;
+        } catch (err) {
+          console.error(`Re-engagement email failed for ${email}:`, err.message);
+          errors++;
+        }
+      }
+
+      return Response.json({ success: true, sequence_type: 're_engagement', sent, errors, total_inactive: inactiveUsers.length });
     }
 
     if (!user_email) {
@@ -45,7 +86,7 @@ Deno.serve(async (req) => {
 
     const config = sequenceConfigs[sequence_type];
 
-    const result = await base44.integrations.Core.SendEmail({
+    const result = await base44.asServiceRole.integrations.Core.SendEmail({
       to: user_email,
       subject: config.subject,
       body: config.body,

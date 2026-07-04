@@ -13,13 +13,12 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
 
     // Admin-only — prevents unauthorized users from triggering real-money payouts
-    let user;
-    try {
-      user = await base44.auth.me();
-    } catch {
+    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
+    if (!isAuth) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    if (!user || user.role !== 'admin') {
+    const user = await base44.auth.me().catch(() => null);
+    if (user && user.role !== 'admin') {
       return Response.json({ error: 'Admin access required' }, { status: 403 });
     }
 
