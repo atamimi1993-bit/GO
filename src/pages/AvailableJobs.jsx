@@ -7,14 +7,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
-
-const CDL_RATE = 0.15;
-const STANDARD_RATE = 0.05;
-
-function calculatePayout(job, driverProfile) {
-  const rate = driverProfile?.has_cdl ? CDL_RATE : STANDARD_RATE;
-  return Number((job.total_price || 0) * rate);
-}
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function AvailableJobs() {
@@ -46,21 +38,19 @@ export default function AvailableJobs() {
     // Optimistic removal
     setJobs(prev => prev.filter(j => j.id !== job.id));
     try {
-      const payout = calculatePayout(job, driverProfile);
       await base44.entities.MoveRequest.update(job.id, {
         status: 'accepted',
         assigned_driver_id: driverProfile.id,
         assigned_driver_name: driverProfile.full_name,
-        driver_payout: payout,
       });
       await base44.entities.DriverPayout.create({
         driver_profile_id: driverProfile.id,
         move_request_id: job.id,
-        amount: payout,
+        amount: job.driver_payout,
         currency: job.currency || 'USD',
         status: 'pending',
       });
-      toast({ title: 'Job accepted!', description: driverProfile.has_cdl ? `CDL rate applied — you'll earn ${formatCurrency(payout, job.currency)}.` : "You've been assigned to this move." });
+      toast({ title: 'Job accepted!', description: "You've been assigned to this move." });
     } catch {
       // Restore job on failure
       setJobs(prev => [job, ...prev]);
@@ -94,9 +84,6 @@ export default function AvailableJobs() {
                   <div className="flex items-center gap-2">
                     <DollarSign size={18} className="text-emerald-600" />
                     <span className="font-display font-bold text-lg text-emerald-600">{formatCurrency(job.driver_payout, job.currency)} payout</span>
-                  {driverProfile?.has_cdl && (
-                    <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px]">CDL: 15%</Badge>
-                  )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     <Calendar size={12} className="inline mr-1" />

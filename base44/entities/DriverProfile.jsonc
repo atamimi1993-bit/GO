@@ -59,10 +59,6 @@
     },
     "company_name": {
       "type": "string"
-    },
-    "has_cdl": {
-      "type": "boolean",
-      "default": false
     }
   },
   "required": [
