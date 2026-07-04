@@ -161,6 +161,14 @@
     "discounted_total": {
       "type": "number",
       "default": 0
+    },
+    "driver_rate_confirmed": {
+      "type": "boolean",
+      "default": false
+    },
+    "customer_price_confirmed": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

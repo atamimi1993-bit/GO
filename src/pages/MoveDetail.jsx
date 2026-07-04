@@ -10,6 +10,7 @@ import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, Cred
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import PromoCodeInput from '@/components/go/PromoCodeInput';
+import PriceConfirmation from '@/components/go/PriceConfirmation';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO } from 'date-fns';
 
@@ -237,6 +238,11 @@ export default function MoveDetail() {
 
       {/* Price */}
       <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} currencyCode={currencyCode} />
+
+      {/* Price confirmation — both parties must confirm after driver acceptance */}
+      {move.status === 'accepted' && (
+        <PriceConfirmation move={move} onConfirmed={load} />
+      )}
 
       {!move.paid && move.status !== 'cancelled' && (
         <>
