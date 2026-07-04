@@ -53,11 +53,21 @@ export default function Admin() {
 
   const handleDriverAction = async (driverId, action) => {
     setProcessingId(driverId);
+    const prevPendingDrivers = data?.pendingDrivers || [];
+    // Optimistically remove the driver from the pending list
+    if (data?.pendingDrivers) {
+      setData((prev) => ({
+        ...prev,
+        pendingDrivers: prev.pendingDrivers.filter((d) => d.id !== driverId),
+      }));
+    }
     try {
       await base44.functions.invoke('admin-dashboard', { action, driver_id: driverId });
       toast({ title: action === 'approve_driver' ? 'Driver approved' : 'Driver rejected' });
       await load();
     } catch (err) {
+      // Restore the original pending drivers list on error
+      setData((prev) => ({ ...prev, pendingDrivers: prevPendingDrivers }));
       toast({ title: 'Action failed', description: err.message, variant: 'destructive' });
     } finally {
       setProcessingId(null);

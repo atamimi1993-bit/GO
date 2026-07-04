@@ -20,7 +20,9 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
       return;
     }
     setSubmitting(true);
+    let optimisticCalled = false;
     onSubmitted?.({ stars, comment: comment.trim(), _optimistic: true });
+    optimisticCalled = true;
     try {
       await base44.entities.Rating.create({
         move_request_id: move.id,
@@ -35,7 +37,7 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
       toast({ title: 'Rating submitted!', description: `Thank you for rating ${rateeName}.` });
     } catch {
       toast({ title: 'Error', description: 'Could not submit rating. Please try again.', variant: 'destructive' });
-      onError?.();
+      if (optimisticCalled) onError?.();
     }
     setSubmitting(false);
   };

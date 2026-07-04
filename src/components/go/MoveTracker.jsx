@@ -64,7 +64,9 @@ export default function MoveTracker({ moveId }) {
       </div>
 
       <div aria-live="polite" aria-atomic="false" className="sr-only">
-        {latestPing && `Driver milestone: ${MILESTONES.find(m => m.key === latestPing.milestone)?.label || latestPing.milestone}`}
+        {latestPing
+          ? `Driver milestone: ${MILESTONES.find(m => m.key === latestPing.milestone)?.label || latestPing.milestone}. Driver coordinates: ${latestPing.lat.toFixed(2)}, ${latestPing.lng.toFixed(2)}. Last updated ${format(new Date(latestPing.created_date), 'MMM d, h:mm a')}.`
+          : 'No driver location available yet.'}
       </div>
 
       {latestPing && latestPing.lat ? (

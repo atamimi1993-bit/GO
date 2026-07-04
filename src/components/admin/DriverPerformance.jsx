@@ -72,22 +72,22 @@ export default function DriverPerformance() {
         <p className="text-sm text-muted-foreground text-center py-6">No drivers yet.</p>
       ) : (
         <div className="overflow-x-auto -mx-2 px-2">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs text-muted-foreground border-b">
-                <th className="pb-2 pr-3 font-medium">Driver</th>
-                <th className="pb-2 pr-3 font-medium text-right">Active</th>
-                <th className="pb-2 pr-3 font-medium text-right">Completed</th>
-                <th className="pb-2 pr-3 font-medium text-right">Total Jobs</th>
-                <th className="pb-2 pr-3 font-medium text-right">Earnings</th>
-                <th className="pb-2 pr-3 font-medium text-right">Pending</th>
-                <th className="pb-2 font-medium text-right">Status</th>
+          <table role="table" className="w-full text-sm">
+            <thead role="rowgroup">
+              <tr role="row" className="text-left text-xs text-muted-foreground border-b">
+                <th role="columnheader" className="pb-2 pr-3 font-medium">Driver</th>
+                <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Active</th>
+                <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Completed</th>
+                <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Total Jobs</th>
+                <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Earnings</th>
+                <th role="columnheader" className="pb-2 pr-3 font-medium text-right">Pending</th>
+                <th role="columnheader" className="pb-2 font-medium text-right">Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody role="rowgroup">
               {drivers.map((d) => (
-                <tr key={d.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="py-3 pr-3">
+                <tr role="row" key={d.id} className="border-b last:border-0 hover:bg-muted/30">
+                  <td role="cell" className="py-3 pr-3">
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
                         <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -108,18 +108,18 @@ export default function DriverPerformance() {
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 pr-3 text-right">
+                  <td role="cell" className="py-3 pr-3 text-right">
                     {d.active_jobs > 0 ? (
                       <span className="font-semibold text-purple-600 dark:text-purple-400">{d.active_jobs}</span>
                     ) : (
                       <span className="text-muted-foreground">0</span>
                     )}
                   </td>
-                  <td className="py-3 pr-3 text-right text-muted-foreground">{d.completed_jobs}</td>
-                  <td className="py-3 pr-3 text-right font-medium">{d.total_jobs}</td>
-                  <td className="py-3 pr-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">{fmt(d.total_earnings)}</td>
-                  <td className="py-3 pr-3 text-right text-amber-600 dark:text-amber-400">{fmt(d.pending_payouts)}</td>
-                  <td className="py-3 text-right">
+                  <td role="cell" className="py-3 pr-3 text-right text-muted-foreground">{d.completed_jobs}</td>
+                  <td role="cell" className="py-3 pr-3 text-right font-medium">{d.total_jobs}</td>
+                  <td role="cell" className="py-3 pr-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">{fmt(d.total_earnings)}</td>
+                  <td role="cell" className="py-3 pr-3 text-right text-amber-600 dark:text-amber-400">{fmt(d.pending_payouts)}</td>
+                  <td role="cell" className="py-3 text-right">
                     <Badge
                       variant="secondary"
                       className={

@@ -68,7 +68,8 @@ function RatingSection({ move }) {
         raterName={move.customer_name || currentUser.full_name || currentUser.email}
         rateeId={move.assigned_driver_id}
         rateeName={move.assigned_driver_name || 'Driver'}
-        onSubmitted={() => { setExistingRating({ stars: 5 }); window.location.reload(); }}
+        onSubmitted={() => setExistingRating({ stars: 5 })}
+        onError={() => setExistingRating(null)}
       />
     </div>
   );

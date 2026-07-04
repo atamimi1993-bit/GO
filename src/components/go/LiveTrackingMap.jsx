@@ -84,6 +84,11 @@ export default function LiveTrackingMap({ move }) {
               </CircleMarker>
             </MapContainer>
           </div>
+          <div aria-live="polite" className="sr-only">
+            {latestPing
+              ? `Driver milestone: ${MILESTONE_LABELS[latestPing.milestone] || latestPing.milestone}. Last updated ${format(new Date(latestPing.created_date), 'MMM d, h:mm a')}.`
+              : 'No driver location available yet.'}
+          </div>
           <div className="px-5 py-3 flex items-center justify-between">
             <div className="min-w-0">
               <p className="text-sm font-medium truncate">

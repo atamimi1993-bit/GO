@@ -95,6 +95,21 @@ export default function ExpenseSubmission({ driverProfile }) {
       return;
     }
     setSubmitting(true);
+    const tempId = `optimistic_${Date.now()}`;
+    const optimisticEntry = {
+      id: tempId,
+      driver_profile_id: driverProfile.id,
+      driver_name: driverProfile.full_name,
+      expense_type: form.expense_type,
+      amount: parseFloat(form.amount),
+      receipt_photo_url: form.use_estimate ? '' : photoUrl,
+      description: form.description,
+      move_request_id: form.move_request_id || undefined,
+      use_estimate: form.use_estimate,
+      status: form.use_estimate ? 'estimated' : 'pending',
+      _optimistic: true,
+    };
+    setReceipts((prev) => [optimisticEntry, ...prev]);
     try {
       await base44.entities.ExpenseReceipt.create({
         driver_profile_id: driverProfile.id,
@@ -113,6 +128,7 @@ export default function ExpenseSubmission({ driverProfile }) {
       setShowForm(false);
       load();
     } catch (err) {
+      setReceipts((prev) => prev.filter((r) => r.id !== tempId));
       toast({ title: 'Submission failed', description: err.message, variant: 'destructive' });
     }
     setSubmitting(false);
