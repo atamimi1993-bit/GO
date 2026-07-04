@@ -253,14 +253,16 @@ Deno.serve(async (req) => {
           let appFeePortion;
           const ratio = chargeAmount / (move.total_price || chargeAmount);
           if (move.app_fee && move.app_fee > 0) {
-            // Platform keeps: app_fee + materials_fee + tax_amount (all proportional to payment)
+            // Platform keeps: app_fee (net profit) + materials_fee + tax_amount + booking_fee
+            //   + reserve_contribution + processing_fee (platform costs, not driver revenue)
             // Driver receives: driver_payout + fuel + tolls (passthrough hard costs)
             // Tax is collected by platform for remittance, NOT split as driver revenue
             // Materials fee is 100% platform profit (upsell, not split with driver)
+            // Booking fee, reserve pool, and processing are 100% platform
             appFeePortion = (move.app_fee + (move.materials_fee || 0) + (move.tax_amount || 0)) * ratio;
           } else {
-            // Fallback: platform keeps 25% of service portion + 100% of tax/materials
-            appFeePortion = (chargeAmount * 0.25) + ((move.tax_amount || 0) + (move.materials_fee || 0)) * ratio;
+            // Fallback: platform keeps 35% of service portion + 100% of tax/materials
+            appFeePortion = (chargeAmount * 0.35) + ((move.tax_amount || 0) + (move.materials_fee || 0)) * ratio;
           }
           // Insurance is 100% platform profit — added as separate line item, not proportional
           if (hasInsurance) {

@@ -32,6 +32,7 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
     ...(pricing.extraServiceFee ? [{ label: `Extra services${pricing.extraHelper ? ' (helper)' : ''}${pricing.elevatorService ? ' (elevator)' : ''}`, value: pricing.extraServiceFee }] : []),
     ...(pricing.surgeMultiplier > 1 ? [{ label: `Dynamic pricing (${surgeLabel}, ×${pricing.surgeMultiplier})`, value: pricing.surgeAdjustedSubtotal - pricing.operationalSubtotal }] : []),
     ...(pricing.loyaltyDiscount ? [{ label: 'Loyalty discount (returning customer)', value: -pricing.loyaltyDiscount, highlight: true }] : []),
+    ...(pricing.bookingFee ? [{ label: 'Booking fee', value: pricing.bookingFee }] : []),
     { label: 'Subtotal (pre-tax)', value: pricing.totalPrice - pricing.taxAmount, bold: true },
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
   ];
@@ -73,7 +74,13 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
       {showInternalCosts && (
         <div className="bg-emerald-500/10 rounded-lg p-3 text-sm text-emerald-600 dark:text-emerald-400 space-y-1">
           <div>Driver payout ({pricing.driverPayoutPercent || (pricing.totalPrice > 0 ? Math.round((pricing.driverPayout / pricing.totalPrice) * 100) : 0)}%): <span className="font-bold">{fmt(pricing.driverPayout)}</span></div>
-          <div className="text-xs text-muted-foreground">Platform fee ({pricing.platformTakePercent || (pricing.totalPrice > 0 ? Math.round((pricing.appFee / pricing.totalPrice) * 100) : 0)}%): {fmt(pricing.appFee)}</div>
+          <div className="text-xs text-muted-foreground">Platform gross (35%): {fmt(pricing.platformFeeGross || pricing.appFee)}</div>
+          <div className="text-xs text-muted-foreground">↳ Reserve pool (4%): {fmt(pricing.reserveContribution || 0)}</div>
+          <div className="text-xs text-muted-foreground">↳ Card processing: {fmt(pricing.processingFee || 0)}</div>
+          <div className="text-xs text-muted-foreground font-medium">Net platform profit: {fmt(pricing.netPlatformProfit || pricing.appFee)}</div>
+          {pricing.reconciles === false && (
+            <div className="text-xs text-destructive font-medium">⚠ Split reconciliation failed</div>
+          )}
         </div>
       )}
       {(() => {

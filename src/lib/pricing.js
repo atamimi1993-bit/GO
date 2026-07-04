@@ -140,32 +140,47 @@ const COUNTRY_LIST = Object.entries(COUNTRY_CONFIG)
   .map(([code, cfg]) => ({ code, name: cfg.name }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-// ─── Three-Way Revenue Split ──────────────────────────────────────────────────
-// Priority: Owner → Company → Drivers → Customers
-//
-// Traditional movers charge 40-60% overhead (fleet, staff, brick-and-mortar).
-// GO doesn't carry that overhead, so we can: price below market, pay drivers
-// above market, and still take 25% from the efficiency gap.
+// ─── Revenue Split Model ──────────────────────────────────────────────────────
+// Core rules:
+//   1. driver_payout is a PROTECTED FLOOR — never reduced by fees, refunds,
+//      disputes, tax, or promos. No exceptions, no per-job surprises.
+//   2. Costs (processing fees, refunds, disputes) are absorbed by a POOLED
+//      RESERVE inside platform_fee — spread across ALL jobs, never deducted
+//      from one unlucky driver's payout.
+//   3. Sales tax is calculated separately, charged to the customer, and passed
+//      straight through to the state. It is never part of driver_payout or
+//      platform_fee.
 //
 //   job_value (service value) = base + labor + distance + fees + surge
-//   driver_payout  = job_value × 0.75   (PROTECTED FLOOR — never reduced by discounts)
-//   platform_fee   = job_value × 0.25   (target — absorbs customer discount from its share)
-//   customer_price = market_rate × 0.90  (10% below what competitors charge)
+//   driver_payout  = job_value × 0.65   (PROTECTED FLOOR — never reduced by anything)
+//   platform_fee   = job_value × 0.35   (gross — absorbs reserve pool + processing + discounts)
+//   customer_price = job_value × 0.88   (12% below market — platform absorbs discount)
 //
-// Reconciliation rule: if customer_price < driver_payout + platform_fee,
-// the shortfall comes from platform_fee, NEVER from driver_payout.
-// This guarantees drivers always earn 75%+ regardless of discounts/promos.
+// From platform_fee, the following are deducted (NEVER from driver_payout):
+//   - reserve_contribution: 4% of job_value → shared pool for refunds/disputes
+//   - processing_fee: 2.9% + $0.30 per transaction
+//   - customer discount shortfall (when customer_price < job_value)
 
-const APP_FEE_RATE = 0.25;        // Platform target share of service value
-const DRIVER_SHARE = 0.75;       // Driver protected floor share of service value
-const PLATFORM_SHARE = 0.25;    // Platform target share of service value
+const APP_FEE_RATE = 0.35;        // Platform target share of service value
+const DRIVER_SHARE = 0.65;       // Driver protected floor share of service value
+const PLATFORM_SHARE = 0.35;    // Platform target share of service value
+
+// Reserve pool — shared across ALL jobs for refunds/disputes
+// Comes OUT of platform_fee, never from driver_payout
+const RESERVE_POOL_PCT = 0.04;   // 4% of job_value set aside into shared reserve pool
+
+// Card processing (Stripe rates)
+const CARD_PROCESSING_PCT = 0.029;   // 2.9%
+const CARD_PROCESSING_FLAT = 0.30;   // + $0.30 per transaction
+
+// Booking fee — flat, goes to platform (added to customer total, NOT part of split)
+const BOOKING_FEE = 3.50;
 
 // Market rate — traditional competitors charge ~45% above GO's service cost
-// due to fleet overhead, full-time dispatch staff, and brick-and-mortar offices
 const MARKET_RATE_MULTIPLIER = 1.45;
 
-// Customer discount below market rate (10% — wins customers without killing margin)
-const CUSTOMER_DISCOUNT_RATE = 0.10;
+// Customer discount below market rate (12% — wins customers without killing margin)
+const CUSTOMER_DISCOUNT_RATE = 0.12;
 
 // Platform minimum — GO always earns at least this per job, even after discounts
 const PLATFORM_MINIMUM_FEE = 20;
@@ -196,17 +211,17 @@ const LABOR_RATES = {
 const LONG_CARRY_THRESHOLD_FT = 75;
 const LONG_CARRY_FEE_PER_50FT = 2;
 
-// Minimum job fee — floor on operational cost to cover dispatch overhead
-const MINIMUM_JOB_FEE = 150;
+// Minimum job value — floor on service value to protect both driver and platform
+const MINIMUM_JOB_FEE = 75;
 
 // Loyalty discount — returning customer markdown (5% off adjusted subtotal)
 const LOYALTY_DISCOUNT_RATE = 0.05;
 
-// Same-day surcharge (within 1.2–1.5× range)
-const SAME_DAY_MULTIPLIER = 1.35;
+// Same-day surcharge
+const SAME_DAY_MULTIPLIER = 1.30;
 
-// Peak day surcharge — last weekend of month (within 1.15–1.3× range)
-const PEAK_DAY_MULTIPLIER = 1.25;
+// Peak day surcharge — last weekend of month
+const PEAK_DAY_MULTIPLIER = 1.20;
 
 // Insurance tiers — damage protection upsell (pure profit for GO)
 const INSURANCE_TIERS = {
@@ -279,25 +294,40 @@ export function calculateCourierPrice({ distanceMiles, deliveryCategory = 'other
   // Hard costs (passthrough)
   const hardCosts = fuelCost + tollCost;
 
-  // Service value (split 75/25) — base + category handling fee
+  // Service value (split 65/35) — base + category handling fee
   const serviceValue = baseCost + categoryFee;
 
-  // Three-way split
+  // Three-way split — driver_payout is a PROTECTED FLOOR
   const splitDriverPayout = serviceValue * DRIVER_SHARE;
   const driverPayout = Math.max(splitDriverPayout, baseDriverPayout);
 
-  // Market rate and customer discount
+  // Platform costs — come OUT of platform_fee, NEVER from driver_payout
+  const reserveContribution = serviceValue * RESERVE_POOL_PCT;
+  const processingFee = serviceValue * CARD_PROCESSING_PCT + CARD_PROCESSING_FLAT;
+  const totalPlatformCosts = reserveContribution + processingFee;
+
+  // Market rate and customer discount (12% below market)
   const marketServiceRate = serviceValue * MARKET_RATE_MULTIPLIER;
   const customerServicePrice = serviceValue * (1 - CUSTOMER_DISCOUNT_RATE);
-  let platformFee = customerServicePrice - driverPayout;
-  if (platformFee < PLATFORM_MINIMUM_FEE) platformFee = PLATFORM_MINIMUM_FEE;
+  let platformFeeGross = serviceValue * PLATFORM_SHARE;
+  // Net platform profit after reserve + processing
+  let netPlatformProfit = platformFeeGross - totalPlatformCosts;
+  // Platform minimum floor
+  if (netPlatformProfit < PLATFORM_MINIMUM_FEE) netPlatformProfit = PLATFORM_MINIMUM_FEE;
+  let platformFee = netPlatformProfit;
 
-  const customerPricePreTax = customerServicePrice + hardCosts;
+  // Booking fee — flat, goes to platform, NOT part of the split
+  const bookingFee = BOOKING_FEE;
+
+  const customerPricePreTax = customerServicePrice + hardCosts + bookingFee;
 
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
   const taxAmount = customerPricePreTax * taxRate;
   const totalPrice = customerPricePreTax + taxAmount;
+
+  // Reconciliation check — driver + platform should equal job value
+  const reconciles = Math.round((driverPayout + platformFeeGross) * 100) / 100 === Math.round(serviceValue * 100) / 100;
 
   const marketRateTotal = (marketServiceRate + hardCosts) * (1 + taxRate);
   const customerSavings = marketRateTotal - totalPrice;
@@ -317,6 +347,14 @@ export function calculateCourierPrice({ distanceMiles, deliveryCategory = 'other
     tollCost: convert(tollCost),
     appFee: convert(platformFee),
     goProfit: convert(platformFee),
+    platformFeeGross: convert(platformFeeGross),
+    reserveContribution: convert(reserveContribution),
+    processingFee: convert(processingFee),
+    totalPlatformCosts: convert(totalPlatformCosts),
+    netPlatformProfit: convert(netPlatformProfit),
+    netProfitPct: serviceValue > 0 ? Math.round((netPlatformProfit / serviceValue) * 100) / 100 : 0,
+    bookingFee: convert(bookingFee),
+    reconciles,
     taxRate,
     taxAmount: convert(taxAmount),
     totalPrice: convert(totalPrice),
@@ -416,31 +454,43 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const finalServiceValue = minimumJobApplied ? MINIMUM_JOB_FEE : preFloorServiceValue;
 
   // ─── THREE-WAY SPLIT ──────────────────────────────────────────────────────────
-  // Driver gets 75% of service value (PROTECTED FLOOR — never reduced by discounts)
+  // Driver gets 65% of service value (PROTECTED FLOOR — never reduced by anything)
   const splitDriverPayout = finalServiceValue * DRIVER_SHARE;
-  // Driver earns at least 75% of service value OR the base rate, whichever is higher
+  // Driver earns at least 65% of service value OR the base rate, whichever is higher
   const driverPayout = Math.max(splitDriverPayout, baseDriverPayout);
 
+  // Platform costs — come OUT of platform_fee, NEVER from driver_payout
+  const reserveContribution = finalServiceValue * RESERVE_POOL_PCT;
+  const processingFee = finalServiceValue * CARD_PROCESSING_PCT + CARD_PROCESSING_FLAT;
+  const totalPlatformCosts = reserveContribution + processingFee;
+
   // Market rate — what traditional competitors charge for the same service
-  // (their 40-60% overhead means they charge ~45% above GO's service cost)
   const marketServiceRate = surgeAdjustedServiceValue * MARKET_RATE_MULTIPLIER;
 
-  // Customer price for service — 10% below market (platform absorbs the discount)
+  // Customer price for service — 12% below market (platform absorbs the discount)
   const customerServicePrice = finalServiceValue * (1 - CUSTOMER_DISCOUNT_RATE);
 
-  // Platform fee = what's left of the customer's service payment after driver payout
-  // Platform ALWAYS absorbs the customer discount from its own 25% target share
-  let platformFee = customerServicePrice - driverPayout;
+  // Platform fee (gross) = 35% of service value
+  const platformFeeGross = finalServiceValue * PLATFORM_SHARE;
+  // Net platform profit after reserve pool + processing costs
+  let netPlatformProfit = platformFeeGross - totalPlatformCosts;
   // Platform minimum — GO always earns at least this much per job
-  if (platformFee < PLATFORM_MINIMUM_FEE) {
-    platformFee = PLATFORM_MINIMUM_FEE;
+  if (netPlatformProfit < PLATFORM_MINIMUM_FEE) {
+    netPlatformProfit = PLATFORM_MINIMUM_FEE;
   }
+  let platformFee = netPlatformProfit;
   const appFee = platformFee;
   const goProfit = platformFee;
   const driverFee = 0;
 
-  // Customer price (pre-tax) = service portion + hard costs + upsells
-  const customerPricePreTax = customerServicePrice + hardCosts + materialsFeeCost;
+  // Booking fee — flat, goes to platform, NOT part of the split
+  const bookingFee = BOOKING_FEE;
+
+  // Customer price (pre-tax) = service portion + hard costs + upsells + booking fee
+  const customerPricePreTax = customerServicePrice + hardCosts + materialsFeeCost + bookingFee;
+
+  // Reconciliation check — driver + platform_gross should equal job value
+  const reconciles = Math.round((driverPayout + platformFeeGross) * 100) / 100 === Math.round(finalServiceValue * 100) / 100;
 
   // Tax rate: country config overrides state
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
@@ -511,6 +561,15 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
     customerSavings: convert(customerSavings),
     customerSavingsPercent,
     customerDiscountRate: CUSTOMER_DISCOUNT_RATE,
+    // Platform cost breakdown (comes out of platform_fee, not driver_payout)
+    platformFeeGross: convert(platformFeeGross),
+    reserveContribution: convert(reserveContribution),
+    processingFee: convert(processingFee),
+    totalPlatformCosts: convert(totalPlatformCosts),
+    netPlatformProfit: convert(netPlatformProfit),
+    netProfitPct: finalServiceValue > 0 ? Math.round((netPlatformProfit / finalServiceValue) * 100) / 100 : 0,
+    bookingFee: convert(bookingFee),
+    reconciles,
     driverPayout: convert(driverPayout),
     driverPayoutPercent,
     driverPayoutFloor: convert(baseDriverPayout),
@@ -746,4 +805,50 @@ export function calculateSurgeMultiplier(date = new Date(), pendingMovesCount = 
   };
 }
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS, LABOR_RATES, MINIMUM_JOB_FEE, APP_FEE_RATE, DRIVER_SHARE, PLATFORM_SHARE, MARKET_RATE_MULTIPLIER, CUSTOMER_DISCOUNT_RATE, PLATFORM_MINIMUM_FEE };
+// ─── Refund / Dispute Handling ────────────────────────────────────────────────
+// Pulls from the shared reserve pool, NEVER from an individual driver's payout.
+
+/**
+ * Process a refund or dispute using the shared reserve pool.
+ * driver_payout is NEVER affected — the reserve pool absorbs the cost.
+ * @param {number} refundAmount - amount to refund
+ * @param {number} reservePoolBalance - current balance of the shared reserve pool
+ * @returns {{ status: string, shortfall?: number, newReservePoolBalance?: number, driverPayoutAffected: boolean }}
+ */
+export function processRefund(refundAmount, reservePoolBalance) {
+  const refund = Math.round(refundAmount * 100) / 100;
+  const balance = Math.round(reservePoolBalance * 100) / 100;
+
+  if (refund > balance) {
+    // Reserve pool underfunded — flag for manual review, needs rate adjustment
+    return {
+      status: 'RESERVE_POOL_INSUFFICIENT',
+      shortfall: Math.round((refund - balance) * 100) / 100,
+      driverPayoutAffected: false, // still never touch driver payout
+    };
+  }
+
+  return {
+    status: 'PROCESSED',
+    newReservePoolBalance: Math.round((balance - refund) * 100) / 100,
+    driverPayoutAffected: false,
+  };
+}
+
+// ─── Config Export ────────────────────────────────────────────────────────────
+export const PRICING_CONFIG = {
+  DRIVER_PAYOUT_PCT: DRIVER_SHARE,
+  PLATFORM_FEE_PCT: PLATFORM_SHARE,
+  RESERVE_POOL_PCT,
+  CARD_PROCESSING_PCT,
+  CARD_PROCESSING_FLAT,
+  MINIMUM_JOB_VALUE: MINIMUM_JOB_FEE,
+  MARKET_DISCOUNT_PCT: CUSTOMER_DISCOUNT_RATE,
+  PEAK_DAY_MULTIPLIER,
+  SAME_DAY_MULTIPLIER,
+  BOOKING_FEE,
+  PLATFORM_MINIMUM_FEE,
+  MARKET_RATE_MULTIPLIER,
+};
+
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES, INSURANCE_TIERS, LABOR_RATES, MINIMUM_JOB_FEE, APP_FEE_RATE, DRIVER_SHARE, PLATFORM_SHARE, MARKET_RATE_MULTIPLIER, CUSTOMER_DISCOUNT_RATE, PLATFORM_MINIMUM_FEE, RESERVE_POOL_PCT, CARD_PROCESSING_PCT, CARD_PROCESSING_FLAT, BOOKING_FEE };
