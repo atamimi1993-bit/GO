@@ -9,10 +9,13 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Auth check — allows workflow (service-role) invocations
-    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
-    if (!isAuth) {
+    // Admin-only — prevents unauthorized users from triggering instant balance payouts
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== 'admin') {
+      return Response.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
