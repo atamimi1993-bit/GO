@@ -73,6 +73,22 @@
       ],
       "default": "None"
     },
+    "courier_eligible": {
+      "type": "boolean",
+      "default": false
+    },
+    "vehicle_category": {
+      "type": "string",
+      "enum": [
+        "sedan",
+        "suv",
+        "van",
+        "truck",
+        "box_truck",
+        "motorcycle"
+      ],
+      "default": "sedan"
+    },
     "bank_name": {
       "type": "string"
     },

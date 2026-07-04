@@ -1,0 +1,109 @@
+{
+  "name": "BusinessAccount",
+  "type": "object",
+  "properties": {
+    "business_name": {
+      "type": "string"
+    },
+    "business_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "business_phone": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string",
+      "enum": [
+        "hospital",
+        "bank",
+        "law_firm",
+        "pharmacy",
+        "lab",
+        "retail",
+        "restaurant",
+        "other"
+      ],
+      "default": "other"
+    },
+    "billing_type": {
+      "type": "string",
+      "enum": [
+        "per_delivery",
+        "monthly_invoice"
+      ],
+      "default": "per_delivery"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "tax_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "suspended"
+      ],
+      "default": "pending"
+    },
+    "monthly_delivery_limit": {
+      "type": "number",
+      "default": 0
+    },
+    "account_owner_email": {
+      "type": "string",
+      "format": "email"
+    }
+  },
+  "required": [
+    "business_name",
+    "business_email",
+    "industry"
+  ],
+  "rls": {
+    "create": {
+      "data.account_owner_email": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.account_owner_email": "{{user.email}}"
+        },
+        {
+          "data.business_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.account_owner_email": "{{user.email}}"
+        },
+        {
+          "data.business_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

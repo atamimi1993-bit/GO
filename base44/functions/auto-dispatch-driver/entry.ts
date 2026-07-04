@@ -3,6 +3,9 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 const TRUCK_SIZE_RANK = { small: 0, medium: 1, large: 2, extra_large: 3 };
 const DISPATCH_TIMEOUT_MS = 60_000; // 60-second accept window
 
+// Vehicle categories suitable for courier jobs (cars/vans preferred over big trucks)
+const COURIER_VEHICLE_RANK = { motorcycle: 0, sedan: 1, suv: 2, van: 3, truck: 4, box_truck: 5 };
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -115,7 +118,31 @@ async function selectAndAssignDriver(base44, move, candidates) {
     return Response.json({ dispatched: false, reason: 'No CDL-certified drivers available for this job' });
   }
 
-  // Check truck size — query trucks for all candidate drivers
+  // Courier jobs: prefer courier-eligible drivers with small vehicles; skip truck-size requirement
+  const isCourier = move.job_type === 'courier';
+
+  if (isCourier) {
+    // Prefer courier-eligible drivers; fall back to all if none
+    let courierPool = cdlFiltered.filter((d) => d.courier_eligible === true);
+    if (courierPool.length === 0) courierPool = cdlFiltered;
+
+    // Rank: courier-eligible first, then smallest vehicle (efficiency), then rating, then jobs
+    courierPool.sort((a, b) => {
+      const aCourier = a.courier_eligible ? 1 : 0;
+      const bCourier = b.courier_eligible ? 1 : 0;
+      if (aCourier !== bCourier) return bCourier - aCourier;
+      const aVeh = COURIER_VEHICLE_RANK[a.vehicle_category] ?? 6;
+      const bVeh = COURIER_VEHICLE_RANK[b.vehicle_category] ?? 6;
+      if (aVeh !== bVeh) return aVeh - bVeh;
+      const ratingDiff = (b.rating || 5) - (a.rating || 5);
+      if (Math.abs(ratingDiff) > 0.1) return ratingDiff;
+      return (b.total_jobs || 0) - (a.total_jobs || 0);
+    });
+
+    return await assignDriver(base44, move, courierPool[0]);
+  }
+
+  // Non-courier: check truck size — query trucks for all candidate drivers
   const driverIds = cdlFiltered.map((d) => d.id);
   const trucks = await base44.asServiceRole.entities.Truck.filter({
     driver_profile_id: { $in: driverIds },
@@ -153,6 +180,10 @@ async function selectAndAssignDriver(base44, move, candidates) {
 
   const bestDriver = withTrucks[0];
 
+  return await assignDriver(base44, move, bestDriver);
+}
+
+async function assignDriver(base44, move, bestDriver) {
   // Assign driver
   await base44.asServiceRole.entities.MoveRequest.update(move.id, {
     assigned_driver_id: bestDriver.id,

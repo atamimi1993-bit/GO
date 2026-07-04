@@ -21,6 +21,10 @@ const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Home = lazy(() => import('@/pages/Home'));
 const NewMove = lazy(() => import('@/pages/NewMove'));
 const QuickDelivery = lazy(() => import('@/pages/QuickDelivery'));
+const SavedAddresses = lazy(() => import('@/pages/SavedAddresses'));
+const BusinessAccount = lazy(() => import('@/pages/BusinessAccount'));
+const RecurringDeliveries = lazy(() => import('@/pages/RecurringDeliveries'));
+const DeliveryHistory = lazy(() => import('@/pages/DeliveryHistory'));
 const MyMoves = lazy(() => import('@/pages/MyMoves'));
 const TrackingHub = lazy(() => import('@/pages/TrackingHub'));
 const MoveDetail = lazy(() => import('@/pages/MoveDetail'));
@@ -106,6 +110,10 @@ const AuthenticatedApp = () => {
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
           <Route path="/quick-delivery" element={<PageTransition><QuickDelivery /></PageTransition>} />
+          <Route path="/saved-addresses" element={<PageTransition><SavedAddresses /></PageTransition>} />
+          <Route path="/business-account" element={<PageTransition><BusinessAccount /></PageTransition>} />
+          <Route path="/recurring-deliveries" element={<PageTransition><RecurringDeliveries /></PageTransition>} />
+          <Route path="/delivery-history" element={<PageTransition><DeliveryHistory /></PageTransition>} />
           <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
           <Route path="/driver-hub" element={<PageTransition><DriverHub /></PageTransition>} />
           <Route path="/drivers-wanted" element={<PageTransition><DriversWanted /></PageTransition>} />

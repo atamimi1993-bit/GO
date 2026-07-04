@@ -23,9 +23,11 @@ import RescheduleButton from '@/components/go/RescheduleButton';
 import TipButton from '@/components/go/TipButton';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/go/PageHeader';
+import TemperatureBadge, { SignatureBadge } from '@/components/go/TemperatureBadge';
 import { format, parseISO } from 'date-fns';
 
 const MoveTracker = lazy(() => import('@/components/go/MoveTracker'));
+const ProofOfDeliveryCapture = lazy(() => import('@/components/go/ProofOfDeliveryCapture'));
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
@@ -254,7 +256,7 @@ export default function MoveDetail() {
           try {
             const stops = JSON.parse(move.intermediate_stops || '[]');
             return stops.map((stop, idx) => (
-              <div key={idx} className="flex items-start gap-3">
+              <div key={`is-${idx}`} className="flex items-start gap-3">
                 <div className="w-[18px] h-[18px] rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">
                   {idx + 1}
                 </div>
@@ -263,10 +265,29 @@ export default function MoveDetail() {
             ));
           } catch { return null; }
         })()}
+        {(() => {
+          try {
+            const stops = JSON.parse(move.multi_stop_addresses || '[]');
+            return stops.map((stop, idx) => (
+              <div key={`ms-${idx}`} className="flex items-start gap-3">
+                <div className="w-[18px] h-[18px] rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">
+                  {idx + 2}
+                </div>
+                <div><p className="text-xs text-muted-foreground">Stop {idx + 2}</p><p className="font-medium text-sm">{stop}</p></div>
+              </div>
+            ));
+          } catch { return null; }
+        })()}
         <div className="flex items-start gap-3">
           <MapPin className="text-red-400 mt-0.5" size={18} />
           <div><p className="text-xs text-muted-foreground">Drop-off</p><p className="font-medium text-sm">{move.dropoff_address}</p></div>
         </div>
+        {(move.temperature_controlled || move.requires_signature) && (
+          <div className="flex gap-2 pt-1">
+            <TemperatureBadge show={move.temperature_controlled} small />
+            <SignatureBadge show={move.requires_signature} small />
+          </div>
+        )}
         <div className="flex items-start gap-3">
           <Calendar className="text-muted-foreground mt-0.5" size={18} />
           <div>
@@ -434,8 +455,18 @@ export default function MoveDetail() {
         </div>
       )}
 
+      {/* Driver proof of delivery — for courier jobs requiring signature/photo */}
+      {move.status === 'in_progress' && driverProfile && move.assigned_driver_id && move.job_type === 'courier' && (
+        <div className="bg-card border rounded-2xl p-5 mt-4">
+          <h3 className="font-display font-bold text-sm mb-3 flex items-center gap-2">
+            <ClipboardCheck size={16} className="text-emerald-600" /> Proof of Delivery
+          </h3>
+          <ProofOfDeliveryCapture move={move} onComplete={() => load()} />
+        </div>
+      )}
+
       {/* Customer confirms delivery — transitions in_progress to completed */}
-      {move.status === 'in_progress' && (
+      {move.status === 'in_progress' && (!driverProfile || move.job_type !== 'courier' || !move.requires_signature) && (
         <div className="mt-4">
           {invoiceSent && (
             <div className="flex items-center gap-2 mb-2 text-emerald-600 dark:text-emerald-400 text-sm font-medium">

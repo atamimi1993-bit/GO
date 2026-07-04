@@ -24,6 +24,9 @@
     "intermediate_stops": {
       "type": "string"
     },
+    "multi_stop_addresses": {
+      "type": "string"
+    },
     "move_date": {
       "type": "string",
       "format": "date"
@@ -347,6 +350,26 @@
       "default": false
     },
     "tip_session_id": {
+      "type": "string"
+    },
+    "business_account_id": {
+      "type": "string"
+    },
+    "business_name": {
+      "type": "string"
+    },
+    "requires_signature": {
+      "type": "boolean",
+      "default": false
+    },
+    "temperature_controlled": {
+      "type": "boolean",
+      "default": false
+    },
+    "proof_of_delivery_id": {
+      "type": "string"
+    },
+    "recurring_delivery_id": {
       "type": "string"
     }
   },

@@ -1,0 +1,45 @@
+{
+  "description": "Runs every day at 6am to process active recurring delivery schedules \u2014 creates MoveRequest records and auto-dispatches drivers.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 6 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_recurring_deliveries",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "process_recurring": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "process-recurring-deliveries",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Process recurring deliveries",
+            "description": "Create & dispatch scheduled deliveries"
+          }
+        }
+      }
+    ]
+  },
+  "name": "Daily Recurring Delivery Processing"
+}
