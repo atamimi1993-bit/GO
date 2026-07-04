@@ -2,7 +2,18 @@
 // Calculates total cost for a move based on weight, distance, truck, and fees
 // Supports multi-currency, metric/imperial units, and international tax rates
 
-const GAS_PRICE_PER_GALLON = 3.50;
+const FUEL_PRICES = {
+  gasoline: 3.50,
+  diesel: 4.00,
+  hybrid: 3.50,
+  electric: 0.15, // per kWh equivalent (used as cost-per-mile for electric)
+};
+const FUEL_LABELS = {
+  gasoline: 'Gasoline',
+  diesel: 'Diesel',
+  hybrid: 'Hybrid',
+  electric: 'Electric',
+};
 
 const TRUCK_CONFIG = {
   small: { baseCost: 75, costPerMile: 1.50, costPerLb: 0.05, mpg: 18 },
@@ -136,7 +147,7 @@ const MI_TO_KM = 1.60934;
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
-export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType }) {
+export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, stateCode, countryCode, currency, distanceUnit, weightUnit, jobType, truckMpg, fuelType }) {
   const truck = TRUCK_CONFIG[truckSize] || TRUCK_CONFIG.medium;
 
   // Convert metric inputs to imperial for internal calculation
@@ -148,9 +159,12 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Base cost + per-mile + per-pound (calculated in USD)
   const baseCost = truck.baseCost + (roundTripMiles * truck.costPerMile) + (weightInLbs * truck.costPerLb);
 
-  // Fuel cost for round trip (in USD)
-  const gallonsNeeded = roundTripMiles / truck.mpg;
-  const fuelCost = gallonsNeeded * GAS_PRICE_PER_GALLON;
+  // Fuel cost for round trip (in USD) — uses driver's actual truck MPG & fuel type if provided
+  const actualMpg = truckMpg || truck.mpg;
+  const actualFuelType = fuelType || 'gasoline';
+  const fuelPrice = FUEL_PRICES[actualFuelType] || FUEL_PRICES.gasoline;
+  const gallonsNeeded = roundTripMiles / actualMpg;
+  const fuelCost = actualFuelType === 'electric' ? roundTripMiles * fuelPrice : gallonsNeeded * fuelPrice;
 
   // Subtotal before fees (in USD)
   const subtotal = baseCost + fuelCost;
@@ -223,4 +237,4 @@ export const TRUCK_SIZE_LABELS = {
   extra_large: '26ft+ Truck (6,000+ lbs)',
 };
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS };

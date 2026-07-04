@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import { formatCurrency } from '@/lib/pricing';
+import { formatCurrency, calculateMovePrice } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function AvailableJobs() {
@@ -38,15 +38,45 @@ export default function AvailableJobs() {
     // Optimistic removal
     setJobs(prev => prev.filter(j => j.id !== job.id));
     try {
+      // Fetch the driver's trucks to get actual MPG and fuel type
+      const trucks = await base44.entities.Truck.filter({ driver_profile_id: driverProfile.id });
+      const truck = trucks.find(t => t.size_category === job.truck_size_needed) || trucks[0];
+
+      let updatedPricing = {};
+      let payoutAmount = job.driver_payout;
+
+      if (truck) {
+        const recalc = calculateMovePrice({
+          totalWeightLbs: job.total_weight_lbs,
+          distanceMiles: job.distance_miles,
+          truckSize: job.truck_size_needed || truck.size_category,
+          countryCode: job.country_code,
+          currency: job.currency,
+          distanceUnit: job.distance_unit,
+          jobType: job.job_type,
+          truckMpg: truck.mpg,
+          fuelType: truck.fuel_type,
+        });
+        updatedPricing = {
+          fuel_cost: recalc.fuelCost,
+          tax_amount: recalc.taxAmount,
+          app_fee: recalc.appFee,
+          total_price: recalc.totalPrice,
+          driver_payout: recalc.driverPayout,
+        };
+        payoutAmount = recalc.driverPayout;
+      }
+
       await base44.entities.MoveRequest.update(job.id, {
         status: 'accepted',
         assigned_driver_id: driverProfile.id,
         assigned_driver_name: driverProfile.full_name,
+        ...updatedPricing,
       });
       await base44.entities.DriverPayout.create({
         driver_profile_id: driverProfile.id,
         move_request_id: job.id,
-        amount: job.driver_payout,
+        amount: payoutAmount,
         currency: job.currency || 'USD',
         status: 'pending',
       });
