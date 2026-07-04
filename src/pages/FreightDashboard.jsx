@@ -125,7 +125,7 @@ export default function FreightDashboard() {
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 filter === tab.key
                   ? 'bg-blue-500 text-white'
                   : 'bg-muted text-muted-foreground hover:bg-muted/70'

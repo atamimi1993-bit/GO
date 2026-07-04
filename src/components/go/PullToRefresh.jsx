@@ -22,9 +22,9 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
 
   const isAtTop = () => {
     if (scrollRef && scrollRef.current) {
-      return scrollRef.current.scrollTop <= 0;
+      return scrollRef.current.scrollTop <= 1;
     }
-    return (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) <= 0;
+    return (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) <= 1;
   };
 
   const handleTouchStart = (e) => {
@@ -69,6 +69,7 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   };
 
   useEffect(() => {
+    // Always prefer scrollRef over wrapperRef when available and valid
     const node = (scrollRef && scrollRef.current) ? scrollRef.current : wrapperRef.current;
     if (!node) return;
     node.addEventListener('touchstart', handleTouchStart, { passive: true });

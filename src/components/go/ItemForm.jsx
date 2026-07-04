@@ -33,7 +33,7 @@ export default function ItemForm({ onAdd }) {
     <form onSubmit={handleSubmit} className="bg-muted rounded-xl p-4 space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <Label className="text-xs text-muted-foreground">Item Name</Label>
+          <Label className="text-sm text-muted-foreground">Item Name</Label>
           <Input
             placeholder="e.g. Couch, TV, Box of books"
             value={item.name}
@@ -41,7 +41,7 @@ export default function ItemForm({ onAdd }) {
           />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Category</Label>
+          <Label className="text-sm text-muted-foreground">Category</Label>
           <MobileSelect
             value={item.category}
             onValueChange={v => setItem({ ...item, category: v })}
@@ -51,7 +51,7 @@ export default function ItemForm({ onAdd }) {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div>
-          <Label className="text-xs text-muted-foreground">Weight (lbs)</Label>
+          <Label className="text-sm text-muted-foreground">Weight (lbs)</Label>
           <Input
             type="number"
             placeholder="50"
@@ -60,7 +60,7 @@ export default function ItemForm({ onAdd }) {
           />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Quantity</Label>
+          <Label className="text-sm text-muted-foreground">Quantity</Label>
           <Input
             type="number"
             min={1}
@@ -74,7 +74,7 @@ export default function ItemForm({ onAdd }) {
               checked={item.special_handling}
               onCheckedChange={v => setItem({ ...item, special_handling: v })}
             />
-            <Label className="text-xs">Fragile / Special</Label>
+            <Label className="text-sm">Fragile / Special</Label>
           </label>
         </div>
       </div>

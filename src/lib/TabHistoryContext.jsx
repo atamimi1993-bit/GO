@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export const TAB_ROOTS = ['/', '/my-moves', '/driver-hub', '/storage', '/help'];
+export const TAB_ROOTS = ['/', '/my-moves', '/tracking', '/driver-hub', '/storage', '/help'];
 
 function getActiveTab(pathname) {
   if (TAB_ROOTS.includes(pathname)) return pathname;
