@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import StatCard from '@/components/admin/StatCard';
 import DriverPerformance from '@/components/admin/DriverPerformance';
+import BulkPayoutPanel from '@/components/admin/BulkPayoutPanel';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
@@ -112,6 +113,9 @@ export default function Admin() {
 
         {/* Driver performance */}
         <DriverPerformance />
+
+        {/* Bulk payout processing */}
+        <BulkPayoutPanel scrollRef={scrollRef} />
 
         {/* AI Lead Finder */}
         <LeadFinder onLeadsGenerated={load} />

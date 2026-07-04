@@ -27,6 +27,58 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, lead: updatedLead });
     }
 
+    // Fetch all pending payouts with driver + move details
+    if (action === 'pending_payouts') {
+      const [payouts, drivers, moves] = await Promise.all([
+        base44.asServiceRole.entities.DriverPayout.filter({ status: 'pending' }, '-created_date', 500),
+        base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+      ]);
+      const driverMap = {};
+      for (const d of drivers) driverMap[d.id] = d;
+      const moveMap = {};
+      for (const m of moves) moveMap[m.id] = m;
+
+      const enriched = payouts.map((p) => ({
+        id: p.id,
+        amount: p.amount || 0,
+        currency: p.currency || 'USD',
+        driver_profile_id: p.driver_profile_id,
+        move_request_id: p.move_request_id,
+        driver_name: driverMap[p.driver_profile_id]?.full_name || 'Unknown',
+        company_name: driverMap[p.driver_profile_id]?.company_name || null,
+        pickup: moveMap[p.move_request_id]?.pickup_address || '',
+        dropoff: moveMap[p.move_request_id]?.dropoff_address || '',
+        move_date: moveMap[p.move_request_id]?.move_date || null,
+        customer_name: moveMap[p.move_request_id]?.customer_name || '',
+      }));
+
+      // Group totals by driver for convenience
+      const byDriver = {};
+      for (const p of enriched) {
+        if (!byDriver[p.driver_profile_id]) {
+          byDriver[p.driver_profile_id] = { driver_name: p.driver_name, company_name: p.company_name, count: 0, total: 0 };
+        }
+        byDriver[p.driver_profile_id].count += 1;
+        byDriver[p.driver_profile_id].total += p.amount;
+      }
+
+      const grandTotal = enriched.reduce((s, p) => s + p.amount, 0);
+      return Response.json({ payouts: enriched, byDriver: Object.values(byDriver), grandTotal, count: enriched.length });
+    }
+
+    // Bulk process payouts — mark selected pending payouts as paid
+    if (action === 'bulk_payout') {
+      const { payout_ids } = body;
+      if (!Array.isArray(payout_ids) || payout_ids.length === 0) {
+        return Response.json({ error: 'payout_ids array is required' }, { status: 400 });
+      }
+      const updated = await base44.asServiceRole.entities.DriverPayout.bulkUpdate(
+        payout_ids.map((pid) => ({ id: pid, status: 'paid' }))
+      );
+      return Response.json({ success: true, processed: payout_ids.length, updated });
+    }
+
     // Per-driver performance: total earnings + active jobs
     if (action === 'driver_performance') {
       const [drivers, moves, payouts] = await Promise.all([
