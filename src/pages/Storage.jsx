@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +7,7 @@ import { Warehouse, Search, MapPin, Phone, Globe, Star, Loader2, Snowflake } fro
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function Storage() {
+  const { scrollRef } = useOutletContext();
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -27,7 +29,7 @@ export default function Storage() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
-    <PullToRefresh onRefresh={loadFacilities}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={loadFacilities}>
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-display font-bold mb-1">Find Storage</h1>

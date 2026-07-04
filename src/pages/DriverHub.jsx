@@ -1,34 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DriverTrackingControls from '@/components/go/DriverTrackingControls';
+import PullToRefresh from '@/components/go/PullToRefresh';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function DriverHub() {
+  const { scrollRef } = useOutletContext();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const u = await base44.auth.me();
-        setUser(u);
-        const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
-        if (profiles.length > 0) setProfile(profiles[0]);
-      } catch {}
-      setLoading(false);
-    };
-    load();
+  const load = useCallback(async () => {
+    try {
+      const u = await base44.auth.me();
+      setUser(u);
+      const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+      if (profiles.length > 0) setProfile(profiles[0]);
+    } catch {}
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   // Not a driver yet
   if (!profile) {
     return (
+      <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
       <div className="max-w-xl mx-auto text-center py-16">
         <div className="w-20 h-20 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Truck className="text-emerald-600 dark:text-emerald-400" size={36} />
@@ -50,11 +54,13 @@ export default function DriverHub() {
           </Button>
         </Link>
       </div>
+      </PullToRefresh>
     );
   }
 
   // Driver dashboard
   return (
+    <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -117,5 +123,6 @@ export default function DriverHub() {
         <DriverTrackingControls driverProfile={profile} />
       )}
     </div>
+    </PullToRefresh>
   );
 }

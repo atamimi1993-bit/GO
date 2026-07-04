@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
 import { ArrowRight, Package, Truck, Shield, DollarSign, Star } from 'lucide-react';
@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function Home() {
+  const { scrollRef } = useOutletContext();
   const [user, setUser] = useState(null);
   useEffect(() => { base44.auth.me().then(setUser).catch(() => {}); }, []);
 
   return (
-    <PullToRefresh onRefresh={async () => { await base44.auth.me().then(setUser).catch(() => {}); }}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={async () => { await base44.auth.me().then(setUser).catch(() => {}); }}>
     <div className="space-y-16">
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900 rounded-3xl overflow-hidden px-8 py-16 md:py-24 text-white">

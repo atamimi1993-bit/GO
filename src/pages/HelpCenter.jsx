@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -28,6 +29,7 @@ const DEFAULT_FAQ = {
 };
 
 export default function HelpCenter() {
+  const { scrollRef } = useOutletContext();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +47,7 @@ export default function HelpCenter() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
-    <PullToRefresh onRefresh={async () => { const articles = await base44.entities.HelpArticle.list('order', 50); setArticles(articles); }}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={async () => { const articles = await base44.entities.HelpArticle.list('order', 50); setArticles(articles); }}>
     <div className="max-w-2xl mx-auto">
       <div className="text-center mb-8">
         <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">

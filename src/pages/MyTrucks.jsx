@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function MyTrucks() {
   const navigate = useNavigate();
+  const { scrollRef } = useOutletContext();
   const [trucks, setTrucks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [driverProfile, setDriverProfile] = useState(null);
@@ -84,7 +85,7 @@ export default function MyTrucks() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
-    <PullToRefresh onRefresh={load}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div className="max-w-2xl mx-auto">
       <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
         <ArrowLeft size={16} /> Back

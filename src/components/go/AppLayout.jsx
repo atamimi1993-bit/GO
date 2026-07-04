@@ -74,7 +74,11 @@ export default function AppLayout() {
         </div>
       </header>
 
-      <main ref={mainRef} data-scroll-container className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-0 overscroll-y-none">
+      <main
+        ref={mainRef}
+        data-scroll-container
+        className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-0 overscroll-y-none h-[calc(100dvh-4rem-56px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto md:h-auto md:overflow-visible"
+      >
         <Outlet context={{ scrollRef: mainRef }} />
       </main>
       <div className="md:hidden">

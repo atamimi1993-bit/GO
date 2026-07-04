@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,7 @@ const STATUS_COLORS = {
 
 export default function MyMoves() {
   const location = useLocation();
+  const { scrollRef } = useOutletContext();
   const optimisticMove = location.state?.optimisticMove;
   const [moves, setMoves] = useState(optimisticMove ? [optimisticMove] : []);
   const [loading, setLoading] = useState(!optimisticMove);
@@ -50,7 +51,7 @@ export default function MyMoves() {
   }
 
   return (
-    <PullToRefresh onRefresh={loadMoves}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={loadMoves}>
     <div>
       <div aria-live="polite" aria-atomic="true" className="sr-only" id="move-status-announcer"></div>
       <div className="flex items-center justify-between mb-6">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function AvailableJobs() {
   const navigate = useNavigate();
+  const { scrollRef } = useOutletContext();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(null);
@@ -59,7 +60,7 @@ export default function AvailableJobs() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
-    <PullToRefresh onRefresh={load}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div>
       <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
         <ArrowLeft size={16} /> Back

@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import MoveTracker from '@/components/go/MoveTracker';
+import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail } from 'lucide-react';
-import moment from 'moment';
+import { format, parseISO } from 'date-fns';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
@@ -20,16 +21,23 @@ const STATUS_COLORS = {
 export default function MoveDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { scrollRef } = useOutletContext();
   const [move, setMove] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.all([
+  const load = useCallback(async () => {
+    const [m, it] = await Promise.all([
       base44.entities.MoveRequest.get(id),
       base44.entities.MoveItem.filter({ move_request_id: id }),
-    ]).then(([m, it]) => { setMove(m); setItems(it); }).finally(() => setLoading(false));
+    ]);
+    setMove(m);
+    setItems(it);
   }, [id]);
+
+  useEffect(() => {
+    load().finally(() => setLoading(false));
+  }, [load]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
   if (!move) return <div className="text-center py-20"><p className="text-muted-foreground">Move not found.</p></div>;
@@ -42,6 +50,7 @@ export default function MoveDetail() {
   };
 
   return (
+    <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div className="max-w-2xl mx-auto">
       <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
         <ArrowLeft size={16} /> Back
@@ -66,7 +75,7 @@ export default function MoveDetail() {
           <Calendar className="text-muted-foreground mt-0.5" size={18} />
           <div>
             <p className="text-xs text-muted-foreground">Date & Time</p>
-            <p className="font-medium text-sm">{moment(move.move_date).format('MMMM D, YYYY')}{move.move_time && ` at ${move.move_time}`}</p>
+            <p className="font-medium text-sm">{format(parseISO(move.move_date), 'MMMM d, yyyy')}{move.move_time && ` at ${move.move_time}`}</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
@@ -119,5 +128,6 @@ export default function MoveDetail() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }
