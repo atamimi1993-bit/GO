@@ -1,0 +1,62 @@
+{
+  "name": "RecruitmentPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "content_type": {
+      "type": "string",
+      "enum": [
+        "job_posting",
+        "outreach_message",
+        "social_post",
+        "recruitment_strategy"
+      ],
+      "default": "job_posting"
+    },
+    "content": {
+      "type": "string"
+    },
+    "target_platform": {
+      "type": "string",
+      "default": "general"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "posted",
+        "archived"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "title",
+    "content_type",
+    "content"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

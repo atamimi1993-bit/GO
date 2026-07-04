@@ -29,6 +29,7 @@ const BackgroundCheckPanel = lazy(() => import('@/components/admin/BackgroundChe
 const DamageClaimsPanel = lazy(() => import('@/components/admin/DamageClaimsPanel'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
+const DriverRecruiter = lazy(() => import('@/components/admin/DriverRecruiter'));
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -294,6 +295,11 @@ export default function Admin() {
         {/* Driver recruitment pipeline */}
         <Suspense fallback={<SectionSkeleton />}>
           <RecruitmentPipeline />
+        </Suspense>
+
+        {/* AI Driver Recruiter — finds platforms, generates job postings & outreach */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <DriverRecruiter />
         </Suspense>
 
         {/* Pending vehicle listing approvals */}
