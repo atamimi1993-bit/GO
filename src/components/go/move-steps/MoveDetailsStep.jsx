@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import MobileSelect from '@/components/go/MobileSelect';
-import { MapPin, Ruler } from 'lucide-react';
+import { MapPin, Ruler, Loader2, Sparkles } from 'lucide-react';
 import { COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES } from '@/lib/pricing';
 
 const JOB_TYPES = [
@@ -11,7 +11,84 @@ const JOB_TYPES = [
   { value: 'corporate_logistics', label: 'Corporate Logistics' },
 ];
 
+const geocodeCache = new Map();
+
+async function geocodeAddress(address) {
+  if (!address || address.trim().length < 5) return null;
+  if (geocodeCache.has(address)) return geocodeCache.get(address);
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+      { headers: { 'Accept-Language': 'en' } }
+    );
+    const data = await res.json();
+    const coords = data.length > 0 ? [parseFloat(data[0].lon), parseFloat(data[0].lat)] : null;
+    geocodeCache.set(address, coords);
+    return coords;
+  } catch {
+    geocodeCache.set(address, null);
+    return null;
+  }
+}
+
 export default function MoveDetailsStep({ form, setForm, handleCountryChange }) {
+  const [autoFilling, setAutoFilling] = useState(false);
+  const [autoFilled, setAutoFilled] = useState(false);
+  const debounceRef = useRef(null);
+
+  const autoFillDistanceAndTolls = useCallback(async (pickup, dropoff) => {
+    if (!pickup || !dropoff || pickup.trim().length < 5 || dropoff.trim().length < 5) return;
+    setAutoFilling(true);
+    try {
+      const [pickupCoord, dropoffCoord] = await Promise.all([
+        geocodeAddress(pickup),
+        geocodeAddress(dropoff),
+      ]);
+
+      if (!pickupCoord || !dropoffCoord) {
+        setAutoFilling(false);
+        return;
+      }
+
+      // OSRM routing API — returns driving distance in meters
+      const routeRes = await fetch(
+        `https://router.project-osrm.org/route/v1/driving/${pickupCoord[0]},${pickupCoord[1]};${dropoffCoord[0]},${dropoffCoord[1]}?overview=false`
+      );
+      const routeData = await routeRes.json();
+
+      if (routeData.routes && routeData.routes.length > 0) {
+        const distanceMeters = routeData.routes[0].distance;
+        const distanceMiles = distanceMeters / 1609.34;
+
+        // Convert to the selected unit
+        const distanceValue = form.distance_unit === 'km'
+          ? Math.round((distanceMiles * 1.60934) * 10) / 10
+          : Math.round(distanceMiles * 10) / 10;
+
+        // Estimate tolls: ~$0.06/mile average for US, scaled by country
+        const tollPerMile = form.country_code === 'US' ? 0.06 : form.country_code === 'CA' ? 0.05 : 0.03;
+        const estimatedTolls = distanceMiles > 5 ? Math.round(distanceMiles * tollPerMile * 100) / 100 : 0;
+
+        setForm(f => ({
+          ...f,
+          distance_miles: distanceValue.toString(),
+          tolls: estimatedTolls > 0 ? estimatedTolls.toFixed(2) : '',
+        }));
+        setAutoFilled(true);
+      }
+    } catch {
+      // Silently fail — user can enter manually
+    }
+    setAutoFilling(false);
+  }, [form.distance_unit, form.country_code, setForm]);
+
+  const handleAddressBlur = () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      autoFillDistanceAndTolls(form.pickup_address, form.dropoff_address);
+    }, 300);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -32,7 +109,8 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange }) 
           <Label className="flex items-center gap-2"><MapPin size={14} /> Pickup Address</Label>
           <Input
             value={form.pickup_address}
-            onChange={e => setForm({ ...form, pickup_address: e.target.value })}
+            onChange={e => { setForm({ ...form, pickup_address: e.target.value }); setAutoFilled(false); }}
+            onBlur={handleAddressBlur}
             placeholder="123 Main St, City, Country"
           />
         </div>
@@ -51,10 +129,25 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange }) 
           <Label className="flex items-center gap-2"><MapPin size={14} /> Drop-off Address</Label>
           <Input
             value={form.dropoff_address}
-            onChange={e => setForm({ ...form, dropoff_address: e.target.value })}
+            onChange={e => { setForm({ ...form, dropoff_address: e.target.value }); setAutoFilled(false); }}
+            onBlur={handleAddressBlur}
             placeholder="456 Oak Ave, City, Country"
           />
         </div>
+
+        {autoFilling && (
+          <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+            <Loader2 size={14} className="animate-spin" />
+            Calculating driving distance and tolls...
+          </div>
+        )}
+        {autoFilled && !autoFilling && (
+          <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+            <Sparkles size={14} />
+            Distance and tolls auto-filled based on your route.
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label className="flex items-center gap-2"><Ruler size={14} /> Distance ({form.distance_unit})</Label>
@@ -66,7 +159,7 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange }) 
             />
           </div>
           <div>
-            <Label>Tolls (optional)</Label>
+            <Label>Tolls {autoFilled ? '(estimated)' : '(optional)'}</Label>
             <Input
               type="number"
               placeholder="e.g. 15.00"
