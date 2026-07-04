@@ -39,7 +39,7 @@ export default function Terms() {
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-1">5. Payments & Fees</h3>
-              <p>GO charges a 10% platform fee on each move, included in the customer's quote. Drivers receive a payout that includes the service subtotal plus a 5% driver fee. Payments are processed securely through Stripe. Payment plans (installments) are available for qualifying moves.</p>
+              <p>GO charges a 25% platform fee on each move, included in the customer's quote. This fee covers platform operations, driver verification, dispute resolution, and customer support. Drivers receive a payout based on truck size, distance, and item weight. Payments are processed securely through Stripe. Payment plans (installments) are available for qualifying moves.</p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-1">6. Cancellations</h3>

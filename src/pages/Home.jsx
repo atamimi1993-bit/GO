@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import AdBanner from '@/components/go/AdBanner';
 import HomeStats from '@/components/go/HomeStats';
+import Testimonials from '@/components/go/Testimonials';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
@@ -77,6 +78,9 @@ export default function Home() {
 
       {/* Stats */}
       <HomeStats />
+
+      {/* Testimonials */}
+      <Testimonials />
 
       {/* Why GO */}
       <section>
