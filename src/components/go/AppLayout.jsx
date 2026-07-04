@@ -11,17 +11,12 @@ import BottomTabBar from '@/components/go/BottomTabBar';
 
 const navItems = [
   { label: 'Home', path: '/', icon: Home },
-  { label: 'My Moves', path: '/my-moves', icon: Package, adminOnly: true },
-  { label: 'Tracking', path: '/tracking', icon: Navigation, adminOnly: true },
-  { label: 'Revenue', path: '/revenue', icon: DollarSign, adminOnly: true },
-  { label: 'Leaderboard', path: '/leaderboard', icon: Trophy, adminOnly: true },
   { label: 'Driver Hub', path: '/driver-hub', icon: Truck, driverOnly: true },
   { label: 'My Report', path: '/driver-report', icon: FileText, driverOnly: true },
   { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Rentals', path: '/rentals', icon: Car },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
   { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
-  { label: 'Financials', path: '/financials', icon: TrendingUp, adminOnly: true },
   { label: 'Drivers', path: '/driver-dashboard', icon: Truck, adminOnly: true },
   { label: 'Freight', path: '/freight-dashboard', icon: Container, cdlOrAdmin: true },
 ];
