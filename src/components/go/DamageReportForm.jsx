@@ -44,6 +44,7 @@ export default function DamageReportForm({ move, user, onSubmitted }) {
         customer_name: move.customer_name || user?.full_name || '',
         customer_email: move.customer_email || user?.email || '',
         driver_name: move.assigned_driver_name || '',
+        driver_profile_id: move.assigned_driver_id || '',
         report_type: reportType,
         item_name: itemName.trim(),
         description: description.trim(),

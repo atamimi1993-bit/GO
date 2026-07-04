@@ -17,6 +17,7 @@ import DriverMonthlyChart from '@/components/go/DriverMonthlyChart';
 import DriverAvailabilityCalendar from '@/components/go/DriverAvailabilityCalendar';
 const StripeConnectCard = lazy(() => import('@/components/go/StripeConnectCard'));
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
+import DriverDisputeCenter from '@/components/go/DriverDisputeCenter';
 
 export default function DriverHub() {
   const { scrollRef } = useOutletContext();
@@ -221,6 +222,9 @@ export default function DriverHub() {
           </div>
         </div>
       )}
+
+      {/* Dispute center — respond to damage reports */}
+      <DriverDisputeCenter driverProfile={profile} />
 
       {/* Expense receipts */}
       <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
