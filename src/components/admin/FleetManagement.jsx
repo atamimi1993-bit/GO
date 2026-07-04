@@ -268,16 +268,16 @@ export default function FleetManagement() {
                       />
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => handleSave(truck.id)} className="bg-emerald-500 hover:bg-emerald-600">
+                      <Button size="sm" onClick={() => handleSave(truck.id)} className="bg-emerald-500 hover:bg-emerald-600" aria-label="Save maintenance record">
                         Save
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>
+                      <Button size="sm" variant="outline" onClick={() => setEditingId(null)} aria-label="Cancel editing">
                         Cancel
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(truck)} className="min-h-[36px]">
+                  <Button size="sm" variant="outline" onClick={() => handleEdit(truck)} className="min-h-[36px]" aria-label="Update maintenance record for this truck">
                     <Wrench size={14} className="mr-1" /> Update Maintenance
                   </Button>
                 )}

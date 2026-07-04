@@ -11,6 +11,7 @@ const FleetManagement = lazy(() => import('@/components/admin/FleetManagement'))
 
 export default function OperationsTab({ scrollRef }) {
   const [showMap, setShowMap] = useState(false);
+  const [showHeatmap, setShowHeatmap] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -36,9 +37,18 @@ export default function OperationsTab({ scrollRef }) {
           <h2 className="font-display font-bold text-lg">Move Demand Heatmap</h2>
           <span className="text-xs text-muted-foreground ml-auto">Peak times & top locations</span>
         </div>
-        <Suspense fallback={<SectionSkeleton />}>
-          <MoveHeatMap />
-        </Suspense>
+        {!showHeatmap ? (
+          <div className="text-center py-6">
+            <p className="text-sm text-muted-foreground mb-3">Load the demand heatmap to see peak moving times and hot locations.</p>
+            <Button onClick={() => setShowHeatmap(true)} variant="outline">
+              <Flame size={16} className="mr-1" /> Load Heatmap
+            </Button>
+          </div>
+        ) : (
+          <Suspense fallback={<SectionSkeleton />}>
+            <MoveHeatMap />
+          </Suspense>
+        )}
       </div>
 
       {/* Global operations map */}

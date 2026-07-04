@@ -282,6 +282,7 @@ export default function ExpenseSubmission({ driverProfile }) {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {r.status === 'approved' && <span className="text-xs font-medium text-emerald-600">${(r.approved_amount || r.amount).toFixed(2)}</span>}
+                  {r._optimistic && <Badge className="bg-blue-500/10 text-blue-600 animate-pulse">Submitting...</Badge>}
                   <Badge className={STATUS_STYLES[r.status]}>
                     {r.status === 'pending' && <Clock size={10} className="mr-1" />}
                     {r.status === 'approved' && <CheckCircle2 size={10} className="mr-1" />}

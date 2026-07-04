@@ -199,7 +199,7 @@ export default function ProofOfDeliveryCapture({ move, onComplete }) {
           onTouchMove={draw}
           onTouchEnd={stopDraw}
         />
-        <Button variant="ghost" size="sm" className="mt-1 text-xs" onClick={clearSig}>Clear signature</Button>
+        <Button variant="ghost" size="sm" className="mt-1 text-xs" onClick={clearSig} aria-label="Clear signature pad">Clear signature</Button>
       </div>
 
       <Button

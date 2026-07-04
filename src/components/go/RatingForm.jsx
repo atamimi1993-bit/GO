@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Star, Loader2, Camera, X } from 'lucide-react';
+import { Star, Loader2, Camera, X, CheckCircle2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -11,6 +11,7 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
   const [photos, setPhotos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const fileRef = useRef(null);
   const { toast } = useToast();
 
@@ -49,6 +50,7 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
       return;
     }
     setSubmitting(true);
+    setSubmitted(true);
     let optimisticCalled = false;
     onSubmitted?.({ stars, comment: comment.trim(), _optimistic: true });
     optimisticCalled = true;
@@ -68,9 +70,19 @@ export default function RatingForm({ move, direction, raterId, raterName, rateeI
     } catch {
       toast({ title: 'Error', description: 'Could not submit rating. Please try again.', variant: 'destructive' });
       if (optimisticCalled) onError?.();
+      setSubmitted(false);
     }
     setSubmitting(false);
   };
+
+  if (submitted) {
+    return (
+      <div className="bg-card border rounded-2xl p-5 text-center">
+        <CheckCircle2 className="mx-auto text-emerald-500 mb-2" size={28} />
+        <p className="font-medium text-sm">Rating submitted! Thank you.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card border rounded-2xl p-5">

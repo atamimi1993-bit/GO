@@ -100,6 +100,8 @@ export default function NotificationCenter({ user }) {
         onClick={() => setOpen(!open)}
         className="relative min-h-[44px] min-w-[44px]"
         aria-label="Notifications"
+        aria-expanded={open}
+        aria-haspopup="dialog"
       >
         <Bell size={20} aria-hidden="true" />
         {unread > 0 && (

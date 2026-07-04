@@ -75,8 +75,8 @@ function CheckCircle2Small() {
   );
 }
 
-export default function TroubleshootWidget() {
-  const [open, setOpen] = useState(false);
+export default function TroubleshootWidget({ initialOpen = false }) {
+  const [open, setOpen] = useState(initialOpen);
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
