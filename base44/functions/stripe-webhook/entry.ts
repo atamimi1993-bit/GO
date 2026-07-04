@@ -103,6 +103,23 @@ Deno.serve(async (req) => {
           });
           console.log('Marked move ' + moveRequestId + ' as fully paid');
         }
+
+        // Send automatic email receipt to customer for any move payment
+        // (skip cancellation fees — those aren't move service payments)
+        if (paymentType !== 'cancellation_fee') {
+          const amountPaid = session.amount_total ? session.amount_total / 100 : null;
+          try {
+            await base44.asServiceRole.functions.invoke('send-payment-receipt', {
+              move_request_id: moveRequestId,
+              payment_type: paymentType,
+              stripe_session_id: session.id,
+              amount_paid: amountPaid,
+            });
+            console.log('Payment receipt sent for move ' + moveRequestId + ' (' + paymentType + ')');
+          } catch (receiptErr) {
+            console.error('Failed to send payment receipt for move ' + moveRequestId + ':', receiptErr.message);
+          }
+        }
       }
     }
 
