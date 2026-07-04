@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { ArrowRight, Package, Truck, Shield, DollarSign, Star } from 'lucide-react';
+import { ArrowRight, Package, Truck, Shield, DollarSign, Star, MapPin, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import HomeStats from '@/components/go/HomeStats';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
@@ -71,84 +72,25 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="bg-card rounded-2xl border border-border p-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[
-            { value: '10K+', label: 'Moves Completed' },
-            { value: '500+', label: 'Verified Drivers' },
-            { value: '4.9', label: 'Average Rating', icon: Star },
-            { value: '50+', label: 'Countries' },
-          ].map((stat, i) => (
-            <div key={i}>
-              <div className="text-3xl font-display font-black text-foreground flex items-center justify-center gap-1">
-                {stat.value}
-                {stat.icon && <stat.icon size={20} className="text-yellow-500 fill-yellow-500" />}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <HomeStats />
 
-      {/* Happy Customers & Movers */}
+      {/* Why GO */}
       <section>
-        <h2 className="text-2xl font-display font-bold text-center mb-2">Happy Customers & Movers</h2>
-        <p className="text-center text-muted-foreground text-sm mb-10">Real people, real moves, real smiles.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 className="text-2xl font-display font-bold text-center mb-2">Why Choose GO</h2>
+        <p className="text-center text-muted-foreground text-sm mb-10">Everything you need for a smooth, stress-free move.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            {
-              name: 'Sarah M.',
-              role: 'Customer',
-              quote: 'The driver was on time, super careful with my furniture, and the live tracking gave me total peace of mind.',
-              photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
-            },
-            {
-              name: 'Marcus T.',
-              role: 'GO Driver',
-              quote: 'I make my own schedule and earn great money. The app makes it so easy to find jobs near me.',
-              photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-            },
-            {
-              name: 'Jennifer L.',
-              role: 'Customer',
-              quote: 'Moved my entire apartment in one trip. Pricing was transparent and the driver was a pro.',
-              photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
-            },
-            {
-              name: 'David K.',
-              role: 'GO Driver',
-              quote: 'Best decision I made was signing up as a driver. Flexible hours and steady work every week.',
-              photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
-            },
-            {
-              name: 'Emily R.',
-              role: 'Customer',
-              quote: 'I could see exactly where my stuff was the whole time. No stress, no surprises. Highly recommend!',
-              photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
-            },
-            {
-              name: 'James W.',
-              role: 'GO Driver',
-              quote: 'The tracking feature makes customers feel safe. Tips went up as soon as I started using it.',
-              photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
-            },
-          ].map((t, i) => (
+            { icon: DollarSign, title: 'Transparent Pricing', desc: 'Instant quotes with full cost breakdown — no hidden fees, no surprises.' },
+            { icon: Shield, title: 'Verified Drivers', desc: 'Every driver is background-checked with a valid license and insurance on file.' },
+            { icon: MapPin, title: 'Real-time Tracking', desc: 'Watch your move progress live — from pickup to dropoff, every step of the way.' },
+            { icon: CreditCard, title: 'Secure Payments', desc: 'Payments processed through Stripe with optional payment plans for larger moves.' },
+          ].map((feat, i) => (
             <div key={i} className="bg-card rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-4 mb-4">
-                <img
-                  src={t.photo}
-                  alt={t.name}
-                  className="w-14 h-14 rounded-full object-cover"
-                  loading="lazy"
-                />
-                <div>
-                  <p className="font-display font-bold text-sm">{t.name}</p>
-                  <p className={`text-xs font-medium ${t.role === 'GO Driver' ? 'text-emerald-600' : 'text-blue-600'}`}>
-                    {t.role}
-                  </p>
-                </div>
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-4">
+                <feat.icon className="text-emerald-600" size={24} />
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed select-text">"{t.quote}"</p>
+              <h3 className="font-display font-bold text-lg mb-2">{feat.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{feat.desc}</p>
             </div>
           ))}
         </div>
@@ -167,6 +109,13 @@ export default function Home() {
           <span className="text-amber-600 font-semibold text-sm group-hover:underline">Get Help →</span>
         </Link>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border pt-6 pb-2 text-center">
+        <p className="text-xs text-muted-foreground">
+          © {new Date().getFullYear()} GO · <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link> · <Link to="/terms" className="underline hover:text-foreground">Privacy Policy</Link>
+        </p>
+      </footer>
     </div>
     </PullToRefresh>
   );

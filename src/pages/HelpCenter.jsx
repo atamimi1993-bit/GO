@@ -91,6 +91,10 @@ export default function HelpCenter() {
           </TabsContent>
         ))}
       </Tabs>
+
+      <div className="text-center mt-8 text-xs text-muted-foreground">
+        <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link> · <Link to="/terms" className="underline hover:text-foreground">Privacy Policy</Link>
+      </div>
     </div>
     </PullToRefresh>
   );
