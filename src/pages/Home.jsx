@@ -59,7 +59,7 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { icon: Package, title: 'List Your Items', desc: 'Add items manually or upload a PDF inventory — we calculate weight and truck size.' },
-            { icon: DollarSign, title: 'Get a Quote', desc: 'Instant pricing with mileage, fuel, tax, and fees — no surprises.' },
+            { icon: DollarSign, title: 'Get a Quote', desc: 'Submit your move details and get matched with a verified driver.' },
             { icon: Truck, title: 'Driver Accepts', desc: 'Verified local drivers with licensed trucks accept your job.' },
             { icon: Shield, title: 'Move with Confidence', desc: 'Sign our liability agreement and track your move from start to finish.' },
           ].map((step, i) => (
@@ -84,7 +84,7 @@ export default function Home() {
         <p className="text-center text-muted-foreground text-sm mb-10">Everything you need for a smooth, stress-free move.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { icon: DollarSign, title: 'Transparent Pricing', desc: 'Instant quotes with full cost breakdown — no hidden fees, no surprises.' },
+            { icon: DollarSign, title: 'Fair Pricing', desc: 'See your total price when your driver accepts — no hidden fees.' },
             { icon: Shield, title: 'Verified Drivers', desc: 'Every driver is background-checked with a valid license and insurance on file.' },
             { icon: MapPin, title: 'Real-time Tracking', desc: 'Watch your move progress live — from pickup to dropoff, every step of the way.' },
             { icon: CreditCard, title: 'Secure Payments', desc: 'Payments processed through Stripe with optional payment plans for larger moves.' },

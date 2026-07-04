@@ -270,8 +270,10 @@ export default function MoveDetail() {
         <RouteLogForm move={move} driverProfile={driverProfile} onSaved={load} />
       )}
 
-      {/* Price */}
-      <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} currencyCode={currencyCode} showInternalCosts={showInternalCosts} />
+      {/* Price — only visible when ready to pay or admin */}
+      {(showInternalCosts || ['quoted', 'accepted', 'in_progress', 'completed'].includes(move.status)) && (
+        <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} currencyCode={currencyCode} showInternalCosts={showInternalCosts} />
+      )}
 
       {/* Price confirmation — both parties must confirm after driver acceptance */}
       {move.status === 'accepted' && (
