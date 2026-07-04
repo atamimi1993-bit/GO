@@ -12,7 +12,6 @@ import {
   Loader2,
   Radio,
   Square,
-  Camera,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -124,14 +123,9 @@ export default function DriverTrackingControls({ driverProfile }) {
             <p className="text-sm font-medium truncate">{activeMove.pickup_address}</p>
             <p className="text-xs text-muted-foreground truncate">→ {activeMove.dropoff_address}</p>
           </div>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => navigate(`/move/${activeMove.id}/inventory`)}>
-              <Camera size={14} className="mr-1" /> Items
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => navigate(`/move/${activeMove.id}`)}>
-              View
-            </Button>
-          </div>
+          <Button size="sm" variant="outline" onClick={() => navigate(`/move/${activeMove.id}`)}>
+            View
+          </Button>
         </div>
 
         {lastPing && (

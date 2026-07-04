@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { Home, Package, Truck, HelpCircle, User, LogOut, LogIn, Warehouse, Bot, ShieldCheck } from 'lucide-react';
+import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, Bot, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/AuthContext';
@@ -54,61 +54,36 @@ export default function AppLayout() {
           </nav>
 
           <div className="flex md:hidden items-center gap-2">
-            {user ? (
-              <Link to="/profile">
-                <Button variant="ghost" size="icon" aria-label="My Account">
-                  <User size={20} />
-                </Button>
-              </Link>
-            ) : (
-              <Link to="/login">
-                <Button variant="ghost" size="sm">
-                  <LogIn size={16} className="mr-1" /> Sign In
-                </Button>
-              </Link>
-            )}
+            <Link to="/profile">
+              <Button variant="ghost" size="icon" aria-label="My Account">
+                <User size={20} />
+              </Button>
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-2">
-            {user ? (
-              <>
-                <Link to="/profile">
-                  <Button variant="ghost" size="sm">
-                    <User size={16} className="mr-1" /> Account
+            <Link to="/profile">
+              <Button variant="ghost" size="sm">
+                <User size={16} className="mr-1" /> Account
+              </Button>
+            </Link>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => base44.auth.logout('/')}
+                    className="text-muted-foreground"
+                    aria-label="Sign out"
+                  >
+                    <LogOut size={16} />
+                    <span className="sr-only">Sign out</span>
                   </Button>
-                </Link>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => base44.auth.logout('/')}
-                        className="text-muted-foreground"
-                        aria-label="Sign out"
-                      >
-                        <LogOut size={16} />
-                        <span className="sr-only">Sign out</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Sign out</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </>
-            ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="ghost" size="sm">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600">
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
-            )}
+                </TooltipTrigger>
+                <TooltipContent>Sign out</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </header>

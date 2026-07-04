@@ -21,7 +21,6 @@ const Home = lazy(() => import('@/pages/Home'));
 const NewMove = lazy(() => import('@/pages/NewMove'));
 const MyMoves = lazy(() => import('@/pages/MyMoves'));
 const MoveDetail = lazy(() => import('@/pages/MoveDetail'));
-const MoveInventory = lazy(() => import('@/pages/MoveInventory'));
 const DriverHub = lazy(() => import('@/pages/DriverHub'));
 const DriverRegister = lazy(() => import('@/pages/DriverRegister'));
 const AvailableJobs = lazy(() => import('@/pages/AvailableJobs'));
@@ -83,25 +82,19 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
       <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
 
-      {/* Public pages — no login required */}
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-        <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
-        <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
-        <Route path="/move/:id/inventory" element={<PageTransition><MoveInventory /></PageTransition>} />
-        <Route path="/storage" element={<PageTransition><Storage /></PageTransition>} />
-        <Route path="/help" element={<PageTransition><HelpCenter /></PageTransition>} />
-      </Route>
-
-      {/* Protected pages — login required (drivers, admins, account features) */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<AppLayout />}>
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
           <Route path="/my-moves" element={<PageTransition><MyMoves /></PageTransition>} />
+          <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
           <Route path="/driver-hub" element={<PageTransition><DriverHub /></PageTransition>} />
           <Route path="/driver-register" element={<PageTransition><DriverRegister /></PageTransition>} />
           <Route path="/available-jobs" element={<PageTransition><AvailableJobs /></PageTransition>} />
           <Route path="/my-trucks" element={<PageTransition><MyTrucks /></PageTransition>} />
           <Route path="/my-payouts" element={<PageTransition><MyPayouts /></PageTransition>} />
+          <Route path="/storage" element={<PageTransition><Storage /></PageTransition>} />
+          <Route path="/help" element={<PageTransition><HelpCenter /></PageTransition>} />
           <Route path="/support" element={<PageTransition><Support /></PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />

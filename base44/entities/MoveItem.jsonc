@@ -33,9 +33,6 @@
       "type": "boolean",
       "default": false
     },
-    "photo_url": {
-      "type": "string"
-    },
     "notes": {
       "type": "string"
     }
