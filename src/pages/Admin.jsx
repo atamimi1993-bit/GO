@@ -102,6 +102,18 @@ export default function Admin() {
         ...prev,
         stats: { ...prev.stats, pendingDrivers: Math.max(0, (prev.stats?.pendingDrivers || 0) - 1) },
       }) : prev);
+
+      // When a driver is approved, award referral bonus points to both parties
+      if (action === 'approve_driver') {
+        try {
+          const referralRes = await base44.functions.invoke('award-driver-referral-bonus', { driver_profile_id: driverId });
+          if (referralRes.data?.awarded) {
+            toast({ title: '🎉 Referral bonus awarded', description: `500 bonus points given to ${driver?.full_name || 'the driver'} and their referrer.` });
+          }
+        } catch (refErr) {
+          console.error('Driver referral bonus failed:', refErr);
+        }
+      }
     } catch (err) {
       // Restore the original pending drivers list on error
       queryClient.setQueryData(overviewQueryKey, (prev) => ({ ...prev, pendingDrivers: prevPendingDrivers }));
