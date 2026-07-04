@@ -141,9 +141,30 @@ const COUNTRY_LIST = Object.entries(COUNTRY_CONFIG)
   .sort((a, b) => a.name.localeCompare(b.name));
 
 const APP_FEE_RATE = 0.25;
-const DRIVER_SHARE_RATE = 0.15;
-const FREIGHT_DRIVER_SHARE_RATE = 0.35;
 const MI_TO_KM = 1.60934;
+
+// Driver payout rates based on truck size + job type
+// GO covers gas and miles; driver earns a rate for their labor + equipment
+const DRIVER_RATES = {
+  residential: {
+    small:       { basePay: 25, perMile: 1.50, perLb: 0.030 },
+    medium:      { basePay: 35, perMile: 2.00, perLb: 0.025 },
+    large:       { basePay: 50, perMile: 2.50, perLb: 0.020 },
+    extra_large: { basePay: 65, perMile: 3.00, perLb: 0.015 },
+  },
+  freight: {
+    small:       { basePay: 40, perMile: 2.25, perLb: 0.035 },
+    medium:      { basePay: 55, perMile: 3.00, perLb: 0.030 },
+    large:       { basePay: 75, perMile: 3.75, perLb: 0.025 },
+    extra_large: { basePay: 95, perMile: 4.50, perLb: 0.020 },
+  },
+  corporate_logistics: {
+    small:       { basePay: 45, perMile: 2.50, perLb: 0.040 },
+    medium:      { basePay: 60, perMile: 3.25, perLb: 0.035 },
+    large:       { basePay: 80, perMile: 4.00, perLb: 0.030 },
+    extra_large: { basePay: 100, perMile: 4.75, perLb: 0.025 },
+  },
+};
 const LB_TO_KG = 0.453592;
 const GAL_TO_L = 3.78541;
 
@@ -166,22 +187,27 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   const gallonsNeeded = roundTripMiles / actualMpg;
   const fuelCost = actualFuelType === 'electric' ? roundTripMiles * fuelPrice : gallonsNeeded * fuelPrice;
 
-  // Subtotal before fees (in USD)
+  // Subtotal before fees (in USD) — GO covers gas (fuelCost) and miles (baseCost)
   const subtotal = baseCost + fuelCost;
+
+  // Driver payout: rate based on truck size + job type (GO pays for gas & miles separately)
+  const jobKey = jobType || 'residential';
+  const rateTable = DRIVER_RATES[jobKey] || DRIVER_RATES.residential;
+  const driverRate = rateTable[truckSize] || rateTable.medium;
+  const driverPayout = driverRate.basePay + (roundTripMiles * driverRate.perMile) + (weightInLbs * driverRate.perLb);
 
   // Tax rate: country config overrides state
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
-  const taxAmount = subtotal * taxRate;
+  const taxableAmount = subtotal + driverPayout;
+  const taxAmount = taxableAmount * taxRate;
 
-  // App fee (25%) (in USD)
+  // App fee (25% of operational subtotal — GO's platform cut, not on driver pay)
   const appFee = subtotal * APP_FEE_RATE;
   const driverFee = 0;
 
-  // Total and driver payout (in USD) — freight/CDL drivers earn 35%, others earn 15%
-  const totalPrice = subtotal + taxAmount + appFee;
-  const isFreight = jobType === 'freight' || jobType === 'corporate_logistics';
-  const driverPayout = totalPrice * (isFreight ? FREIGHT_DRIVER_SHARE_RATE : DRIVER_SHARE_RATE);
+  // Total price (in USD) — customer pays for miles + gas + driver labor + tax + app fee
+  const totalPrice = subtotal + driverPayout + taxAmount + appFee;
 
   // Currency conversion
   const currencyCode = currency || country?.currency || 'USD';
@@ -237,4 +263,4 @@ export const TRUCK_SIZE_LABELS = {
   extra_large: '26ft+ Truck (6,000+ lbs)',
 };
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS };
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES };
