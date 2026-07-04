@@ -46,6 +46,14 @@ export default function AppLayout() {
             ))}
           </nav>
 
+          <div className="flex md:hidden items-center gap-2">
+            <Link to="/profile">
+              <Button variant="ghost" size="icon">
+                <User size={20} />
+              </Button>
+            </Link>
+          </div>
+
           <div className="hidden md:flex items-center gap-2">
             <Link to="/profile">
               <Button variant="ghost" size="sm">
@@ -57,6 +65,7 @@ export default function AppLayout() {
               size="sm"
               onClick={() => base44.auth.logout('/')}
               className="text-muted-foreground"
+              aria-label="Sign out"
             >
               <LogOut size={16} />
             </Button>

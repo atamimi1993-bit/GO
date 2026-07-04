@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTabHistory } from '@/lib/TabHistoryContext';
 import { Home, Package, Truck, Warehouse, HelpCircle } from 'lucide-react';
 
 const tabs = [
@@ -12,6 +13,9 @@ const tabs = [
 
 export default function BottomTabBar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { getTargetPath } = useTabHistory();
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border flex select-none" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {tabs.map(tab => {
@@ -20,9 +24,16 @@ export default function BottomTabBar() {
           <Link
             key={tab.path}
             to={tab.path}
+            aria-label={tab.label}
+            aria-current={active ? 'page' : undefined}
             onClick={(e) => {
-              if (active && location.pathname === tab.path) {
+              if (active) {
+                if (location.pathname === tab.path) {
+                  e.preventDefault();
+                }
+              } else {
                 e.preventDefault();
+                navigate(getTargetPath(tab.path));
               }
             }}
             className={`flex-1 flex flex-col items-center justify-center py-3 min-h-[56px] gap-0.5 text-xs font-medium transition-colors select-none ${active ? 'text-primary' : 'text-muted-foreground'}`}

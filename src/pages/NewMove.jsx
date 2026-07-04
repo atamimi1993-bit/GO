@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import MobileSelect from '@/components/go/MobileSelect';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import ItemForm from '@/components/go/ItemForm';
@@ -215,14 +215,12 @@ export default function NewMove() {
             </div>
             <div>
               <Label>State (for tax calculation)</Label>
-              <Select value={form.state_code} onValueChange={v => setForm({ ...form, state_code: v })}>
-                <SelectTrigger><SelectValue placeholder="Select state" /></SelectTrigger>
-                <SelectContent>
-                  {Object.keys(STATE_TAX_RATES).sort().map(s => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MobileSelect
+                value={form.state_code}
+                onValueChange={v => setForm({ ...form, state_code: v })}
+                options={Object.keys(STATE_TAX_RATES).sort().map(s => ({ value: s, label: s }))}
+                placeholder="Select state"
+              />
             </div>
             <div className="flex items-center justify-between bg-blue-500/10 rounded-xl p-4">
               <div>
@@ -317,19 +315,16 @@ export default function NewMove() {
 
               <div>
                 <Label className="text-sm mb-2 block">Truck Size</Label>
-                <Select value={truckSize} onValueChange={v => {
-                  setTruckSize(v);
-                  setPricing(calculateMovePrice({
-                    totalWeightLbs: totalWeight, distanceMiles: Number(form.distance_miles), truckSize: v, stateCode: form.state_code
-                  }));
-                }}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(TRUCK_SIZE_LABELS).map(([k, v]) => (
-                      <SelectItem key={k} value={k}>{v}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <MobileSelect
+                  value={truckSize}
+                  onValueChange={v => {
+                    setTruckSize(v);
+                    setPricing(calculateMovePrice({
+                      totalWeightLbs: totalWeight, distanceMiles: Number(form.distance_miles), truckSize: v, stateCode: form.state_code
+                    }));
+                  }}
+                  options={Object.entries(TRUCK_SIZE_LABELS).map(([k, v]) => ({ value: k, label: v }))}
+                />
               </div>
 
               <PriceBreakdown pricing={pricing} truckSize={truckSize} />

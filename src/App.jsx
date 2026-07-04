@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { TabHistoryProvider } from '@/lib/TabHistoryContext';
 import AppLayout from '@/components/go/AppLayout';
 
 const PageNotFound = lazy(() => import('./lib/PageNotFound'));
@@ -100,7 +101,9 @@ function App() {
         <QueryClientProvider client={queryClientInstance}>
           <Router>
             <ScrollToTop />
-            <AuthenticatedApp />
+            <TabHistoryProvider>
+              <AuthenticatedApp />
+            </TabHistoryProvider>
           </Router>
           <Toaster />
         </QueryClientProvider>

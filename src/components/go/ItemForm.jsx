@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import MobileSelect from '@/components/go/MobileSelect';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus } from 'lucide-react';
 
@@ -42,12 +42,11 @@ export default function ItemForm({ onAdd }) {
         </div>
         <div>
           <Label className="text-xs text-muted-foreground">Category</Label>
-          <Select value={item.category} onValueChange={v => setItem({ ...item, category: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <MobileSelect
+            value={item.category}
+            onValueChange={v => setItem({ ...item, category: v })}
+            options={CATEGORIES}
+          />
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

@@ -77,20 +77,20 @@ export default function DriverHub() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-card border rounded-2xl p-5 text-center">
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-card border rounded-2xl p-3 md:p-5 text-center">
           <Briefcase className="mx-auto text-muted-foreground mb-1" size={20} />
-          <p className="text-2xl font-display font-bold">{profile.total_jobs || 0}</p>
+          <p className="text-xl md:text-2xl font-display font-bold">{profile.total_jobs || 0}</p>
           <p className="text-xs text-muted-foreground">Jobs</p>
         </div>
-        <div className="bg-card border rounded-2xl p-5 text-center">
+        <div className="bg-card border rounded-2xl p-3 md:p-5 text-center">
           <DollarSign className="mx-auto text-muted-foreground mb-1" size={20} />
-          <p className="text-2xl font-display font-bold">${(profile.total_earnings || 0).toFixed(0)}</p>
+          <p className="text-xl md:text-2xl font-display font-bold">${(profile.total_earnings || 0).toFixed(0)}</p>
           <p className="text-xs text-muted-foreground">Earnings</p>
         </div>
-        <div className="bg-card border rounded-2xl p-5 text-center">
+        <div className="bg-card border rounded-2xl p-3 md:p-5 text-center">
           <Star className="mx-auto text-yellow-400 fill-yellow-400 mb-1" size={20} />
-          <p className="text-2xl font-display font-bold">{(profile.rating || 5.0).toFixed(1)}</p>
+          <p className="text-xl md:text-2xl font-display font-bold">{(profile.rating || 5.0).toFixed(1)}</p>
           <p className="text-xs text-muted-foreground">Rating</p>
         </div>
       </div>

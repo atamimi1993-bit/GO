@@ -81,7 +81,7 @@ export default function DriverRegister() {
       <p className="text-muted-foreground text-sm mb-6">Fill in your details and upload required documents.</p>
 
       <form onSubmit={handleSubmit} className="bg-card border rounded-2xl p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><Label>Full Name *</Label><Input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} /></div>
           <div><Label>Email *</Label><Input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
         </div>
