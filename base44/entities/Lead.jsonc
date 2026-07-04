@@ -53,6 +53,27 @@
     },
     "notes": {
       "type": "string"
+    },
+    "matched_vehicle_rental_id": {
+      "type": "string"
+    },
+    "matched_vehicle_title": {
+      "type": "string"
+    },
+    "matched_driver_id": {
+      "type": "string"
+    },
+    "matched_driver_name": {
+      "type": "string"
+    },
+    "assignment_status": {
+      "type": "string",
+      "enum": [
+        "unassigned",
+        "matched",
+        "assigned"
+      ],
+      "default": "unassigned"
     }
   },
   "required": [

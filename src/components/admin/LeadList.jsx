@@ -2,6 +2,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { User, Building2, MapPin, Clock, ExternalLink, Star } from 'lucide-react';
+import LeadVehicleMatcher from '@/components/admin/LeadVehicleMatcher';
 
 const STATUS_COLORS = {
   new: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
@@ -72,6 +73,9 @@ export default function LeadList({ leads, onUpdateStatus }) {
                 >
                   <ExternalLink size={10} /> Source
                 </a>
+              )}
+              {lead.status === 'converted' && (
+                <LeadVehicleMatcher lead={lead} onAssigned={() => onUpdateStatus(lead.id, 'converted')} />
               )}
             </div>
             <div className="flex items-center gap-2 shrink-0 flex-wrap">
