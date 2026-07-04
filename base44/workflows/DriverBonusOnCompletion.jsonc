@@ -1,0 +1,40 @@
+{
+  "name": "Driver Bonus on Move Completion",
+  "description": "When a MoveRequest's status transitions to completed, award the driver their sign-on bonus and referral bonus via the award-driver-bonuses backend function. This ensures bonuses fire regardless of whether the move was completed by the customer, driver, or admin.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "MoveRequest",
+      "events": [
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"completed\" and .trigger.old_data.status != \"completed\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "driver_bonus_on_completion",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "award_driver_bonuses": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "award-driver-bonuses",
+            "args": {
+              "move_request_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Award driver bonuses",
+            "description": "Sign-on & referral bonus on first completed move"
+          }
+        }
+      }
+    ]
+  }
+}
