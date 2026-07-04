@@ -20,6 +20,7 @@ const navItems = [
   { label: 'Help Center', path: '/help', icon: HelpCircle },
   { label: 'Assistant', path: '/support', icon: Bot },
   { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
+  { label: 'Drivers', path: '/driver-dashboard', icon: Truck, adminOnly: true },
   { label: 'Freight', path: '/freight-dashboard', icon: Container, cdlOrAdmin: true },
 ];
 
