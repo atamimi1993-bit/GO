@@ -20,8 +20,21 @@ export default function Profile() {
   const { user, checkUserAuth } = useAuth();
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { toast } = useToast();
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await base44.functions.invoke('delete-user-account', {});
+      toast({ title: 'Account deleted', description: 'Your account and personal data have been permanently removed.' });
+      base44.auth.logout('/');
+    } catch (err) {
+      toast({ title: 'Deletion failed', description: err.message || 'Please try again or contact support.', variant: 'destructive' });
+      setDeleting(false);
+    }
+  };
 
   return (
     <PullToRefresh onRefresh={async () => { await checkUserAuth(); }} scrollRef={scrollRef}>
@@ -76,9 +89,13 @@ export default function Profile() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { base44.auth.deleteAccount().catch(() => {}); base44.auth.logout('/'); }}>
-                {deleting ? 'Deleting...' : 'Delete Account'}
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                disabled={deleting}
+                onClick={(e) => { e.preventDefault(); handleDeleteAccount(); }}
+              >
+                {deleting ? <><Loader2 size={14} className="mr-1 animate-spin" /> Deleting...</> : 'Delete Account'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
