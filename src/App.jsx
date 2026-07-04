@@ -29,6 +29,7 @@ const MyPayouts = lazy(() => import('@/pages/MyPayouts'));
 const Storage = lazy(() => import('@/pages/Storage'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const Profile = lazy(() => import('@/pages/Profile'));
+const Support = lazy(() => import('@/pages/Support'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -93,6 +94,7 @@ const AuthenticatedApp = () => {
           <Route path="/my-payouts" element={<PageTransition><MyPayouts /></PageTransition>} />
           <Route path="/storage" element={<PageTransition><Storage /></PageTransition>} />
           <Route path="/help" element={<PageTransition><HelpCenter /></PageTransition>} />
+          <Route path="/support" element={<PageTransition><Support /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
         </Route>
       </Route>

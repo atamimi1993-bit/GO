@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse } from 'lucide-react';
+import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import BottomTabBar from '@/components/go/BottomTabBar';
@@ -13,6 +13,7 @@ const navItems = [
   { label: 'Driver Hub', path: '/driver-hub', icon: Truck },
   { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
+  { label: 'Assistant', path: '/support', icon: Bot },
 ];
 
 export default function AppLayout() {

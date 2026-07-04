@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTabHistory } from '@/lib/TabHistoryContext';
-import { Home, Package, Truck, Warehouse, HelpCircle } from 'lucide-react';
+import { Home, Package, Truck, Warehouse, HelpCircle, Bot } from 'lucide-react';
 
 const tabs = [
   { label: 'Home', path: '/', icon: Home },
@@ -9,6 +9,7 @@ const tabs = [
   { label: 'Driver', path: '/driver-hub', icon: Truck },
   { label: 'Storage', path: '/storage', icon: Warehouse },
   { label: 'Help', path: '/help', icon: HelpCircle },
+  { label: 'AI', path: '/support', icon: Bot },
 ];
 
 export default function BottomTabBar() {
