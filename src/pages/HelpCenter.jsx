@@ -11,7 +11,7 @@ import PageHeader from '@/components/go/PageHeader';
 const DEFAULT_FAQ = {
   customer: [
     { title: 'How do I book a move?', content: 'Click "Start a Move" on the home page. Enter your pickup and drop-off addresses, add your items (manually or by uploading a file), review your quote, sign the liability agreement, and submit. A local driver will accept your job.' },
-    { title: 'How is the price calculated?', content: 'Your price is based on: total item weight, round-trip distance, truck fuel cost, local tax rate, a 10% GO app fee, and a 5% driver fee. You see the full breakdown before confirming.' },
+    { title: 'How is the price calculated?', content: 'Your price is based on: total item weight, round-trip distance, truck fuel cost, local tax rate, a 25% GO app fee, and a 5% driver fee. You see the full breakdown before confirming.' },
     { title: 'What if my items are damaged or lost?', content: 'Contact the driver assigned to your move first. If they cannot resolve the issue, the cost will be deducted from their payout. GO facilitates the resolution process.' },
     { title: 'Can I cancel a move?', content: 'You can cancel a pending move from your "My Moves" page. Once a driver has accepted, please contact them directly through the app.' },
     { title: 'Do you offer storage?', content: 'Yes! Visit our Storage page to find climate-controlled and standard storage facilities near your move location.' },
@@ -26,7 +26,7 @@ const DEFAULT_FAQ = {
   general: [
     { title: 'What is GO?', content: 'GO is a marketplace that connects people who need to move their belongings with verified, independent drivers who have trucks of all sizes. Think of it as a rideshare for moving.' },
     { title: 'Is GO available in my area?', content: 'GO operates across all 50 US states. Driver availability varies by location — the more drivers in your area, the faster your job gets accepted.' },
-    { title: 'How does GO make money?', content: 'GO charges a 10% app fee on each move, which is included in your quote. This covers platform operations, dispute resolution, and customer support.' },
+    { title: 'How does GO make money?', content: 'GO charges a 25% app fee on each move, which is included in your quote. This covers platform operations, dispute resolution, and customer support.' },
   ],
 };
 
