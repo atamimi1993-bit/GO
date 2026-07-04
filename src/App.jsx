@@ -53,8 +53,10 @@ const PageTransition = ({ children }) => {
       initial={{ x: isPop ? '-100%' : '100%', opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: isPop ? '100%' : '-100%', opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
-      style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
+      transition={isPop
+        ? { type: 'tween', duration: 0.25, ease: 'easeOut' }
+        : { type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+      style={{ position: 'relative', width: '100%', overflowX: 'hidden', willChange: 'transform' }}
     >
       {children}
     </motion.div>

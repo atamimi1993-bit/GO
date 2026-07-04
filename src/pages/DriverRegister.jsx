@@ -170,7 +170,7 @@ export default function DriverRegister() {
               <p className="font-medium text-sm">CDL Certified?</p>
               <p className="text-xs text-muted-foreground">Required for freight and corporate logistics jobs.</p>
             </div>
-            <Switch checked={form.cdl_certified} onCheckedChange={v => setForm({ ...form, cdl_certified: v, cdl_class: v ? 'Class A' : 'None' })} />
+            <Switch checked={form.cdl_certified} onCheckedChange={v => setForm({ ...form, cdl_certified: v, cdl_class: v ? 'Class A' : 'None' })} aria-label="Toggle CDL certification" />
           </div>
           {form.cdl_certified && (
             <div>

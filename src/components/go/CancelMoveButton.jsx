@@ -20,8 +20,11 @@ export default function CancelMoveButton({ move, onCancelled }) {
   const handleCancel = async () => {
     // If no fee required (pending/quoted), just mark cancelled directly
     if (!requiresFee) {
+      setLoading(true);
+      const prevStatus = move.status;
+      // Optimistically notify parent before the API call
+      onCancelled?.(prevStatus);
       try {
-        setLoading(true);
         await base44.entities.MoveRequest.update(move.id, { status: 'cancelled' });
         if (move.assigned_driver_id) {
           try {
@@ -29,9 +32,10 @@ export default function CancelMoveButton({ move, onCancelled }) {
           } catch {}
         }
         toast({ title: 'Move cancelled', description: 'Your move has been cancelled.' });
-        onCancelled?.();
         setOpen(false);
       } catch {
+        // Revert the optimistic update
+        onCancelled?.(prevStatus, true);
         toast({ title: 'Could not cancel', description: 'Please try again.', variant: 'destructive' });
       } finally {
         setLoading(false);

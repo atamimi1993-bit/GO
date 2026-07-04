@@ -57,7 +57,7 @@ export default function AppLayout() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
           {/* Left: Logo + nav tabs */}
           <div className="flex items-center gap-1 min-w-0">
-            <Link to="/" className="flex items-center shrink-0">
+            <Link to="/" aria-label="GO Home" className="flex items-center shrink-0">
               <Logo size="sm" />
             </Link>
             <nav className="hidden md:flex items-center gap-1 ml-2 overflow-x-auto">

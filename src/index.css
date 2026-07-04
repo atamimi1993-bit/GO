@@ -104,6 +104,7 @@
   button, [role="tab"], nav, .select-none-ui, a[role="link"], [data-radix-collection-item] {
     user-select: none;
     -webkit-user-select: none;
+    touch-action: manipulation;
   }
 
   .safe-top { padding-top: env(safe-area-inset-top); }

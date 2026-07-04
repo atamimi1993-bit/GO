@@ -47,7 +47,20 @@ export default function MoveChat({ move, currentUser, driverProfile }) {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim() || !currentUser) return;
+    const text = input.trim();
+    if (!text || !currentUser || sending) return;
+    // Optimistic message — shown immediately, replaced when the subscription fires
+    const tempId = `temp-${Date.now()}`;
+    setMessages(prev => [...prev, {
+      id: tempId,
+      _pending: true,
+      move_request_id: move.id,
+      sender_id: currentUser.id,
+      sender_name: senderName,
+      sender_role: senderRole,
+      content: text,
+    }]);
+    setInput('');
     setSending(true);
     try {
       await base44.entities.Message.create({
@@ -55,10 +68,13 @@ export default function MoveChat({ move, currentUser, driverProfile }) {
         sender_id: currentUser.id,
         sender_name: senderName,
         sender_role: senderRole,
-        content: input.trim(),
+        content: text,
       });
-      setInput('');
-    } catch {}
+      // The subscription will replace the optimistic message with the real one
+    } catch {
+      // Remove the optimistic message on failure
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+    }
     setSending(false);
   };
 
@@ -102,7 +118,10 @@ export default function MoveChat({ move, currentUser, driverProfile }) {
                       {msg.sender_name} · {msg.sender_role}
                     </p>
                   )}
-                  <p className="text-sm select-text">{msg.content}</p>
+                  <p className={`text-sm select-text ${msg._pending ? 'opacity-60' : ''}`}>{msg.content}</p>
+                  {msg._pending && (
+                    <p className="text-[10px] opacity-50 mt-0.5">Sending...</p>
+                  )}
                 </div>
               </div>
             );
