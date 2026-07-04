@@ -9,6 +9,7 @@ const MoveCalendar = lazy(() => import('@/components/admin/MoveCalendar'));
 const MoveHeatMap = lazy(() => import('@/components/admin/MoveHeatMap'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const FleetManagement = lazy(() => import('@/components/admin/FleetManagement'));
+const PromoCodeManager = lazy(() => import('@/components/admin/PromoCodeManager'));
 
 export default function OperationsTab({ scrollRef }) {
   const [showMap, setShowMap] = useState(false);
@@ -36,6 +37,11 @@ export default function OperationsTab({ scrollRef }) {
       {/* Move status tracker */}
       <Suspense fallback={<SectionSkeleton />}>
         <MoveStatusTracker />
+      </Suspense>
+
+      {/* Promo code manager */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <PromoCodeManager />
       </Suspense>
 
       {/* Move calendar */}

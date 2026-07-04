@@ -5,9 +5,17 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Clock, Loader2, ChevronDown, ChevronRight, Package, Navigation, CheckCircle2,
+  UserPlus, X,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const STATUS_GROUPS = [
   { key: 'pending', label: 'Pending', icon: Clock, color: 'text-amber-500', badge: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300' },
@@ -31,6 +39,10 @@ export default function MoveStatusTracker() {
   const [expanded, setExpanded] = useState({ pending: true, in_progress: true, completed: false });
   const [showAll, setShowAll] = useState({});
   const [limit, setLimit] = useState(50);
+  const [approvedDrivers, setApprovedDrivers] = useState([]);
+  const [assigningMoveId, setAssigningMoveId] = useState(null);
+  const [selectedDriver, setSelectedDriver] = useState({});
+  const [assigning, setAssigning] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -44,6 +56,36 @@ export default function MoveStatusTracker() {
   }, [toast, limit]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Load approved drivers for manual assignment
+  useEffect(() => {
+    base44.entities.DriverProfile.filter({ status: 'approved', available: true })
+      .then(setApprovedDrivers)
+      .catch(() => {});
+  }, []);
+
+  const handleManualAssign = async (moveId) => {
+    const driverId = selectedDriver[moveId];
+    if (!driverId) return;
+    const driver = approvedDrivers.find((d) => d.id === driverId);
+    if (!driver) return;
+    setAssigning(true);
+    try {
+      await base44.entities.MoveRequest.update(moveId, {
+        assigned_driver_id: driver.id,
+        assigned_driver_name: driver.full_name,
+        dispatched_at: new Date().toISOString(),
+        status: 'accepted',
+      });
+      toast({ title: 'Driver assigned', description: `${driver.full_name} assigned to this move` });
+      setAssigningMoveId(null);
+      setSelectedDriver({});
+      load();
+    } catch (err) {
+      toast({ title: 'Failed to assign driver', description: err.message, variant: 'destructive' });
+    }
+    setAssigning(false);
+  };
 
   const grouped = STATUS_GROUPS.map((group) => ({
     ...group,
@@ -94,15 +136,57 @@ export default function MoveStatusTracker() {
                       <>
                         <div className="divide-y">
                           {visibleMoves.map((m) => (
-                            <div key={m.id} className="flex items-center justify-between gap-2 p-3 hover:bg-muted/30">
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium truncate">{m.pickup_address} → {m.dropoff_address}</p>
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {m.customer_name || 'Unknown'} · {m.move_date ? format(parseISO(m.move_date), 'MMM d, yyyy') : 'No date'}
-                                  {m.assigned_driver_name ? ` · ${m.assigned_driver_name}` : ' · Unassigned'}
-                                </p>
+                            <div key={m.id} className="p-3 hover:bg-muted/30">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium truncate">{m.pickup_address} → {m.dropoff_address}</p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {m.customer_name || 'Unknown'} · {m.move_date ? format(parseISO(m.move_date), 'MMM d, yyyy') : 'No date'}
+                                    {m.assigned_driver_name ? ` · ${m.assigned_driver_name}` : ' · Unassigned'}
+                                  </p>
+                                </div>
+                                <span className="text-sm font-semibold shrink-0">{fmt(m.total_price)}</span>
                               </div>
-                              <span className="text-sm font-semibold shrink-0">{fmt(m.total_price)}</span>
+                              {/* Manual driver assignment for unassigned moves */}
+                              {!m.assigned_driver_id && approvedDrivers.length > 0 && (
+                                <div className="mt-2">
+                                  {assigningMoveId === m.id ? (
+                                    <div className="flex items-center gap-2">
+                                      <Select
+                                        value={selectedDriver[m.id] || ''}
+                                        onValueChange={(val) => setSelectedDriver({ ...selectedDriver, [m.id]: val })}
+                                      >
+                                        <SelectTrigger className="h-8 text-xs flex-1">
+                                          <SelectValue placeholder="Select a driver..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {approvedDrivers.map((d) => (
+                                            <SelectItem key={d.id} value={d.id}>
+                                              {d.full_name} · {d.vehicle_category}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                      <Button
+                                        size="sm"
+                                        className="h-8"
+                                        disabled={!selectedDriver[m.id] || assigning}
+                                        onClick={() => handleManualAssign(m.id)}
+                                      >
+                                        {assigning ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} className="mr-1" />}
+                                        Assign
+                                      </Button>
+                                      <Button size="sm" variant="ghost" className="h-8" onClick={() => { setAssigningMoveId(null); setSelectedDriver({}); }}>
+                                        <X size={14} />
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAssigningMoveId(m.id)}>
+                                      <UserPlus size={12} className="mr-1" /> Assign Driver
+                                    </Button>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
