@@ -14,6 +14,8 @@ import PromoCodeInput from '@/components/go/PromoCodeInput';
 import AssignedDriverCard from '@/components/go/AssignedDriverCard';
 import PriceConfirmation from '@/components/go/PriceConfirmation';
 import PaymentMethods from '@/components/go/PaymentMethods';
+import PaymentOptions from '@/components/go/PaymentOptions';
+import InstallmentProgress from '@/components/go/InstallmentProgress';
 import OnSiteChecklist from '@/components/go/OnSiteChecklist';
 import CancelMoveButton from '@/components/go/CancelMoveButton';
 import MoveChat from '@/components/go/MoveChat';
@@ -377,8 +379,8 @@ export default function MoveDetail() {
         <PriceConfirmation move={move} onConfirmed={load} />
       )}
 
-      {/* Delivery payment — second half due upon delivery */}
-      {!move.paid && move.deposit_paid && move.balance_due > 0 && move.status !== 'cancelled' && (
+      {/* Delivery payment — second half due upon delivery (50/50 split only) */}
+      {!move.paid && move.deposit_paid && move.balance_due > 0 && move.payment_option !== 'installment_plan' && move.status !== 'cancelled' && (
         <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 mt-2 space-y-3">
           <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-medium">
             <Wallet size={16} /> Pickup paid — delivery payment due
@@ -409,51 +411,14 @@ export default function MoveDetail() {
         </div>
       )}
 
-      {/* Pickup deposit — 50% due at pickup */}
+      {/* Payment options — full, 50/50 split, or installment plan */}
       {!move.paid && !move.deposit_paid && move.status !== 'cancelled' && (
-        <>
-          <PromoCodeInput move={move} onApplied={setPromoData} />
-          {promoData && (
-            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 mt-2 space-y-1">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Original Total</span>
-                <span className="line-through text-muted-foreground">{curr.symbol}{promoData.original_total.toFixed(curr.decimals)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-emerald-600 dark:text-emerald-400">Discount ({promoData.promo.discount_percent}%)</span>
-                <span className="text-emerald-600 dark:text-emerald-400">−{curr.symbol}{promoData.discount_amount.toFixed(curr.decimals)}</span>
-              </div>
-              <div className="flex justify-between font-bold pt-1 border-t border-emerald-500/20">
-                <span>New Total</span>
-                <span className="text-emerald-600 dark:text-emerald-400">{curr.symbol}{promoData.discounted_total.toFixed(curr.decimals)}</span>
-              </div>
-            </div>
-          )}
+        <PaymentOptions move={move} onPromoApplied={setPromoData} />
+      )}
 
-          {/* Split payment info */}
-          <div className="mt-2 rounded-xl border border-border p-3 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <Wallet size={18} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">Pay in 2 — pickup & delivery</p>
-              <p className="text-xs text-muted-foreground">
-                {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 2).toFixed(curr.decimals)} at pickup · {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 2).toFixed(curr.decimals)} at delivery
-              </p>
-            </div>
-          </div>
-
-          <Button
-            onClick={handlePay}
-            disabled={paying}
-            className="w-full mt-2 bg-emerald-500 hover:bg-emerald-600"
-          >
-            {paying
-              ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</>
-              : <><CreditCard size={16} className="mr-1" /> Pay at Pickup — {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) / 2).toFixed(curr.decimals)}</>}
-          </Button>
-          <PaymentMethods />
-        </>
+      {/* Installment plan progress — track and pay monthly installments */}
+      {!move.paid && move.deposit_paid && move.payment_option === 'installment_plan' && move.status !== 'cancelled' && (
+        <InstallmentProgress move={move} />
       )}
 
       {move.paid && (

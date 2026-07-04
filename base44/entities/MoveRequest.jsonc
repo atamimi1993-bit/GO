@@ -232,6 +232,43 @@
       "type": "boolean",
       "default": false
     },
+    "payment_option": {
+      "type": "string",
+      "enum": [
+        "full",
+        "split_50_50",
+        "installment_plan"
+      ],
+      "default": "split_50_50"
+    },
+    "credit_tier": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "fair"
+      ]
+    },
+    "installment_term_months": {
+      "type": "number",
+      "default": 0
+    },
+    "interest_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "installment_total": {
+      "type": "number",
+      "default": 0
+    },
+    "monthly_payment": {
+      "type": "number",
+      "default": 0
+    },
+    "installments_total_count": {
+      "type": "number",
+      "default": 0
+    },
     "deposit_amount": {
       "type": "number",
       "default": 0
@@ -291,16 +328,14 @@
     "move_date"
   ],
   "rls": {
-    "create": {
-      "created_by_id": "{{user.id}}"
-    },
+    "create": true,
     "read": {
       "$or": [
         {
           "created_by_id": "{{user.id}}"
         },
         {
-          "data.assigned_driver_id": "{{user.id}}"
+          "data.customer_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -315,7 +350,7 @@
           "created_by_id": "{{user.id}}"
         },
         {
-          "data.assigned_driver_id": "{{user.id}}"
+          "data.customer_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -328,6 +363,9 @@
       "$or": [
         {
           "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.customer_email": "{{user.email}}"
         },
         {
           "user_condition": {

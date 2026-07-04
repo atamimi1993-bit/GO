@@ -55,13 +55,13 @@ Deno.serve(async (req) => {
             balance_due: Math.max(0, newBalance),
           };
 
-          if (newCount >= 3) {
+          if (newCount >= (move?.installments_total_count || 3)) {
             updateFields.paid = true;
             updateFields.balance_due = 0;
           }
 
           await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, updateFields);
-          console.log(`Installment ${newCount}/3 paid for move ${moveRequestId}. Balance: ${Math.max(0, newBalance)}`);
+          console.log(`Installment ${newCount}/${move?.installments_total_count || 3} paid for move ${moveRequestId}. Balance: ${Math.max(0, newBalance)}`);
         } else if (paymentType === 'deposit') {
           await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
             deposit_paid: true,

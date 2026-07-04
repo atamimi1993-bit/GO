@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
       }
 
       const installmentNum = (move.installments_paid || 0) + 1;
-      const totalInstallments = 3;
+      const totalInstallments = move.installments_total_count || 3;
       const greeting = move.customer_name ? `Hi ${move.customer_name.split(' ')[0]},` : 'Hello,';
 
       const htmlBody = [

@@ -8,6 +8,48 @@ const ZERO_DECIMAL_CURRENCIES = [
   'DKK', 'CZK', 'HUF', 'KES', 'TRY'
 ];
 
+// Installment plan rate table — APR % (longer terms = higher rates, lower credit = higher rates)
+const INSTALLMENT_RATES = {
+  excellent: { 3: 5.99, 6: 6.99, 12: 8.99, 24: 10.99, 36: 13.99, 48: 16.99 },
+  good:      { 3: 9.99, 6: 11.99, 12: 14.99, 24: 17.99, 36: 21.99, 48: 25.99 },
+  fair:      { 3: 14.99, 6: 17.99, 12: 21.99, 24: 25.99, 36: 28.99, 48: 31.99 },
+};
+
+function getInstallmentAPR(termMonths, creditTier) {
+  const rates = INSTALLMENT_RATES[creditTier] || INSTALLMENT_RATES.good;
+  const breakpoints = [3, 6, 12, 24, 36, 48];
+  if (termMonths <= 3) return rates[3];
+  if (termMonths >= 48) return rates[48];
+  let lower = 3, upper = 48;
+  for (let i = 0; i < breakpoints.length - 1; i++) {
+    if (termMonths >= breakpoints[i] && termMonths <= breakpoints[i + 1]) {
+      lower = breakpoints[i];
+      upper = breakpoints[i + 1];
+      break;
+    }
+  }
+  const t = (termMonths - lower) / (upper - lower);
+  return Math.round((rates[lower] + t * (rates[upper] - rates[lower])) * 100) / 100;
+}
+
+function calculateInstallmentPlan(principal, termMonths, creditTier) {
+  const apr = getInstallmentAPR(termMonths, creditTier);
+  const monthlyRate = apr / 100 / 12;
+  let monthlyPayment;
+  if (monthlyRate === 0) {
+    monthlyPayment = principal / termMonths;
+  } else {
+    monthlyPayment = principal * monthlyRate * Math.pow(1 + monthlyRate, termMonths) / (Math.pow(1 + monthlyRate, termMonths) - 1);
+  }
+  const totalCost = monthlyPayment * termMonths;
+  return {
+    apr,
+    monthlyPayment: Math.round(monthlyPayment * 100) / 100,
+    totalCost: Math.round(totalCost * 100) / 100,
+    totalInterest: Math.round((totalCost - principal) * 100) / 100,
+  };
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -19,7 +61,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { move_request_id, promo_code, validate_only, payment_plan, pay_balance } = body;
+    const { move_request_id, promo_code, validate_only, payment_plan, pay_balance, pay_installment, payment_option, credit_tier, installment_term_months } = body;
 
     if (!move_request_id) {
       return Response.json({ error: 'move_request_id is required' }, { status: 400 });
@@ -107,17 +149,33 @@ Deno.serve(async (req) => {
     const currencyCode = (move.currency || 'USD').toUpperCase();
     const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.includes(currencyCode);
 
-    // Determine charge amount: pickup deposit (50%) or delivery balance (50%)
+    // Determine charge amount based on selected payment option
     let chargeAmount;
-    let paymentType = 'pickup';
+    let paymentType = 'full';
     const splitAmount = Math.round(discountedTotal / 2 * 100) / 100;
+    const effectiveOption = move.payment_option || payment_option || 'split_50_50';
 
-    if (pay_balance && move.balance_due > 0) {
-      // Delivery payment — remaining 50% balance
+    if (pay_installment && move.monthly_payment > 0) {
+      // Subsequent installment payment
+      chargeAmount = move.monthly_payment;
+      paymentType = 'installment';
+    } else if (pay_balance && move.balance_due > 0) {
+      // 50/50 split — delivery payment (remaining balance)
       chargeAmount = move.balance_due;
       paymentType = 'delivery';
+    } else if (effectiveOption === 'full') {
+      // Full one-time payment
+      chargeAmount = discountedTotal;
+      paymentType = 'full';
+    } else if (effectiveOption === 'installment_plan') {
+      // First installment payment — calculate plan details
+      const term = Math.min(Math.max(parseInt(installment_term_months) || 3, 3), 48);
+      const tier = ['excellent', 'good', 'fair'].includes(credit_tier) ? credit_tier : 'good';
+      const plan = calculateInstallmentPlan(discountedTotal, term, tier);
+      chargeAmount = plan.monthlyPayment;
+      paymentType = 'installment';
     } else {
-      // Pickup deposit — 50% of total
+      // 50/50 split — pickup deposit (50%)
       chargeAmount = splitAmount;
       paymentType = 'pickup';
     }
@@ -126,9 +184,13 @@ Deno.serve(async (req) => {
       ? Math.round(chargeAmount)
       : Math.round(chargeAmount * 100);
 
-    const productLabel = paymentType === 'delivery'
-      ? 'GO Move Service — Delivery Payment'
-      : 'GO Move Service — Pickup Deposit';
+    const productLabels = {
+      full: 'GO Move Service — Full Payment',
+      pickup: 'GO Move Service — Pickup Deposit',
+      delivery: 'GO Move Service — Delivery Payment',
+      installment: 'GO Move Service — Installment Payment',
+    };
+    const productLabel = productLabels[paymentType] || productLabels.pickup;
 
     const sessionParams = {
       payment_method_types: ['card', 'link', 'cashapp', 'afterpay_clearpay', 'klarna'],
@@ -154,6 +216,7 @@ Deno.serve(async (req) => {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         move_request_id: move.id,
         payment_type: paymentType,
+        payment_option: effectiveOption,
       },
     };
 
@@ -189,11 +252,32 @@ Deno.serve(async (req) => {
       stripe_session_id: session.id,
     };
 
-    // Store split payment details when pickup deposit is charged
-    if (paymentType === 'pickup') {
+    // Store payment plan details based on payment type
+    if (paymentType === 'full') {
+      updateData.payment_option = 'full';
+      updateData.deposit_amount = chargeAmount;
+      updateData.balance_due = 0;
+    } else if (paymentType === 'pickup') {
+      updateData.payment_option = 'split_50_50';
       updateData.payment_plan = true;
       updateData.deposit_amount = chargeAmount;
       updateData.balance_due = Math.round((discountedTotal - chargeAmount) * 100) / 100;
+    } else if (paymentType === 'installment' && !pay_installment) {
+      // First installment — store full plan details
+      const term = Math.min(Math.max(parseInt(installment_term_months) || 3, 3), 48);
+      const tier = ['excellent', 'good', 'fair'].includes(credit_tier) ? credit_tier : 'good';
+      const plan = calculateInstallmentPlan(discountedTotal, term, tier);
+      updateData.payment_option = 'installment_plan';
+      updateData.payment_plan = true;
+      updateData.credit_tier = tier;
+      updateData.installment_term_months = term;
+      updateData.interest_rate = plan.apr;
+      updateData.installment_total = plan.totalCost;
+      updateData.monthly_payment = plan.monthlyPayment;
+      updateData.installment_amount = plan.monthlyPayment;
+      updateData.installments_total_count = term;
+      updateData.deposit_amount = chargeAmount;
+      updateData.balance_due = Math.round((plan.totalCost - chargeAmount) * 100) / 100;
     }
 
     if (appliedPromoCode) {

@@ -330,4 +330,55 @@ const US_STATES = [
   { code: 'WV', name: 'West Virginia' }, { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' },
 ];
 
-export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE };
+// Installment plan rate table — APR % (longer terms = higher rates, lower credit = higher rates)
+const INSTALLMENT_RATES = {
+  excellent: { 3: 5.99, 6: 6.99, 12: 8.99, 24: 10.99, 36: 13.99, 48: 16.99 },
+  good:      { 3: 9.99, 6: 11.99, 12: 14.99, 24: 17.99, 36: 21.99, 48: 25.99 },
+  fair:      { 3: 14.99, 6: 17.99, 12: 21.99, 24: 25.99, 36: 28.99, 48: 31.99 },
+};
+
+export function getInstallmentAPR(termMonths, creditTier) {
+  const rates = INSTALLMENT_RATES[creditTier] || INSTALLMENT_RATES.good;
+  const breakpoints = [3, 6, 12, 24, 36, 48];
+  if (termMonths <= 3) return rates[3];
+  if (termMonths >= 48) return rates[48];
+  let lower = 3, upper = 48;
+  for (let i = 0; i < breakpoints.length - 1; i++) {
+    if (termMonths >= breakpoints[i] && termMonths <= breakpoints[i + 1]) {
+      lower = breakpoints[i];
+      upper = breakpoints[i + 1];
+      break;
+    }
+  }
+  const t = (termMonths - lower) / (upper - lower);
+  return Math.round((rates[lower] + t * (rates[upper] - rates[lower])) * 100) / 100;
+}
+
+export function calculateInstallmentPlan(principal, termMonths, creditTier) {
+  const apr = getInstallmentAPR(termMonths, creditTier);
+  const monthlyRate = apr / 100 / 12;
+  let monthlyPayment;
+  if (monthlyRate === 0) {
+    monthlyPayment = principal / termMonths;
+  } else {
+    monthlyPayment = principal * monthlyRate * Math.pow(1 + monthlyRate, termMonths) / (Math.pow(1 + monthlyRate, termMonths) - 1);
+  }
+  const totalCost = monthlyPayment * termMonths;
+  return {
+    apr,
+    monthlyPayment: Math.round(monthlyPayment * 100) / 100,
+    totalCost: Math.round(totalCost * 100) / 100,
+    totalInterest: Math.round((totalCost - principal) * 100) / 100,
+    termMonths,
+  };
+}
+
+export const CREDIT_TIERS = [
+  { key: 'excellent', label: 'Excellent', description: '720+ credit score' },
+  { key: 'good', label: 'Good', description: '660-719 credit score' },
+  { key: 'fair', label: 'Fair', description: '600-659 credit score' },
+];
+
+export const INSTALLMENT_TERM_OPTIONS = [3, 6, 12, 24, 36, 48];
+
+export { STATE_TAX_RATES, CURRENCIES, COUNTRY_CONFIG, COUNTRY_LIST, FUEL_PRICES, FUEL_LABELS, DRIVER_RATES, US_STATES, BULKY_ITEM_FEE, BULKY_WEIGHT_THRESHOLD, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE, CANCELLATION_FEE, INSTALLMENT_RATES };
