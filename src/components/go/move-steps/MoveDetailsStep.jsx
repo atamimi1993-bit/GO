@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import MobileSelect from '@/components/go/MobileSelect';
 import IntermediateStops from '@/components/go/move-steps/IntermediateStops';
-import { MapPin, Ruler, Loader2, Sparkles, Footprints, UserPlus, ArrowUpDown } from 'lucide-react';
+import { MapPin, Ruler, Loader2, Sparkles, Footprints, UserPlus, ArrowUpDown, Warehouse } from 'lucide-react';
 import { COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE } from '@/lib/pricing';
 
 const JOB_TYPES = [
@@ -259,6 +259,41 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange, in
               </div>
             </button>
           </div>
+        </div>
+
+        {/* Storage needed toggle + days input */}
+        <div className="border-t border-border pt-4 space-y-3">
+          <button
+            type="button"
+            onClick={() => setForm({ ...form, needs_storage: !form.needs_storage })}
+            aria-label="Toggle storage needed"
+            aria-pressed={form.needs_storage}
+            className={`w-full flex items-center gap-3 rounded-xl border p-3 text-left transition-colors ${form.needs_storage ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:bg-muted'}`}
+          >
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${form.needs_storage ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-muted text-muted-foreground'}`}>
+              <Warehouse size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium">Need Storage?</p>
+              <p className="text-xs text-muted-foreground">Let us know if you need short-term storage between pickup and drop-off</p>
+            </div>
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${form.needs_storage ? 'border-emerald-500' : 'border-muted-foreground/30'}`}>
+              {form.needs_storage && <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />}
+            </div>
+          </button>
+          {form.needs_storage && (
+            <div>
+              <Label>How many days do you need storage?</Label>
+              <Input
+                type="number"
+                min={1}
+                placeholder="e.g. 7"
+                value={form.storage_days || ''}
+                onChange={e => setForm({ ...form, storage_days: Number(e.target.value) || 0 })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">Enter the number of days you'll need storage for your belongings</p>
+            </div>
+          )}
         </div>
 
         {autoFilling && (

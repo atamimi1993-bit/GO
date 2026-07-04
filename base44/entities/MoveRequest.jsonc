@@ -196,6 +196,10 @@
       "type": "boolean",
       "default": false
     },
+    "storage_days": {
+      "type": "number",
+      "default": 0
+    },
     "items_pdf_url": {
       "type": "string"
     },
