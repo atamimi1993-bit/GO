@@ -84,6 +84,18 @@
         "extra_large"
       ]
     },
+    "service_level": {
+      "type": "string",
+      "enum": [
+        "self_service",
+        "standard",
+        "full_service"
+      ],
+      "default": "standard"
+    },
+    "media_urls": {
+      "type": "string"
+    },
     "base_cost": {
       "type": "number",
       "default": 0
