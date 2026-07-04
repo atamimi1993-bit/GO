@@ -34,26 +34,39 @@ export default function DriverAvailabilityCalendar({ driverProfile }) {
     const dateStr = format(date, 'yyyy-MM-dd');
     const existing = getEntry(date);
     setToggling(dateStr);
+    const prevAvailability = availability;
 
-    try {
-      if (existing) {
-        const newStatus = existing.status === 'available' ? 'unavailable' : 'available';
-        await base44.entities.DriverAvailability.update(existing.id, {
-          status: newStatus,
-        });
-        setAvailability((prev) =>
-          prev.map((a) => (a.id === existing.id ? { ...a, status: newStatus } : a))
-        );
-      } else {
+    if (existing) {
+      const newStatus = existing.status === 'available' ? 'unavailable' : 'available';
+      setAvailability((prev) =>
+        prev.map((a) => (a.id === existing.id ? { ...a, status: newStatus } : a))
+      );
+      try {
+        await base44.entities.DriverAvailability.update(existing.id, { status: newStatus });
+      } catch {
+        setAvailability(prevAvailability);
+      }
+    } else {
+      const tempEntry = {
+        id: 'optimistic_' + Date.now(),
+        driver_profile_id: driverProfile.id,
+        driver_name: driverProfile.full_name,
+        date: dateStr,
+        status: 'available',
+      };
+      setAvailability((prev) => [...prev, tempEntry]);
+      try {
         const created = await base44.entities.DriverAvailability.create({
           driver_profile_id: driverProfile.id,
           driver_name: driverProfile.full_name,
           date: dateStr,
           status: 'available',
         });
-        setAvailability((prev) => [...prev, created]);
+        setAvailability((prev) => prev.map((a) => (a.id === tempEntry.id ? created : a)));
+      } catch {
+        setAvailability(prevAvailability);
       }
-    } catch {}
+    }
     setToggling(null);
   };
 

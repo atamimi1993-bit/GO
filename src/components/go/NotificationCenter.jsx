@@ -117,7 +117,7 @@ export default function NotificationCenter({ user }) {
             tabIndex={0}
             aria-label="Close notifications"
             onClick={() => setOpen(false)}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(false); } }}
+            onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(false); } }}
           />
           <div
             ref={dropdownRef}

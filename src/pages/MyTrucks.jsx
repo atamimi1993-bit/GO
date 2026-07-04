@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import MobileSelect from '@/components/go/MobileSelect';
 import { useToast } from '@/components/ui/use-toast';
 import { TRUCK_SIZE_LABELS } from '@/lib/pricing';
-import { ArrowLeft, Plus, Truck, Upload, Loader2, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Plus, Truck, Upload, Loader2, ShieldCheck, Trash2 } from 'lucide-react';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 
@@ -83,6 +83,18 @@ export default function MyTrucks() {
       toast({ title: 'Error', variant: 'destructive' });
     }
     setSaving(false);
+  };
+
+  const handleDelete = async (id) => {
+    const prev = trucks;
+    setTrucks(prev => prev.filter(t => t.id !== id));
+    try {
+      await base44.entities.Truck.delete(id);
+      toast({ title: 'Truck removed' });
+    } catch {
+      setTrucks(prev);
+      toast({ title: 'Error removing truck', variant: 'destructive' });
+    }
   };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
@@ -190,6 +202,9 @@ export default function MyTrucks() {
                 ) : (
                   <span className="text-xs text-yellow-600">Pending verification</span>
                 )}
+                <Button variant="ghost" size="icon" className="text-destructive min-h-[40px] min-w-[40px]" onClick={() => handleDelete(truck.id)}>
+                  <Trash2 size={16} />
+                </Button>
               </div>
             </div>
           ))}

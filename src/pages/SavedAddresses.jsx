@@ -31,21 +31,31 @@ export default function SavedAddresses() {
   const handleSave = async () => {
     if (!form.label || !form.address || !user) return;
     setSaving(true);
+    const tempId = `optimistic_${Date.now()}`;
+    const optimisticAddr = { ...form, user_email: user.email, id: tempId, created_date: new Date().toISOString() };
+    queryClient.setQueryData(['savedAddresses', user.email], (prev = []) => [optimisticAddr, ...prev]);
     try {
-      await base44.entities.SavedAddress.create({ ...form, user_email: user.email });
-      queryClient.invalidateQueries({ queryKey: ['savedAddresses', user.email] });
+      const created = await base44.entities.SavedAddress.create({ ...form, user_email: user.email });
+      queryClient.setQueryData(['savedAddresses', user.email], (prev = []) => prev.map(a => a.id === tempId ? created : a));
       setForm({ label: '', address: '', contact_name: '', contact_phone: '', category: 'other' });
       setShowForm(false);
       toast({ title: 'Address saved!' });
     } catch {
+      queryClient.setQueryData(['savedAddresses', user.email], (prev = []) => prev.filter(a => a.id !== tempId));
       toast({ title: 'Error saving address', variant: 'destructive' });
     }
     setSaving(false);
   };
 
   const handleDelete = async (id) => {
-    await base44.entities.SavedAddress.delete(id);
-    queryClient.invalidateQueries({ queryKey: ['savedAddresses', user?.email] });
+    const prev = queryClient.getQueryData(['savedAddresses', user?.email]) || [];
+    queryClient.setQueryData(['savedAddresses', user?.email], (old = []) => old.filter(a => a.id !== id));
+    try {
+      await base44.entities.SavedAddress.delete(id);
+    } catch {
+      queryClient.setQueryData(['savedAddresses', user?.email], prev);
+      toast({ title: 'Error deleting address', variant: 'destructive' });
+    }
   };
 
   return (

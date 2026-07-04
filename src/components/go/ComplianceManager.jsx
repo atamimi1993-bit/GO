@@ -17,6 +17,7 @@ export default function ComplianceManager({ driverProfile, onUpdated }) {
   const [trucks, setTrucks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState({});
+  const [uploadingField, setUploadingField] = useState(null);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({
@@ -45,6 +46,7 @@ export default function ComplianceManager({ driverProfile, onUpdated }) {
   const handleUpload = async (field, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setUploadingField(field);
     setUploading(u => ({ ...u, [field]: true }));
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -56,6 +58,7 @@ export default function ComplianceManager({ driverProfile, onUpdated }) {
       toast({ title: 'Upload failed', variant: 'destructive' });
     }
     setUploading(u => ({ ...u, [field]: false }));
+    setUploadingField(null);
   };
 
   const handleSaveLicense = async () => {
@@ -194,7 +197,12 @@ export default function ComplianceManager({ driverProfile, onUpdated }) {
         {docs.map(doc => {
           const uploaded = profile[doc.field];
           return (
-            <div key={doc.field} className="flex items-center justify-between p-3 rounded-xl bg-muted/30">
+            <div key={doc.field} className="relative flex items-center justify-between p-3 rounded-xl bg-muted/30">
+              {uploadingField === doc.field && (
+                <div className="absolute inset-0 rounded-xl bg-background/60 flex items-center justify-center z-10">
+                  <Loader2 size={16} className="animate-spin text-primary" />
+                </div>
+              )}
               <div className="flex items-center gap-2 min-w-0">
                 <doc.icon size={16} className={uploaded ? 'text-emerald-500' : 'text-muted-foreground'} />
                 <span className="text-sm truncate">{doc.label}</span>

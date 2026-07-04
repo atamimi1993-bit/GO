@@ -49,33 +49,57 @@ export default function RecurringDeliveries() {
   const handleSave = async () => {
     if (!form.pickup_address || !form.dropoff_address || !user) return;
     setSaving(true);
+    const now = new Date();
+    const tempId = `optimistic_${Date.now()}`;
+    const optimisticSchedule = {
+      ...form,
+      customer_name: user.full_name,
+      customer_email: user.email,
+      active: true,
+      next_trigger: new Date(now.getTime() + 86400000).toISOString(),
+      id: tempId,
+      created_date: now.toISOString(),
+    };
+    queryClient.setQueryData(['recurringDeliveries', user.email], (prev = []) => [optimisticSchedule, ...prev]);
     try {
-      const now = new Date();
-      await base44.entities.RecurringDelivery.create({
+      const created = await base44.entities.RecurringDelivery.create({
         ...form,
         customer_name: user.full_name,
         customer_email: user.email,
         active: true,
         next_trigger: new Date(now.getTime() + 86400000).toISOString(),
       });
-      queryClient.invalidateQueries({ queryKey: ['recurringDeliveries', user.email] });
+      queryClient.setQueryData(['recurringDeliveries', user.email], (prev = []) => prev.map(s => s.id === tempId ? created : s));
       toast({ title: 'Recurring delivery scheduled!', description: 'We will auto-create deliveries on schedule.' });
       setShowForm(false);
       setForm({ pickup_address: '', dropoff_address: '', delivery_category: 'hospital', item_description: '', frequency: 'weekly', day_of_week: 1, time_slot: 'Morning (9-12)', requires_signature: false, temperature_controlled: false, notes: '' });
     } catch {
+      queryClient.setQueryData(['recurringDeliveries', user.email], (prev = []) => prev.filter(s => s.id !== tempId));
       toast({ title: 'Error saving schedule', variant: 'destructive' });
     }
     setSaving(false);
   };
 
   const toggleActive = async (id, current) => {
-    await base44.entities.RecurringDelivery.update(id, { active: !current });
-    queryClient.invalidateQueries({ queryKey: ['recurringDeliveries', user?.email] });
+    const prev = queryClient.getQueryData(['recurringDeliveries', user?.email]) || [];
+    queryClient.setQueryData(['recurringDeliveries', user?.email], (old = []) => old.map(s => s.id === id ? { ...s, active: !current } : s));
+    try {
+      await base44.entities.RecurringDelivery.update(id, { active: !current });
+    } catch {
+      queryClient.setQueryData(['recurringDeliveries', user?.email], prev);
+      toast({ title: 'Error updating schedule', variant: 'destructive' });
+    }
   };
 
   const handleDelete = async (id) => {
-    await base44.entities.RecurringDelivery.delete(id);
-    queryClient.invalidateQueries({ queryKey: ['recurringDeliveries', user?.email] });
+    const prev = queryClient.getQueryData(['recurringDeliveries', user?.email]) || [];
+    queryClient.setQueryData(['recurringDeliveries', user?.email], (old = []) => old.filter(s => s.id !== id));
+    try {
+      await base44.entities.RecurringDelivery.delete(id);
+    } catch {
+      queryClient.setQueryData(['recurringDeliveries', user?.email], prev);
+      toast({ title: 'Error deleting schedule', variant: 'destructive' });
+    }
   };
 
   return (
