@@ -94,6 +94,29 @@ Make the copy energetic, trustworthy, and action-oriented. Vary the tone between
     }));
     const createdAds = await base44.asServiceRole.entities.PromotionalAd.bulkCreate(adsToCreate);
 
+    // Auto-generate a promotional image for each ad
+    const imageResults = await Promise.allSettled(
+      createdAds.map((ad) =>
+        base44.asServiceRole.integrations.Core.GenerateImage({
+          prompt: `Professional advertising image for a moving and hauling marketplace called "GO". Headline: "${ad.headline}". Subtext: "${ad.subtext}". Promo code: ${ad.promo_code} (${ad.discount_percent}% off). Style: clean, modern, vibrant, high-quality marketing visual with a moving truck, boxes, and happy people. No text overlay.`,
+        })
+      )
+    );
+
+    const adsWithImages = [];
+    for (let i = 0; i < createdAds.length; i++) {
+      const result = imageResults[i];
+      const imageUrl = result.status === 'fulfilled' && result.value?.url ? result.value.url : '';
+      if (imageUrl) {
+        const updated = await base44.asServiceRole.entities.PromotionalAd.update(createdAds[i].id, {
+          image_url: imageUrl,
+        });
+        adsWithImages.push(updated);
+      } else {
+        adsWithImages.push(createdAds[i]);
+      }
+    }
+
     // Auto-generate leads from marketing sources
     const leadPrompt = `You are a lead generation assistant for "GO", a moving and hauling marketplace platform.
 Search the web for people, families, or businesses who are likely to need moving services soon.
@@ -172,12 +195,13 @@ Return up to 15 realistic leads. Do not fabricate contact details.`;
     }
 
     return Response.json({
-      ads_generated: createdAds.length,
+      ads_generated: adsWithImages.length,
       promo_codes_created: promoCodes.length,
       leads_generated: createdLeads,
+      images_generated: imageResults.filter((r) => r.status === 'fulfilled').length,
       campaign_start: now.toISOString(),
       campaign_end: campaignEnd.toISOString(),
-      ads: createdAds,
+      ads: adsWithImages,
     });
   } catch (error) {
     console.error('generate-ads error:', error);
