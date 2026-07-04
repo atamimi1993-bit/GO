@@ -9,6 +9,7 @@ const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformanc
 const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 const DriverRecruiter = lazy(() => import('@/components/admin/DriverRecruiter'));
+const CdlDriverFinder = lazy(() => import('@/components/admin/CdlDriverFinder'));
 const DriverCoach = lazy(() => import('@/components/admin/DriverCoach'));
 const BackgroundCheckPanel = lazy(() => import('@/components/admin/BackgroundCheckPanel'));
 const LeadContactAssistant = lazy(() => import('@/components/admin/LeadContactAssistant'));
@@ -40,6 +41,11 @@ export default function DriversLeadsTab({ data, processingId, onDriverAction, on
       {/* AI Driver Recruiter */}
       <Suspense fallback={<SectionSkeleton />}>
         <DriverRecruiter />
+      </Suspense>
+
+      {/* AI CDL & Certified Driver Finder */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <CdlDriverFinder />
       </Suspense>
 
       {/* AI Driver Coach */}

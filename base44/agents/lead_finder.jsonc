@@ -23,20 +23,38 @@
     },
     {
       "function_name": "find-leads",
-      "description": "Search the web for new moving/delivery leads in a specific location. Pass location (city, state, or region) and optional keywords. Returns found leads that are saved to the Lead entity."
+      "description": "Search the web for new moving/delivery leads by location and keywords"
     },
     {
       "function_name": "auto-find-leads",
-      "description": "Automatically scan all 20 major US markets for new leads in one pass. Optionally pass a custom list of markets. Returns a per-market summary of leads found and created."
+      "description": "Auto-scan all 20 major US markets for new leads in one pass"
     },
     {
       "function_name": "generate-ads",
-      "description": "Generate targeted ad campaign content for specific markets or audiences. Pass campaign description, target audience, and placement to create marketing ads."
+      "description": "Generate targeted ad campaigns for specific markets or audiences"
     },
     {
       "function_name": "generate-lead-outreach",
-      "description": "Generate personalized outreach messages (email, SMS, phone script, social DM) for a specific lead. Pass lead_id, message_type, and channel."
+      "description": "Generate personalized outreach messages for specific leads"
     }
   ],
+  "context_files": [],
+  "app_user_connector_configs": [],
+  "selected_skill_names": [],
+  "selected_workspace_skill_ids": [],
+  "model": "automatic",
+  "whatsapp_greeting": null,
+  "telegram_greeting": null,
+  "line_greeting": null,
+  "memory_config": {
+    "enabled": true,
+    "scope": "both",
+    "include_other_conversation_context": false,
+    "instructions": null
+  },
+  "voice_config": {
+    "voice_id": null
+  },
+  "allow_anonymous_access": false,
   "name": "lead_finder"
 }
