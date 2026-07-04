@@ -40,7 +40,9 @@
     "stars"
   ],
   "rls": {
-    "create": true,
+    "create": {
+      "data.rater_id": "{{user.id}}"
+    },
     "read": {
       "$or": [
         {
@@ -57,28 +59,14 @@
       ]
     },
     "update": {
-      "$or": [
-        {
-          "data.rater_id": "{{user.id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
-      "$or": [
-        {
-          "data.rater_id": "{{user.id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     }
   }
 }

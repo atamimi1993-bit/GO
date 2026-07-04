@@ -50,7 +50,7 @@
     "read": {
       "$or": [
         {
-          "created_by_id": "{{user.id}}"
+          "data.driver_profile_id": "{{user.id}}"
         },
         {
           "user_condition": {

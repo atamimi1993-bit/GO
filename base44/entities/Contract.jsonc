@@ -55,14 +55,16 @@
     "contract_type"
   ],
   "rls": {
-    "create": true,
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
     "read": {
       "$or": [
         {
           "created_by_id": "{{user.id}}"
         },
         {
-          "data.party_email": "{{user.email}}"
+          "data.driver_profile_id": "{{user.id}}"
         },
         {
           "user_condition": {
@@ -77,9 +79,6 @@
           "created_by_id": "{{user.id}}"
         },
         {
-          "data.party_email": "{{user.email}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
@@ -87,19 +86,9 @@
       ]
     },
     "delete": {
-      "$or": [
-        {
-          "created_by_id": "{{user.id}}"
-        },
-        {
-          "data.party_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     }
   }
 }

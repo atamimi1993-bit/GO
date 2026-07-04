@@ -291,14 +291,16 @@
     "move_date"
   ],
   "rls": {
-    "create": true,
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
     "read": {
       "$or": [
         {
           "created_by_id": "{{user.id}}"
         },
         {
-          "data.customer_email": "{{user.email}}"
+          "data.assigned_driver_id": "{{user.id}}"
         },
         {
           "user_condition": {
@@ -313,7 +315,7 @@
           "created_by_id": "{{user.id}}"
         },
         {
-          "data.customer_email": "{{user.email}}"
+          "data.assigned_driver_id": "{{user.id}}"
         },
         {
           "user_condition": {
@@ -326,9 +328,6 @@
       "$or": [
         {
           "created_by_id": "{{user.id}}"
-        },
-        {
-          "data.customer_email": "{{user.email}}"
         },
         {
           "user_condition": {

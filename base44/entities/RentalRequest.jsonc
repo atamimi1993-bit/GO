@@ -63,5 +63,42 @@
     "renter_email",
     "requested_start_date",
     "requested_end_date"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "data.renter_email": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.renter_email": "{{user.email}}"
+        },
+        {
+          "data.owner_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.renter_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

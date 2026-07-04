@@ -58,5 +58,21 @@
     "requested_by_id",
     "requested_by_role",
     "proposed_date"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "data.requested_by_id": "{{user.id}}"
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }
