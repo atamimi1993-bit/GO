@@ -8,7 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { User, Mail, Loader2, ArrowLeft } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import DriverPaymentInfo from '@/components/go/DriverPaymentInfo';
+import StripeConnectCard from '@/components/go/StripeConnectCard';
 import LoyaltyCard from '@/components/go/LoyaltyCard';
 import ReferralCard from '@/components/go/ReferralCard';
 
@@ -77,7 +77,7 @@ export default function Profile() {
 
       <LoyaltyCard />
       <ReferralCard />
-      <DriverPaymentInfo />
+      <StripeConnectCard />
     </div>
     </PullToRefresh>
   );

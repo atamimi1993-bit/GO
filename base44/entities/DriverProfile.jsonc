@@ -89,6 +89,13 @@
     },
     "bank_account_last4": {
       "type": "string"
+    },
+    "stripe_account_id": {
+      "type": "string"
+    },
+    "stripe_payouts_enabled": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

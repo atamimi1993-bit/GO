@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
         ? 'GO Move Service — Remaining Balance'
         : 'GO Move Service';
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams = {
       payment_method_types: ['card', 'link', 'cashapp', 'afterpay_clearpay', 'klarna'],
       payment_method_options: {
         afterpay_clearpay: { limit: 400000 },
@@ -145,7 +145,34 @@ Deno.serve(async (req) => {
         move_request_id: move.id,
         payment_type: paymentType,
       },
-    });
+    };
+
+    // Stripe Connect: if assigned driver has a connected account, split payment
+    // automatically — platform keeps app fee, driver gets the rest
+    if (move.assigned_driver_id) {
+      try {
+        const driver = await base44.asServiceRole.entities.DriverProfile.get(move.assigned_driver_id);
+        if (driver?.stripe_account_id && driver?.stripe_payouts_enabled) {
+          let appFeePortion;
+          if (move.app_fee && move.app_fee > 0) {
+            appFeePortion = paymentType === 'installment' ? move.app_fee / 3 : move.app_fee;
+          } else {
+            appFeePortion = chargeAmount * 0.25;
+          }
+          const appFeeCents = isZeroDecimal
+            ? Math.round(appFeePortion)
+            : Math.round(appFeePortion * 100);
+
+          sessionParams.transfer_data = { destination: driver.stripe_account_id };
+          sessionParams.application_fee_amount = appFeeCents;
+          console.log('Stripe Connect destination charge: driver=' + driver.stripe_account_id + ' fee=' + appFeeCents);
+        }
+      } catch (e) {
+        console.error('Failed to check driver Stripe Connect status:', e.message);
+      }
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     // Update move with discount info and session ID
     const updateData = {

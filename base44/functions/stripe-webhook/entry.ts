@@ -60,6 +60,20 @@ Deno.serve(async (req) => {
       }
     }
 
+    if (event.type === 'account.updated') {
+      const account = event.data.object;
+      const drivers = await base44.asServiceRole.entities.DriverProfile.filter({
+        stripe_account_id: account.id,
+      });
+      if (drivers.length > 0) {
+        const payoutsEnabled = account.charges_enabled && account.details_submitted;
+        await base44.asServiceRole.entities.DriverProfile.update(drivers[0].id, {
+          stripe_payouts_enabled: payoutsEnabled,
+        });
+        console.log('Updated Stripe Connect status for driver ' + drivers[0].id + ': ' + payoutsEnabled);
+      }
+    }
+
     return Response.json({ received: true });
   } catch (error) {
     console.error('Webhook error:', error.message);

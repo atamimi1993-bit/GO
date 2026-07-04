@@ -11,6 +11,7 @@ import ComplianceManager from '@/components/go/ComplianceManager';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 import AdBanner from '@/components/go/AdBanner';
+import StripeConnectCard from '@/components/go/StripeConnectCard';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
 
 export default function DriverHub() {
@@ -158,6 +159,9 @@ export default function DriverHub() {
           </Button>
         </Link>
       </div>
+
+      {/* Stripe Connect — automatic payouts */}
+      <StripeConnectCard profile={profile} onUpdated={setProfile} />
 
       {/* Compliance & documents */}
       <ComplianceManager driverProfile={profile} onUpdated={setProfile} />
