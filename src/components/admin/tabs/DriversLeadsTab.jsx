@@ -5,6 +5,7 @@ import SectionSkeleton from '@/components/admin/SectionSkeleton';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
 
+const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
 const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 const DriverRecruiter = lazy(() => import('@/components/admin/DriverRecruiter'));
@@ -20,6 +21,11 @@ export default function DriversLeadsTab({ data, processingId, onDriverAction, on
 
   return (
     <div className="space-y-6">
+      {/* Driver performance dashboard */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <DriverPerformance />
+      </Suspense>
+
       {/* Driver leaderboard */}
       <Suspense fallback={<SectionSkeleton />}>
         <DriverTopPerformers />
