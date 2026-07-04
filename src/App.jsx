@@ -41,7 +41,7 @@ const PageTransition = ({ children }) => {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: isPop ? '100%' : '-100%', opacity: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
-      style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
+      style={{ position: 'relative', width: '100%', willChange: 'transform', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden', overflow: 'hidden' }}
     >
       {children}
     </motion.div>
@@ -70,7 +70,7 @@ const AuthenticatedApp = () => {
   }
 
   return (
-    <AnimatePresence mode="popLayout">
+    <AnimatePresence mode="wait">
     <Suspense fallback={
       <div className="fixed inset-0 flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>

@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import MessageBubble from '@/components/go/MessageBubble';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, Send, Plus, MessageSquare, Loader2, Bot, ChevronLeft } from 'lucide-react';
 
 const AGENT_NAME = 'go_support';
@@ -32,6 +33,12 @@ export default function Support() {
   }, []);
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
+
+  useEffect(() => {
+    if (mobileView === 'chat') {
+      document.getElementById('chat-input')?.focus();
+    }
+  }, [mobileView]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -116,6 +123,7 @@ export default function Support() {
 
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Conversation list */}
+        <PullToRefresh scrollRef={listRef} onRefresh={loadConversations}>
         <div ref={listRef} className={`${mobileView === 'list' ? 'flex' : 'hidden'} sm:flex w-full sm:w-56 shrink-0 overflow-y-auto border-r border-border pr-2 space-y-1 flex-col`}>
           <Button variant="outline" size="sm" className="w-full mb-2" onClick={handleNewChat} disabled={creating}>
             {creating ? <Loader2 size={14} className="animate-spin mr-1" /> : <Plus size={14} className="mr-1" />} New Chat
@@ -137,6 +145,7 @@ export default function Support() {
             ))
           )}
         </div>
+        </PullToRefresh>
 
         {/* Chat area */}
         <div className={`${mobileView === 'chat' ? 'flex' : 'hidden'} sm:flex flex-1 flex-col min-h-0 bg-card border rounded-2xl overflow-hidden`}>
