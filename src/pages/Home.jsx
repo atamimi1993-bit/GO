@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
@@ -6,12 +6,15 @@ import { ArrowRight, Package, Truck, Shield, DollarSign, Star, MapPin, CreditCar
 import { Button } from '@/components/ui/button';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import AdBanner from '@/components/go/AdBanner';
-import HomeStats from '@/components/go/HomeStats';
-import Testimonials from '@/components/go/Testimonials';
 import FaqSection from '@/components/go/FaqSection';
 import { Gift } from 'lucide-react';
-import DriverRecruitmentBanner from '@/components/go/DriverRecruitmentBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+const HomeStats = lazy(() => import('@/components/go/HomeStats'));
+const Testimonials = lazy(() => import('@/components/go/Testimonials'));
+const DriverRecruitmentBanner = lazy(() => import('@/components/go/DriverRecruitmentBanner'));
+
+const LazyFallback = () => <div className="animate-pulse bg-muted rounded-2xl h-32 w-full" />;
 
 export default function Home() {
   const navigate = useNavigate();
@@ -83,13 +86,19 @@ export default function Home() {
       </section>
 
       {/* Driver recruitment banner */}
-      <DriverRecruitmentBanner />
+      <Suspense fallback={<LazyFallback />}>
+        <DriverRecruitmentBanner />
+      </Suspense>
 
       {/* Stats */}
-      <HomeStats />
+      <Suspense fallback={<LazyFallback />}>
+        <HomeStats />
+      </Suspense>
 
       {/* Testimonials */}
-      <Testimonials />
+      <Suspense fallback={<LazyFallback />}>
+        <Testimonials />
+      </Suspense>
 
       {/* FAQ */}
       <FaqSection />

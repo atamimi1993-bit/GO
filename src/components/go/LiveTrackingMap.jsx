@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { Navigation, MapPin, Clock, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 

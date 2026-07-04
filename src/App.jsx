@@ -78,7 +78,7 @@ const AuthenticatedApp = () => {
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
+      <div role="status" aria-label="Loading" aria-live="polite" className="fixed inset-0 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
       </div>
     );
@@ -96,7 +96,7 @@ const AuthenticatedApp = () => {
   return (
     <AnimatePresence mode="popLayout">
     <Suspense fallback={
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
+      <div role="status" aria-label="Loading" aria-live="polite" className="fixed inset-0 flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
       </div>
     }>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { Navigation, MapPin, PackageCheck, Truck, CheckCircle2, Loader2, Flag } from 'lucide-react';
 import { format } from 'date-fns';
 

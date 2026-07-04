@@ -206,7 +206,7 @@ export default function DriverTrackingControls({ driverProfile }) {
                 <Navigation size={16} className="mr-1" /> Start Live Tracking
               </Button>
             ) : (
-              <Button variant="outline" className="w-full" onClick={stopTracking}>
+              <Button variant="outline" className="w-full" aria-label="Stop tracking" onClick={stopTracking}>
                 <Square size={16} className="mr-1" /> Stop Tracking
               </Button>
             )}

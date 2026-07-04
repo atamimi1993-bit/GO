@@ -55,8 +55,27 @@ export default function AppLayout() {
   return (
     <div className="h-dvh flex flex-col bg-background">
       <OfflineBanner />
-      {/* Top nav */}
-      <header className="shrink-0 bg-card border-b border-border sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Mobile-only minimal header */}
+      <header className="md:hidden shrink-0 bg-card border-b border-border sticky top-0 z-50 flex items-center justify-between px-4 h-14" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <Link to="/" aria-label="GO Home" className="flex items-center">
+          <Logo size="sm" />
+        </Link>
+        <div className="flex items-center gap-1">
+          {user && <NotificationCenter user={user} />}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => base44.auth.logout('/')}
+            className="min-h-[44px] min-w-[44px]"
+            aria-label="Sign out"
+          >
+            <LogOut size={20} />
+          </Button>
+        </div>
+      </header>
+
+      {/* Desktop top nav */}
+      <header className="hidden md:flex shrink-0 bg-card border-b border-border sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
           {/* Left: Logo + nav tabs */}
           <div className="flex items-center gap-1 min-w-0">

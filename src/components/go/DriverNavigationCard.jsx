@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { Navigation, MapPin, Flag, Loader2, ExternalLink, Smartphone } from 'lucide-react';
 
 // Fix default marker icons for Leaflet in bundler environments

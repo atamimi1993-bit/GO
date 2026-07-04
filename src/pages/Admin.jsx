@@ -115,7 +115,7 @@ export default function Admin() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
+    return <div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
   }
 
   if (error) {
@@ -134,7 +134,7 @@ export default function Admin() {
 
   if (!data) {
     return (
-      <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>
+      <div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>
     );
   }
 

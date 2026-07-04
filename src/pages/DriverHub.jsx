@@ -60,7 +60,7 @@ export default function DriverHub() {
     load();
   }, [load, user]);
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
+  if (loading) return <div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   // Show pending banner if navigated from registration
   const pendingBanner = pendingApplication && (
@@ -187,23 +187,23 @@ export default function DriverHub() {
       </div>
 
       {/* Stripe Connect — automatic payouts */}
-      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+      <Suspense fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
         <StripeConnectCard profile={profile} onUpdated={setProfile} />
       </Suspense>
 
       {/* Compliance & documents */}
-      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+      <Suspense fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
         <ComplianceManager driverProfile={profile} onUpdated={setProfile} />
       </Suspense>
 
       {/* Background check status */}
-      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+      <Suspense fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
         <BackgroundCheckStatus driverProfile={profile} onUpdated={setProfile} />
       </Suspense>
 
       {/* Continuous GPS tracker for active jobs */}
       {activeJobs.length > 0 && (
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
           <ContinuousTracker driverProfile={profile} activeJobs={activeJobs} />
         </Suspense>
       )}
@@ -240,7 +240,7 @@ export default function DriverHub() {
           </div>
           <div className="space-y-4">
             {activeJobs.map(job => (
-              <Suspense key={job.id} fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+              <Suspense key={job.id} fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
                 <DriverNavigationCard job={job} />
               </Suspense>
             ))}
@@ -252,17 +252,17 @@ export default function DriverHub() {
       <DriverDisputeCenter driverProfile={profile} />
 
       {/* Expense receipts */}
-      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+      <Suspense fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
         <ExpenseSubmission driverProfile={profile} />
       </Suspense>
 
       {/* Driver leaderboard */}
-      <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+      <Suspense fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
         <DriverLeaderboardCard currentDriverId={profile.id} />
       </Suspense>
 
       {profile.status === 'approved' && (
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<div role="status" aria-label="Loading" aria-live="polite" className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
           <DriverTrackingControls driverProfile={profile} />
         </Suspense>
       )}

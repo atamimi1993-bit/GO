@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, Marker, Tooltip } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { base44 } from '@/api/base44Client';
 import { Loader2, MapPin, Truck, Package, CheckCircle2 } from 'lucide-react';
 import L from 'leaflet';
