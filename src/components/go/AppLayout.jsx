@@ -6,6 +6,7 @@ import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse, Bot, ShieldC
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/AuthContext';
+import { useQuery } from '@tanstack/react-query';
 import BottomTabBar from '@/components/go/BottomTabBar';
 
 const navItems = [
@@ -16,14 +17,24 @@ const navItems = [
   { label: 'Help Center', path: '/help', icon: HelpCircle },
   { label: 'Assistant', path: '/support', icon: Bot },
   { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
-  { label: 'Freight', path: '/freight-dashboard', icon: Container, adminOnly: true },
+  { label: 'Freight', path: '/freight-dashboard', icon: Container, cdlOrAdmin: true },
 ];
 
 export default function AppLayout() {
   const location = useLocation();
   const mainRef = useRef(null);
   const { user } = useAuth();
-  const visibleNavItems = navItems.filter(item => !item.adminOnly || user?.role === 'admin');
+  const { data: driverProfile } = useQuery({
+    queryKey: ['myDriverProfile', user?.id],
+    queryFn: () => base44.entities.DriverProfile.filter({ email: user.email }).then(r => r[0] || null),
+    enabled: !!user?.email && user?.role !== 'admin',
+    staleTime: 5 * 60 * 1000,
+  });
+  const visibleNavItems = navItems.filter(item => {
+    if (item.adminOnly) return user?.role === 'admin';
+    if (item.cdlOrAdmin) return user?.role === 'admin' || driverProfile?.cdl_certified;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-background">

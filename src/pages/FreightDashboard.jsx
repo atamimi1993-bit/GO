@@ -23,6 +23,7 @@ export default function FreightDashboard() {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [cdlAccess, setCdlAccess] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -43,18 +44,35 @@ export default function FreightDashboard() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (user?.role === 'admin') { load(); return; }
+      try {
+        const profiles = user?.email ? await base44.entities.DriverProfile.filter({ email: user.email }) : [];
+        if (profiles.length > 0 && profiles[0].cdl_certified) {
+          load();
+        } else {
+          setCdlAccess(false);
+          setLoading(false);
+        }
+      } catch {
+        setCdlAccess(false);
+        setLoading(false);
+      }
+    };
+    checkAccess();
+  }, [user, load]);
 
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
   }
 
-  if (user?.role !== 'admin') {
+  if (user?.role !== 'admin' && cdlAccess === false) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <ShieldCheck className="text-muted-foreground mb-3" size={48} />
         <h2 className="font-display font-bold text-lg mb-1">Access Denied</h2>
-        <p className="text-muted-foreground text-sm">You need admin privileges to view this dashboard.</p>
+        <p className="text-muted-foreground text-sm">This dashboard is restricted to administrators and CDL-certified drivers.</p>
       </div>
     );
   }
