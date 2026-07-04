@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
+import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck, Award } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
@@ -118,6 +118,12 @@ export default function AvailableJobs() {
                   {accepting === job.id ? <Loader2 size={14} className="animate-spin" /> : 'Accept Job'}
                 </Button>
               </div>
+              {driverProfile?.cdl_certified && (
+                <div className="mt-3 bg-amber-500/10 rounded-lg p-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <Award size={14} />
+                  CDL bonus: earn {formatCurrency(Math.round(job.total_price * 0.25 * 100) / 100, job.currency)} (25%) for this job
+                </div>
+              )}
             </div>
           ))}
         </div>
