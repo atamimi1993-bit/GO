@@ -3,7 +3,8 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { HelpCircle, User, Truck, BookOpen, Loader2 } from 'lucide-react';
+import { HelpCircle, User, Truck, BookOpen, Bot, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 
@@ -57,6 +58,16 @@ export default function HelpCenter() {
         <PageHeader title="Help Center" isRoot />
         <p className="text-muted-foreground">Find answers for customers, drivers, and general questions.</p>
       </div>
+
+      <Link to="/support" className="flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 mb-6 hover:bg-emerald-500/10 transition-colors">
+        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+          <Bot className="text-emerald-600 dark:text-emerald-400" size={20} />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium">Chat with the GO Assistant</p>
+          <p className="text-xs text-muted-foreground">Get instant answers about your moves, pricing, and more</p>
+        </div>
+      </Link>
 
       <Tabs defaultValue="customer">
         <TabsList className="grid w-full grid-cols-3 mb-6">
