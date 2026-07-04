@@ -132,7 +132,9 @@ export default function Admin() {
         </div>
 
         {/* Quick access links */}
-        <AdminQuickLinks />
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <AdminQuickLinks />
+        </Suspense>
 
         {/* Move status tracker */}
         <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
