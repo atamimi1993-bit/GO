@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import RatingForm from '@/components/go/RatingForm';
 import { formatCurrency } from '@/lib/pricing';
-import { DollarSign, TrendingUp, CheckCircle2, Clock, Star, Loader2, MessageSquare } from 'lucide-react';
+import { DollarSign, TrendingUp, CheckCircle2, Clock, Star, Loader2, MessageSquare, Lock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 export default function Revenue() {
@@ -37,6 +37,21 @@ export default function Revenue() {
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   const isDriver = !!driverProfile;
+  const isAdmin = user?.role === 'admin';
+
+  if (!isDriver && !isAdmin) {
+    return (
+      <div className="text-center py-20">
+        <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+          <Lock className="text-muted-foreground" size={28} />
+        </div>
+        <h2 className="font-display font-bold text-lg mb-1">Access Restricted</h2>
+        <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+          Revenue and earnings information is only available to drivers and administrators.
+        </p>
+      </div>
+    );
+  }
 
   // Revenue metrics
   const completedMoves = moves.filter((m) => m.status === 'completed');

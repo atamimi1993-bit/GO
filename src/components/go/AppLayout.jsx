@@ -13,7 +13,7 @@ const navItems = [
   { label: 'Home', path: '/', icon: Home },
   { label: 'My Moves', path: '/my-moves', icon: Package },
   { label: 'Tracking', path: '/tracking', icon: Navigation },
-  { label: 'Revenue', path: '/revenue', icon: DollarSign },
+  { label: 'Revenue', path: '/revenue', icon: DollarSign, driverOrAdmin: true },
   { label: 'Leaderboard', path: '/leaderboard', icon: Trophy },
   { label: 'Driver Hub', path: '/driver-hub', icon: Truck },
   { label: 'Storage', path: '/storage', icon: Warehouse },
@@ -37,6 +37,7 @@ export default function AppLayout() {
   const visibleNavItems = navItems.filter(item => {
     if (item.adminOnly) return user?.role === 'admin';
     if (item.cdlOrAdmin) return user?.role === 'admin' || driverProfile?.cdl_certified;
+    if (item.driverOrAdmin) return user?.role === 'admin' || !!driverProfile;
     return true;
   });
 

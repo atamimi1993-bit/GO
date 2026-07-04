@@ -86,6 +86,7 @@ export default function MoveDetail() {
   const [promoData, setPromoData] = useState(null);
   const [usePaymentPlan, setUsePaymentPlan] = useState(false);
   const [payingBalance, setPayingBalance] = useState(false);
+  const [driverProfile, setDriverProfile] = useState(null);
   const { toast } = useToast();
 
   const handleConfirmDelivery = async () => {
@@ -163,6 +164,12 @@ export default function MoveDetail() {
     setItems(it);
     setCurrentUser(u);
     setContract(contracts?.[0] || null);
+    if (u?.email) {
+      try {
+        const profiles = await base44.entities.DriverProfile.filter({ email: u.email });
+        setDriverProfile(profiles[0] || null);
+      } catch { setDriverProfile(null); }
+    }
   }, [id]);
 
   useEffect(() => {
@@ -174,6 +181,7 @@ export default function MoveDetail() {
 
   const currencyCode = move.currency || 'USD';
   const curr = getCurrency(currencyCode);
+  const showInternalCosts = currentUser?.role === 'admin' || (driverProfile?.id && driverProfile.id === move.assigned_driver_id);
   const distUnit = move.distance_unit || 'mi';
   const pricing = {
     baseCost: move.base_cost, fuelCost: move.fuel_cost, taxRate: move.tax_rate,
@@ -258,7 +266,7 @@ export default function MoveDetail() {
       )}
 
       {/* Price */}
-      <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} currencyCode={currencyCode} />
+      <PriceBreakdown pricing={pricing} truckSize={move.truck_size_needed} currencyCode={currencyCode} showInternalCosts={showInternalCosts} />
 
       {/* Price confirmation — both parties must confirm after driver acceptance */}
       {move.status === 'accepted' && (

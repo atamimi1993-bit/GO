@@ -1,7 +1,7 @@
 import React from 'react';
 import { TRUCK_SIZE_LABELS, getCurrency } from '@/lib/pricing';
 
-export default function PriceBreakdown({ pricing, truckSize, currencyCode }) {
+export default function PriceBreakdown({ pricing, truckSize, currencyCode, showInternalCosts = false }) {
   if (!pricing) return null;
 
   const curr = pricing.currency || getCurrency(currencyCode || 'USD');
@@ -17,7 +17,7 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode }) {
     { label: fuelLabel, value: pricing.fuelCost },
     ...(pricing.tolls ? [{ label: 'Tolls (reimbursed to driver)', value: pricing.tolls }] : []),
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
-    { label: 'GO App Fee (25%)', value: pricing.appFee },
+    ...(showInternalCosts ? [{ label: 'GO App Fee (25%)', value: pricing.appFee }] : []),
   ];
 
   return (
@@ -37,9 +37,11 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode }) {
           {fmt(pricing.totalPrice)}
         </span>
       </div>
-      <div className="bg-emerald-500/10 rounded-lg p-3 text-sm text-emerald-600 dark:text-emerald-400">
-        Driver payout for this job: <span className="font-bold">{fmt(pricing.driverPayout)}</span>
-      </div>
+      {showInternalCosts && (
+        <div className="bg-emerald-500/10 rounded-lg p-3 text-sm text-emerald-600 dark:text-emerald-400">
+          Driver payout for this job: <span className="font-bold">{fmt(pricing.driverPayout)}</span>
+        </div>
+      )}
     </div>
   );
 }
