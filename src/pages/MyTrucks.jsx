@@ -4,8 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import MobileSelect from '@/components/go/MobileSelect';
 import { useToast } from '@/components/ui/use-toast';
 import { TRUCK_SIZE_LABELS } from '@/lib/pricing';
 import { ArrowLeft, Plus, Truck, Upload, Loader2, ShieldCheck } from 'lucide-react';
@@ -107,12 +107,12 @@ export default function MyTrucks() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Size Category *</Label>
-                  <Select value={form.size_category} onValueChange={v => setForm({ ...form, size_category: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(TRUCK_SIZE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <MobileSelect
+                    value={form.size_category}
+                    onValueChange={v => setForm({ ...form, size_category: v })}
+                    options={Object.entries(TRUCK_SIZE_LABELS).map(([k, v]) => ({ value: k, label: v }))}
+                    placeholder="Select size"
+                  />
                 </div>
                 <div><Label>Capacity (lbs)</Label><Input type="number" value={form.capacity_lbs} onChange={e => setForm({ ...form, capacity_lbs: e.target.value })} /></div>
               </div>
@@ -120,15 +120,17 @@ export default function MyTrucks() {
                 <div><Label>License Plate *</Label><Input value={form.license_plate} onChange={e => setForm({ ...form, license_plate: e.target.value })} /></div>
                 <div>
                   <Label>Fuel Type</Label>
-                  <Select value={form.fuel_type} onValueChange={v => setForm({ ...form, fuel_type: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gasoline">Gasoline</SelectItem>
-                      <SelectItem value="diesel">Diesel</SelectItem>
-                      <SelectItem value="electric">Electric</SelectItem>
-                      <SelectItem value="hybrid">Hybrid</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <MobileSelect
+                    value={form.fuel_type}
+                    onValueChange={v => setForm({ ...form, fuel_type: v })}
+                    options={[
+                      { value: 'gasoline', label: 'Gasoline' },
+                      { value: 'diesel', label: 'Diesel' },
+                      { value: 'electric', label: 'Electric' },
+                      { value: 'hybrid', label: 'Hybrid' },
+                    ]}
+                    placeholder="Select fuel type"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">

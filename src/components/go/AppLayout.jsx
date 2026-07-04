@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
@@ -16,6 +16,7 @@ const navItems = [
 
 export default function AppLayout() {
   const location = useLocation();
+  const mainRef = useRef(null);
 
   return (
     <div className="min-h-screen bg-background">
@@ -73,8 +74,8 @@ export default function AppLayout() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-0 overscroll-y-none">
-        <Outlet />
+      <main ref={mainRef} data-scroll-container className="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-0 overscroll-y-none">
+        <Outlet context={{ scrollRef: mainRef }} />
       </main>
       <div className="md:hidden">
         <BottomTabBar />

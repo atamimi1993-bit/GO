@@ -33,13 +33,13 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
   const isPop = navType === 'POP';
-
   return (
     <motion.div
-      initial={{ opacity: 0, x: isPop ? -20 : 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: isPop ? 20 : -20 }}
-      transition={{ duration: 0.2 }}
+      initial={{ x: isPop ? '-100%' : '100%', opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: isPop ? '100%' : '-100%', opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+      style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
     >
       {children}
     </motion.div>
@@ -68,7 +68,7 @@ const AuthenticatedApp = () => {
   }
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
     <Suspense fallback={
       <div className="fixed inset-0 flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>

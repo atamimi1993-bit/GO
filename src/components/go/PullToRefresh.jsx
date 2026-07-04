@@ -4,14 +4,21 @@ import { Loader2, RefreshCw } from 'lucide-react';
 const THRESHOLD = 70;
 const MAX_PULL = 100;
 
-export default function PullToRefresh({ onRefresh, children }) {
+export default function PullToRefresh({ onRefresh, children, scrollRef }) {
   const [pulling, setPulling] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
 
+  const isAtTop = () => {
+    if (scrollRef && scrollRef.current) {
+      return scrollRef.current.scrollTop <= 0;
+    }
+    return (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) <= 0;
+  };
+
   const handleTouchStart = (e) => {
-    if ((window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) <= 0 && !refreshing) {
+    if (isAtTop() && !refreshing) {
       startY.current = e.touches[0].clientY;
       setPulling(true);
     }
