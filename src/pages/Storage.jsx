@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Warehouse, Search, MapPin, Phone, Globe, Star, Loader2, Snowflake } from 'lucide-react';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 
 export default function Storage() {
   const { scrollRef } = useOutletContext();
@@ -33,7 +34,7 @@ export default function Storage() {
     <PullToRefresh scrollRef={scrollRef} onRefresh={loadFacilities}>
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-display font-bold mb-1">Find Storage</h1>
+        <PageHeader title="Find Storage" isRoot />
         <p className="text-muted-foreground text-sm">Browse storage facilities near your move.</p>
       </div>
 

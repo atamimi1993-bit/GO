@@ -12,6 +12,7 @@ import DamageReportForm from '@/components/go/DamageReportForm';
 import PromoCodeInput from '@/components/go/PromoCodeInput';
 import PriceConfirmation from '@/components/go/PriceConfirmation';
 import { useToast } from '@/components/ui/use-toast';
+import PageHeader from '@/components/go/PageHeader';
 import { format, parseISO } from 'date-fns';
 
 const MoveTracker = lazy(() => import('@/components/go/MoveTracker'));
@@ -197,12 +198,8 @@ export default function MoveDetail() {
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div className="max-w-2xl mx-auto">
-      <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
-        <ArrowLeft size={16} /> Back
-      </button>
-
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-display font-bold">Move Details</h1>
+        <PageHeader title="Move Details" isRoot={false} />
         <Badge className={STATUS_COLORS[move.status]}>{move.status?.replace('_', ' ')}</Badge>
       </div>
 

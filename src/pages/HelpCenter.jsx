@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { HelpCircle, User, Truck, BookOpen, Bot, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 
 const DEFAULT_FAQ = {
   customer: [
@@ -60,7 +61,7 @@ export default function HelpCenter() {
         <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <HelpCircle className="text-emerald-600" size={32} />
         </div>
-        <h1 className="text-3xl font-display font-bold mb-2">Help Center</h1>
+        <PageHeader title="Help Center" isRoot />
         <p className="text-muted-foreground">Find answers for customers, drivers, and general questions.</p>
       </div>
 

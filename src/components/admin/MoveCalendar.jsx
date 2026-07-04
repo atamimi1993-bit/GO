@@ -8,6 +8,7 @@ import {
   Truck, MapPin, X,
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, addMonths, parseISO } from 'date-fns';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/30',
@@ -27,6 +28,7 @@ export default function MoveCalendar({ scrollRef }) {
   const [moves, setMoves] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const load = async () => {
@@ -57,6 +59,12 @@ export default function MoveCalendar({ scrollRef }) {
     }
     return map;
   }, [moves]);
+
+  const monthMoves = useMemo(() => {
+    return Object.entries(movesByDate)
+      .filter(([key]) => isSameMonth(parseISO(key), currentMonth))
+      .sort(([a], [b]) => a.localeCompare(b));
+  }, [movesByDate, currentMonth]);
 
   const approvedDriverCount = (drivers || []).filter((d) => d.status === 'approved').length;
   const capacity = Math.max(DAY_CAPACITY, approvedDriverCount);
@@ -145,8 +153,8 @@ export default function MoveCalendar({ scrollRef }) {
         </div>
       </div>
 
-      {/* Calendar grid */}
-      <div className="overflow-x-auto -mx-2 px-2">
+      {/* Calendar grid — desktop view */}
+      <div className="hidden sm:block overflow-x-auto -mx-2 px-2">
         <div className="min-w-[640px]">
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 mb-1">
@@ -206,6 +214,46 @@ export default function MoveCalendar({ scrollRef }) {
         </div>
       </div>
 
+      {/* Mobile card list view */}
+      {isMobile && (
+        <div className="sm:hidden">
+          {monthMoves.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No moves scheduled this month.</p>
+          ) : (
+            <div className="space-y-4">
+              {monthMoves.map(([dateKey, dayMoves]) => {
+              const date = parseISO(dateKey);
+              const sortedMoves = [...dayMoves].sort((a, b) => (a.move_time || '').localeCompare(b.move_time || ''));
+              return (
+                <div key={dateKey}>
+                  <button
+                    onClick={() => setSelectedDay(date)}
+                    className="w-full text-left mb-2 min-h-[44px] flex items-center"
+                  >
+                    <h3 className="text-sm font-semibold text-muted-foreground">
+                      {format(date, 'EEEE, MMM d')}
+                    </h3>
+                  </button>
+                  <div className="space-y-2">
+                    {sortedMoves.map(m => (
+                      <div key={m.id} className="p-3 rounded-xl bg-muted/50 border border-border">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium">{m.move_time || 'Time TBD'}</span>
+                          <Badge className={STATUS_COLORS[m.status]}>{m.status?.replace('_', ' ')}</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">{m.pickup_address} → {m.dropoff_address}</p>
+                        <p className="text-xs text-muted-foreground">{m.customer_name || 'Unknown'} · {m.assigned_driver_name || 'Unassigned'}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Selected day detail */}
       {selectedDay && (
         <div className="mt-4 border-t pt-4">
@@ -213,7 +261,7 @@ export default function MoveCalendar({ scrollRef }) {
             <h3 className="font-display font-bold text-sm">
               {format(selectedDay, 'EEEE, MMMM d, yyyy')}
             </h3>
-            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setSelectedDay(null)}>
+            <Button size="icon" variant="ghost" className="h-11 w-11" onClick={() => setSelectedDay(null)}>
               <X size={16} />
             </Button>
           </div>

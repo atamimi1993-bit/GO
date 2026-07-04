@@ -6,6 +6,7 @@ import { ArrowLeft, DollarSign, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
@@ -42,10 +43,7 @@ export default function MyPayouts() {
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div className="max-w-2xl mx-auto">
-      <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
-        <ArrowLeft size={16} /> Back
-      </button>
-      <h1 className="text-2xl font-display font-bold mb-1">Payouts</h1>
+      <PageHeader title="Payouts" isRoot={false} />
       <p className="text-muted-foreground text-sm mb-6">Track your earnings from completed jobs.</p>
 
       <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 mb-6 text-center">

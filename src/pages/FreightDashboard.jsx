@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 import FreightJobCard from '@/components/admin/FreightJobCard';
 import StatCard from '@/components/admin/StatCard';
 import { Badge } from '@/components/ui/badge';
@@ -92,18 +93,13 @@ export default function FreightDashboard() {
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
       <div className="pb-4">
-        <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
-          ← Back
-        </button>
+        <PageHeader title="Freight & Logistics" isRoot={false} />
 
         <div className="flex items-center gap-3 mb-6">
           <div className="bg-blue-500 rounded-xl p-2.5 flex items-center justify-center">
             <Container className="text-white" size={24} />
           </div>
-          <div>
-            <h1 className="text-2xl font-display font-bold">Freight & Logistics</h1>
-            <p className="text-muted-foreground text-sm">Monitor active freight and corporate logistics jobs with CDL driver assignments.</p>
-          </div>
+          <p className="text-muted-foreground text-sm">Monitor active freight and corporate logistics jobs with CDL driver assignments.</p>
         </div>
 
         {/* Stats */}

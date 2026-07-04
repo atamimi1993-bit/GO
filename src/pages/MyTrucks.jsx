@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { TRUCK_SIZE_LABELS } from '@/lib/pricing';
 import { ArrowLeft, Plus, Truck, Upload, Loader2, ShieldCheck } from 'lucide-react';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 
 export default function MyTrucks() {
   const navigate = useNavigate();
@@ -87,12 +88,8 @@ export default function MyTrucks() {
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div className="max-w-2xl mx-auto">
-      <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
-        <ArrowLeft size={16} /> Back
-      </button>
-
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-display font-bold">My Trucks</h1>
+        <PageHeader title="My Trucks" isRoot={false} />
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="bg-emerald-500 hover:bg-emerald-600"><Plus size={16} className="mr-1" /> Add Truck</Button>

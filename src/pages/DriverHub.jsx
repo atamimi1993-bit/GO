@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import DriverTrackingControls from '@/components/go/DriverTrackingControls';
 import DriverLeaderboardCard from '@/components/go/DriverLeaderboardCard';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield } from 'lucide-react';
 
 export default function DriverHub() {
@@ -88,7 +89,7 @@ export default function DriverHub() {
       {pendingBanner}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-display font-bold">Driver Dashboard</h1>
+          <PageHeader title="Driver Dashboard" isRoot />
           <p className="text-muted-foreground text-sm">Welcome back, {profile.full_name}.</p>
         </div>
         <Badge className={profile.status === 'approved' ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400' : 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300'}>

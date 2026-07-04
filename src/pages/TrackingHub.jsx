@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Navigation, Package, Loader2, MapPin } from 'lucide-react';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 import TrackingCard from '@/components/go/TrackingCard';
 import LiveTrackingMap from '@/components/go/LiveTrackingMap';
 
@@ -40,10 +41,7 @@ export default function TrackingHub() {
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-            <Navigation className="text-emerald-500" size={24} />
-            Tracking Hub
-          </h1>
+          <PageHeader title="Tracking Hub" isRoot />
           <p className="text-muted-foreground text-sm">Live status of all your shipments.</p>
         </div>
 

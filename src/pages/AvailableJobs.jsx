@@ -8,6 +8,7 @@ import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from
 import { format, parseISO } from 'date-fns';
 import { formatCurrency, calculateMovePrice } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 
 export default function AvailableJobs() {
   const navigate = useNavigate();
@@ -104,10 +105,7 @@ export default function AvailableJobs() {
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div>
-      <button onClick={() => navigate(-1)} aria-label="Go back" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
-        <ArrowLeft size={16} /> Back
-      </button>
-      <h1 className="text-2xl font-display font-bold mb-1">Available Jobs</h1>
+      <PageHeader title="Available Jobs" isRoot={false} />
       <p className="text-muted-foreground text-sm mb-6">Accept a move to get started.</p>
 
       {jobs.length === 0 ? (

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Package, MapPin, Calendar, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import PageHeader from '@/components/go/PageHeader';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
@@ -56,7 +57,7 @@ export default function MyMoves() {
       <div aria-live="polite" aria-atomic="true" className="sr-only" id="move-status-announcer"></div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-display font-bold">My Moves</h1>
+          <PageHeader title="My Moves" isRoot />
           <p className="text-muted-foreground text-sm">Track all your move requests.</p>
         </div>
         <Link to="/new-move">

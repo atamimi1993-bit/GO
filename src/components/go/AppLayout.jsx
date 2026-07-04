@@ -72,10 +72,19 @@ export default function AppLayout() {
 
           <div className="flex md:hidden items-center gap-2">
             <Link to="/profile">
-              <Button variant="ghost" size="icon" aria-label="My Account">
+              <Button variant="ghost" size="icon" aria-label="My Account" className="min-h-[44px] min-w-[44px]">
                 <User size={20} />
               </Button>
             </Link>
+            <Button
+              variant="ghost"
+              onClick={() => base44.auth.logout('/')}
+              className="min-h-[44px] px-3 text-muted-foreground"
+              aria-label="Sign out"
+            >
+              <LogOut size={18} />
+              <span className="text-xs">Sign out</span>
+            </Button>
           </div>
 
           <div className="hidden md:flex items-center gap-2">

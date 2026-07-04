@@ -9,6 +9,7 @@ import { ArrowLeft, Upload, Loader2, FileText } from 'lucide-react';
 import MobileSelect from '@/components/go/MobileSelect';
 import { Switch } from '@/components/ui/switch';
 import ContractSign from '@/components/go/ContractSign';
+import PageHeader from '@/components/go/PageHeader';
 
 export default function DriverRegister() {
   const navigate = useNavigate();
@@ -88,12 +89,9 @@ export default function DriverRegister() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <button onClick={() => step === 'contract' ? setStep('form') : navigate(-1)} aria-label="Go back" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
-        <ArrowLeft size={16} /> Back
-      </button>
+      <PageHeader title={step === 'contract' ? 'Driver Service Agreement' : 'Driver Registration'} isRoot={false} onBack={() => step === 'contract' ? setStep('form') : navigate(-1)} />
       {step === 'form' ? (
         <>
-      <h1 className="text-2xl font-display font-bold mb-1">Driver Registration</h1>
       <p className="text-muted-foreground text-sm mb-6">Fill in your details and upload required documents.</p>
 
       <form onSubmit={handleSubmit} className="bg-card border rounded-2xl p-6 space-y-4">
@@ -147,7 +145,6 @@ export default function DriverRegister() {
       ) : (
         <div className="space-y-4">
           <div>
-            <h1 className="text-2xl font-display font-bold mb-1">Driver Service Agreement</h1>
             <p className="text-muted-foreground text-sm mb-6">Please review and sign the contract to complete your registration.</p>
           </div>
           <ContractSign
