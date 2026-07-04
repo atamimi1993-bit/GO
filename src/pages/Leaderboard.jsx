@@ -6,7 +6,7 @@ import CustomerLeaderboard from '@/components/go/CustomerLeaderboard';
 
 export default function Leaderboard() {
   const { scrollRef } = useOutletContext();
-  const [tab, setTab] = useState('customers');
+  const [tab, setTab] = useState('drivers');
 
   return (
     <Tabs value={tab} onValueChange={setTab} className="w-full">

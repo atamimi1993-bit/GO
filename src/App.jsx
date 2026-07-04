@@ -117,6 +117,7 @@ const AuthenticatedApp = () => {
           <Route path="/driver-dashboard" element={<PageTransition><DriverDashboard /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+          <Route path="/leaderboard" element={<PageTransition><Leaderboard /></PageTransition>} />
           <Route path="/rentals" element={<PageTransition><Rentals /></PageTransition>} />
           <Route path="/rentals/new" element={<PageTransition><NewRental /></PageTransition>} />
           <Route path="/rentals/:id" element={<PageTransition><RentalDetail /></PageTransition>} />
@@ -127,7 +128,6 @@ const AuthenticatedApp = () => {
             <Route path="/my-moves" element={<PageTransition><MyMoves /></PageTransition>} />
             <Route path="/tracking" element={<PageTransition><TrackingHub /></PageTransition>} />
             <Route path="/revenue" element={<PageTransition><Revenue /></PageTransition>} />
-            <Route path="/leaderboard" element={<PageTransition><Leaderboard /></PageTransition>} />
             <Route path="/financials" element={<PageTransition><FinancialDashboard /></PageTransition>} />
             <Route path="/growth" element={<PageTransition><GrowthDashboard /></PageTransition>} />
           </Route>

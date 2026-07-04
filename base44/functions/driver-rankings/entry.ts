@@ -4,15 +4,8 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Require authentication — allows admin users or workflow (service-role) invocations
-    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
-    if (!isAuth) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const user = await base44.auth.me().catch(() => null);
-    if (user && user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
-    }
+    // Public endpoint — no auth required. Only returns public-safe data
+    // (no earnings, no bank details, no contact info).
 
     // Fetch all approved drivers
     const drivers = await base44.asServiceRole.entities.DriverProfile.filter(
@@ -75,7 +68,6 @@ Deno.serve(async (req) => {
         avg_rating: avgRating,
         review_count: reviewCount,
         completed_jobs: completedJobs,
-        total_earnings: d.total_earnings || 0,
         score,
       };
     });
