@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import AdminRoute from '@/components/AdminRoute';
 import { TabHistoryProvider } from '@/lib/TabHistoryContext';
 import AppLayout from '@/components/go/AppLayout';
 
@@ -97,8 +98,6 @@ const AuthenticatedApp = () => {
         <Route element={<AppLayout />}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/new-move" element={<PageTransition><NewMove /></PageTransition>} />
-          <Route path="/my-moves" element={<PageTransition><MyMoves /></PageTransition>} />
-          <Route path="/tracking" element={<PageTransition><TrackingHub /></PageTransition>} />
           <Route path="/move/:id" element={<PageTransition><MoveDetail /></PageTransition>} />
           <Route path="/driver-hub" element={<PageTransition><DriverHub /></PageTransition>} />
           <Route path="/driver-register" element={<PageTransition><DriverRegister /></PageTransition>} />
@@ -110,16 +109,22 @@ const AuthenticatedApp = () => {
           <Route path="/support" element={<PageTransition><Support /></PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
           <Route path="/freight-dashboard" element={<PageTransition><FreightDashboard /></PageTransition>} />
-          <Route path="/revenue" element={<PageTransition><Revenue /></PageTransition>} />
-          <Route path="/leaderboard" element={<PageTransition><Leaderboard /></PageTransition>} />
           <Route path="/driver-dashboard" element={<PageTransition><DriverDashboard /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
-          <Route path="/financials" element={<PageTransition><FinancialDashboard /></PageTransition>} />
           <Route path="/rentals" element={<PageTransition><Rentals /></PageTransition>} />
           <Route path="/rentals/new" element={<PageTransition><NewRental /></PageTransition>} />
           <Route path="/rentals/:id" element={<PageTransition><RentalDetail /></PageTransition>} />
           <Route path="/driver-report" element={<PageTransition><DriverReport /></PageTransition>} />
+
+          {/* Admin-only routes */}
+          <Route element={<AdminRoute />}>
+            <Route path="/my-moves" element={<PageTransition><MyMoves /></PageTransition>} />
+            <Route path="/tracking" element={<PageTransition><TrackingHub /></PageTransition>} />
+            <Route path="/revenue" element={<PageTransition><Revenue /></PageTransition>} />
+            <Route path="/leaderboard" element={<PageTransition><Leaderboard /></PageTransition>} />
+            <Route path="/financials" element={<PageTransition><FinancialDashboard /></PageTransition>} />
+          </Route>
         </Route>
       </Route>
 
