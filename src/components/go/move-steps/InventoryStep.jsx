@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Upload, Trash2, Loader2, FileText, Package } from 'lucide-react';
 import AIScanItems from '@/components/go/AIScanItems';
+import InventoryChecklist from '@/components/go/InventoryChecklist';
 import QuickAddItems from '@/components/go/QuickAddItems';
 import ItemForm from '@/components/go/ItemForm';
 import { formatCurrency, recommendTruckSize, TRUCK_SIZE_LABELS, BULKY_WEIGHT_THRESHOLD, BULKY_ITEM_FEE } from '@/lib/pricing';
@@ -34,6 +35,7 @@ export default function InventoryStep({ items, onAddItem, onAddItems, onRemoveIt
         </label>
       </div>
 
+      <InventoryChecklist onAddItems={onAddItems} existingItems={items} />
       <QuickAddItems onAdd={onAddItem} existingItems={items} />
       <ItemForm onAdd={onAddItem} />
 
