@@ -19,7 +19,7 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function CompletedMovesChart({ chartData }) {
+function CompletedMovesChart({ chartData }) {
   if (!chartData || chartData.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
@@ -57,3 +57,5 @@ export default function CompletedMovesChart({ chartData }) {
     </div>
   );
 }
+
+export default React.memo(CompletedMovesChart);

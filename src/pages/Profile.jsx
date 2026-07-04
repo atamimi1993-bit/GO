@@ -89,15 +89,7 @@ export default function Profile() {
               <AlertDialogTitle>Delete your account?</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-3 text-sm">
-                  <p>This will permanently and irreversibly delete:</p>
-                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>Your account and login credentials</li>
-                    <li>All move requests and history</li>
-                    <li>Your driver profile and documents (if applicable)</li>
-                    <li>All pending and completed payouts</li>
-                    <li>Loyalty points and referral records</li>
-                  </ul>
-                  <p className="font-medium text-destructive">This action cannot be undone.</p>
+                  <p>This will permanently delete your personal data including your profile, addresses, and loyalty account. Financial records required by law will be anonymized. This cannot be undone.</p>
                   <div>
                     <p className="mb-2">Type <strong className="text-destructive">DELETE</strong> to confirm:</p>
                     <Input

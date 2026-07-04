@@ -79,6 +79,17 @@ export default function BulkPayoutPanel({ scrollRef }) {
     setProcessing(true);
     try {
       const res = await base44.functions.invoke('admin-dashboard', { action: 'bulk_payout', payout_ids: ids });
+      const selectedIds = new Set(selected);
+      setData(prevData => {
+        if (!prevData) return prevData;
+        return {
+          ...prevData,
+          payouts: prevData.payouts.map(p =>
+            selectedIds.has(p.id) ? { ...p, status: 'paid' } : p
+          ),
+        };
+      });
+      setSelected(new Set());
       toast({
         title: 'Payouts processed',
         description: `${res.data.processed} payout${res.data.processed !== 1 ? 's' : ''} marked as paid.`,

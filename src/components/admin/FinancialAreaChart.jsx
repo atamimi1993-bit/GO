@@ -26,7 +26,7 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function FinancialAreaChart({ chartData }) {
+function FinancialAreaChart({ chartData }) {
   if (!chartData || chartData.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
@@ -100,6 +100,8 @@ export default function FinancialAreaChart({ chartData }) {
         </AreaChart>
       </ResponsiveContainer>
       <p className="sr-only">Monthly financial breakdown: {summary}.</p>
-    </div>
-  );
-}
+      </div>
+      );
+      }
+
+      export default React.memo(FinancialAreaChart);

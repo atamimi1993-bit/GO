@@ -34,7 +34,7 @@ export default function MoveCalendar({ scrollRef }) {
     const load = async () => {
       try {
         const [allMoves, allDrivers] = await Promise.all([
-          base44.entities.MoveRequest.list('-created_date', 500),
+          base44.entities.MoveRequest.list('-created_date', 150),
           base44.entities.DriverProfile.list('-created_date', 500),
         ]);
         setMoves(allMoves);
@@ -136,6 +136,8 @@ export default function MoveCalendar({ scrollRef }) {
           </Button>
         </div>
       </div>
+
+      <p className="text-xs text-muted-foreground mb-3">Showing moves for {format(currentMonth, 'MMMM yyyy')} only.</p>
 
       {/* Legend */}
       <div className="flex items-center gap-4 mb-4 flex-wrap text-xs">

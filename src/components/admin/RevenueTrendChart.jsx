@@ -21,7 +21,7 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function RevenueTrendChart({ chartData }) {
+function RevenueTrendChart({ chartData }) {
   if (!chartData || chartData.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
@@ -67,3 +67,5 @@ export default function RevenueTrendChart({ chartData }) {
     </div>
   );
 }
+
+export default React.memo(RevenueTrendChart);

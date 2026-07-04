@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import StatCard from '@/components/admin/StatCard';
 import SectionSkeleton from '@/components/admin/SectionSkeleton';
@@ -27,6 +27,18 @@ const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 export default function OverviewTab({ data, processingId, onDriverAction }) {
   const { stats, movesByStatus, recentMoves, pendingDrivers, recentPayouts, recentUsers } = data;
   const fmt = (n) => `$${(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const [localPendingDrivers, setLocalPendingDrivers] = useState(pendingDrivers);
+  useEffect(() => { setLocalPendingDrivers(pendingDrivers); }, [pendingDrivers]);
+  const handleDriverAction = async (driverId, action) => {
+    const removed = localPendingDrivers.find(d => d.id === driverId);
+    setLocalPendingDrivers(prev => prev.filter(d => d.id !== driverId));
+    try {
+      await onDriverAction(driverId, action);
+    } catch {
+      if (removed) setLocalPendingDrivers(prev => [...prev, removed]);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -63,15 +75,15 @@ export default function OverviewTab({ data, processingId, onDriverAction }) {
       </Suspense>
 
       {/* Pending driver approvals — surfaced at top of overview for visibility */}
-      {pendingDrivers.length > 0 && (
+      {localPendingDrivers.length > 0 && (
         <div className="bg-card border rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <UserCheck size={20} className="text-amber-500" />
             <h2 className="font-display font-bold text-lg">Pending Driver Approvals</h2>
-            <Badge className="ml-auto bg-amber-500/10 text-amber-700 dark:text-amber-300">{pendingDrivers.length} waiting</Badge>
+            <Badge className="ml-auto bg-amber-500/10 text-amber-700 dark:text-amber-300">{localPendingDrivers.length} waiting</Badge>
           </div>
           <div className="space-y-3">
-            {pendingDrivers.map((d) => (
+            {localPendingDrivers.map((d) => (
               <div key={d.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
                 <div className="min-w-0">
                   <p className="font-medium truncate">{d.full_name}</p>
@@ -83,7 +95,7 @@ export default function OverviewTab({ data, processingId, onDriverAction }) {
                     size="sm"
                     className="bg-emerald-500 hover:bg-emerald-600"
                     disabled={processingId === d.id}
-                    onClick={() => onDriverAction(d.id, 'approve_driver')}
+                    onClick={() => handleDriverAction(d.id, 'approve_driver')}
                   >
                     {processingId === d.id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
                     Approve
@@ -92,7 +104,7 @@ export default function OverviewTab({ data, processingId, onDriverAction }) {
                     size="sm"
                     variant="outline"
                     disabled={processingId === d.id}
-                    onClick={() => onDriverAction(d.id, 'reject_driver')}
+                    onClick={() => handleDriverAction(d.id, 'reject_driver')}
                   >
                     <UserX size={14} />
                     Reject

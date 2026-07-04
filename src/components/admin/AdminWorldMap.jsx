@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, Marker, Tooltip } from 'react-leaflet';
 import { base44 } from '@/api/base44Client';
 import { Loader2, MapPin, DollarSign, Package, Truck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import L from 'leaflet';
 
 // Fix default marker icons for Leaflet in bundler environments
@@ -98,6 +99,7 @@ export default function AdminWorldMap() {
   const [salesPins, setSalesPins] = useState([]);
   const [jobPins, setJobPins] = useState([]);
   const [driverPins, setDriverPins] = useState([]);
+  const [pinLimit, setPinLimit] = useState(15);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -127,7 +129,7 @@ export default function AdminWorldMap() {
     let cancelled = false;
     setGeocoding(true);
     (async () => {
-      const addresses = moves.slice(0, 30)
+      const addresses = moves.slice(0, pinLimit)
         .filter(m => m.pickup_address)
         .map(m => ({ address: m.pickup_address, move: m }));
       const results = await geocodeBatch(addresses);
@@ -160,7 +162,7 @@ export default function AdminWorldMap() {
       setGeocoding(false);
     })();
     return () => { cancelled = true; };
-  }, [moves]);
+  }, [moves, pinLimit]);
 
   // Geocode drivers
   useEffect(() => {
@@ -335,9 +337,14 @@ export default function AdminWorldMap() {
         </div>
       )}
 
-      {(moves.length > 30 || drivers.length > 20) && !loading && (
+      {moves.length > pinLimit && !loading && (
+        <Button variant="outline" size="sm" className="mt-2 min-h-[44px]" onClick={() => setPinLimit(prev => prev + 10)}>
+          Load more pins
+        </Button>
+      )}
+      {(moves.length > pinLimit || drivers.length > 20) && !loading && (
         <p className="text-xs text-muted-foreground mt-2">
-          Showing up to 30 recent move locations and 20 driver service areas
+          Showing up to {pinLimit} recent move locations and 20 driver service areas
         </p>
       )}
 
