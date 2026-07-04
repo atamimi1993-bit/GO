@@ -8,6 +8,7 @@ const MovesByCityChart = lazy(() => import('@/components/admin/MovesByCityChart'
 const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
 const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
 const MoveStatusTracker = lazy(() => import('@/components/admin/MoveStatusTracker'));
+const MoveHeatMap = lazy(() => import('@/components/admin/MoveHeatMap'));
 const GrowthSummary = lazy(() => import('@/components/admin/GrowthSummary'));
 const RecordExportButton = lazy(() => import('@/components/admin/RecordExportButton'));
 const BulkPayoutPanel = lazy(() => import('@/components/admin/BulkPayoutPanel'));
@@ -32,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import {
   ShieldCheck, DollarSign, Truck, Package, Users, CheckCircle2,
-  Loader2, UserCheck, UserX, Wallet, TrendingUp, AlertCircle, MapPin, Building2,
+  Loader2, UserCheck, UserX, Wallet, TrendingUp, AlertCircle, MapPin, Building2, Flame,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -209,6 +210,18 @@ export default function Admin() {
         <Suspense fallback={<SectionSkeleton />}>
           <MoveStatusTracker />
         </Suspense>
+
+        {/* Move demand heatmap */}
+        <div className="bg-card border rounded-2xl p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Flame size={20} className="text-orange-500" />
+            <h2 className="font-display font-bold text-lg">Move Demand Heatmap</h2>
+            <span className="text-xs text-muted-foreground ml-auto">Peak times & top locations</span>
+          </div>
+          <Suspense fallback={<SectionSkeleton />}>
+            <MoveHeatMap />
+          </Suspense>
+        </div>
 
         {/* Global operations map */}
         <div className="bg-card border rounded-2xl p-5 mb-6">
