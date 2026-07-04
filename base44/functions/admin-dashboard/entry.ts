@@ -278,6 +278,21 @@ Deno.serve(async (req) => {
       const driverMap = {};
       for (const d of allDrivers) driverMap[d.id] = d;
 
+      // Optional date range filter
+      const { months_back } = body;
+      let movesToProcess = allMoves;
+      if (months_back && months_back > 0) {
+        const cutoff = new Date();
+        cutoff.setUTCMonth(cutoff.getUTCMonth() - months_back);
+        cutoff.setUTCDate(1);
+        cutoff.setUTCHours(0, 0, 0, 0);
+        const cutoffMs = cutoff.getTime();
+        movesToProcess = allMoves.filter((m) => {
+          const d = new Date(m.move_date || m.created_date);
+          return !isNaN(d.getTime()) && d.getTime() >= cutoffMs;
+        });
+      }
+
       const monthKey = (iso) => {
         if (!iso) return null;
         const d = new Date(iso);
@@ -292,7 +307,7 @@ Deno.serve(async (req) => {
         if (!months[key]) months[key] = { month: key, completed_moves: 0, move_fee_revenue: 0, total_revenue: 0 };
       };
 
-      for (const m of allMoves) {
+      for (const m of movesToProcess) {
         if (m.status !== 'completed') continue;
         const key = monthKey(m.move_date || m.created_date);
         if (!key) continue;
@@ -304,21 +319,42 @@ Deno.serve(async (req) => {
 
       const monthlySeries = Object.values(months).sort((a, b) => a.month.localeCompare(b.month));
 
-      // Top driver regions by completed moves and revenue
+      // Top driver regions by completed moves and revenue (with per-driver breakdown)
       const regions = {};
-      for (const m of allMoves) {
+      for (const m of movesToProcess) {
         if (m.status !== 'completed' || !m.assigned_driver_id) continue;
         const driver = driverMap[m.assigned_driver_id];
         const region = driver?.service_area || 'Unknown';
-        if (!regions[region]) regions[region] = { region, completed_moves: 0, revenue: 0, move_fee_revenue: 0, driver_count: new Set() };
+        if (!regions[region]) {
+          regions[region] = { region, completed_moves: 0, revenue: 0, move_fee_revenue: 0, driver_count: new Set(), drivers: {} };
+        }
         regions[region].completed_moves += 1;
         regions[region].revenue += m.total_price || 0;
         regions[region].move_fee_revenue += m.app_fee || (m.total_price || 0) * 0.25;
-        if (driver) regions[region].driver_count.add(driver.id);
+        if (driver) {
+          regions[region].driver_count.add(driver.id);
+          if (!regions[region].drivers[driver.id]) {
+            regions[region].drivers[driver.id] = {
+              id: driver.id,
+              name: driver.full_name,
+              company_name: driver.company_name || null,
+              completed_moves: 0,
+              revenue: 0,
+              move_fee_revenue: 0,
+            };
+          }
+          regions[region].drivers[driver.id].completed_moves += 1;
+          regions[region].drivers[driver.id].revenue += m.total_price || 0;
+          regions[region].drivers[driver.id].move_fee_revenue += m.app_fee || (m.total_price || 0) * 0.25;
+        }
       }
 
       const topRegions = Object.values(regions)
-        .map((r) => ({ ...r, driver_count: r.driver_count.size }))
+        .map((r) => ({
+          ...r,
+          driver_count: r.driver_count.size,
+          drivers: Object.values(r.drivers).sort((a, b) => b.completed_moves - a.completed_moves),
+        }))
         .sort((a, b) => b.completed_moves - a.completed_moves)
         .slice(0, 10);
 

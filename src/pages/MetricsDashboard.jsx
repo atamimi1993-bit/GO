@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { formatCurrency } from '@/lib/pricing';
-import { BarChart3, CheckCircle2, DollarSign, MapPin, Loader2, Lock, Trophy, TrendingUp, Download, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { BarChart3, CheckCircle2, DollarSign, MapPin, Loader2, Lock, Trophy, TrendingUp, Download, ArrowUpRight, ArrowDownRight, Minus, ChevronDown } from 'lucide-react';
 import CompletedMovesChart from '@/components/admin/CompletedMovesChart';
 import RevenueTrendChart from '@/components/admin/RevenueTrendChart';
 import { Button } from '@/components/ui/button';
@@ -11,17 +11,29 @@ import { useToast } from '@/components/ui/use-toast';
 
 const fmt = (n) => formatCurrency(n, 'USD');
 
+const DATE_RANGES = [
+  { key: '3m', label: '3M', months: 3 },
+  { key: '6m', label: '6M', months: 6 },
+  { key: '12m', label: '12M', months: 12 },
+  { key: 'all', label: 'All', months: null },
+];
+
 export default function MetricsDashboard() {
   const { scrollRef } = useOutletContext();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
   const [data, setData] = useState(null);
+  const [dateRange, setDateRange] = useState('all');
+  const [expandedRegion, setExpandedRegion] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await base44.functions.invoke('admin-dashboard', { action: 'metrics_overview' });
+      const payload = { action: 'metrics_overview' };
+      const range = DATE_RANGES.find((r) => r.key === dateRange);
+      if (range?.months) payload.months_back = range.months;
+      const res = await base44.functions.invoke('admin-dashboard', payload);
       setData(res.data);
     } catch (err) {
       if (String(err?.response?.status || err?.message || '').includes('403') ||
@@ -30,7 +42,7 @@ export default function MetricsDashboard() {
       }
     }
     setLoading(false);
-  }, []);
+  }, [dateRange]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -164,8 +176,26 @@ export default function MetricsDashboard() {
           </div>
         </div>
 
+        {/* Date range filter */}
+        <div className="flex items-center gap-2 mt-6 mb-4">
+          <span className="text-xs text-muted-foreground mr-1">Range:</span>
+          {DATE_RANGES.map((r) => (
+            <button
+              key={r.key}
+              onClick={() => { setDateRange(r.key); setExpandedRegion(null); }}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                dateRange === r.key
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+
         {/* Stat tiles */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           {stats.map((s, i) => (
             <div key={i} className={`border rounded-2xl p-4 flex items-center gap-3 ${s.bg}`}>
               <div className="w-10 h-10 rounded-xl bg-background/60 flex items-center justify-center shrink-0">
@@ -215,31 +245,53 @@ export default function MetricsDashboard() {
           ) : (
             <div className="space-y-3">
               {topRegions.map((r, idx) => (
-                <div key={r.region} className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 text-xs font-bold">
-                    {idx + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <p className="font-medium text-sm truncate flex items-center gap-1">
-                        <MapPin size={12} className="text-muted-foreground shrink-0" />
-                        {r.region}
-                      </p>
-                      <div className="flex items-center gap-3 shrink-0 text-xs">
-                        <span className="text-muted-foreground">{r.completed_moves} moves</span>
-                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{fmt(r.revenue)}</span>
+                <div key={r.region}>
+                  <button
+                    onClick={() => setExpandedRegion(expandedRegion === r.region ? null : r.region)}
+                    className="flex items-center gap-3 w-full text-left"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 text-xs font-bold">
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <p className="font-medium text-sm truncate flex items-center gap-1">
+                          <MapPin size={12} className="text-muted-foreground shrink-0" />
+                          {r.region}
+                        </p>
+                        <div className="flex items-center gap-3 shrink-0 text-xs">
+                          <span className="text-muted-foreground">{r.completed_moves} moves</span>
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">{fmt(r.revenue)}</span>
+                          <ChevronDown size={14} className={`text-muted-foreground transition-transform shrink-0 ${expandedRegion === r.region ? 'rotate-180' : ''}`} />
+                        </div>
                       </div>
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-emerald-500 transition-all"
+                          style={{ width: `${(r.completed_moves / maxMoves) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {r.driver_count} driver{r.driver_count !== 1 ? 's' : ''} · {fmt(r.move_fee_revenue)} in move fees
+                      </p>
                     </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-emerald-500 transition-all"
-                        style={{ width: `${(r.completed_moves / maxMoves) * 100}%` }}
-                      />
+                  </button>
+                  {expandedRegion === r.region && r.drivers?.length > 0 && (
+                    <div className="ml-10 mt-2 mb-1 space-y-1">
+                      {r.drivers.map((d) => (
+                        <div key={d.id} className="flex items-center justify-between text-xs py-2 px-3 rounded-lg bg-muted/50">
+                          <div className="min-w-0 mr-2">
+                            <p className="font-medium truncate">{d.name}</p>
+                            {d.company_name && <p className="text-muted-foreground truncate">{d.company_name}</p>}
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="text-muted-foreground">{d.completed_moves} move{d.completed_moves !== 1 ? 's' : ''}</span>
+                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">{fmt(d.revenue)}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {r.driver_count} driver{r.driver_count !== 1 ? 's' : ''} · {fmt(r.move_fee_revenue)} in move fees
-                    </p>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
