@@ -72,20 +72,26 @@ export default function MyMoves() {
       {/* In Transit — live tracking for active moves */}
       {(() => {
         const activeMoves = moves.filter(m => ['accepted', 'in_progress'].includes(m.status));
-        if (activeMoves.length === 0) return null;
         return (
           <div className="mb-6">
             <h2 className="font-display font-bold text-sm uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
               <Navigation size={14} className="text-emerald-500" /> In Transit ({activeMoves.length})
             </h2>
-            <div className="space-y-3">
-              {activeMoves.map(move => (
-                <div key={move.id} className="space-y-3">
-                  <LiveTrackingMap move={move} />
-                  <TrackingCard move={move} />
-                </div>
-              ))}
-            </div>
+            {activeMoves.length === 0 ? (
+              <div className="text-center py-8 bg-card border rounded-2xl">
+                <Navigation className="mx-auto text-muted-foreground mb-2" size={28} />
+                <p className="text-sm text-muted-foreground">No active shipments to track right now.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {activeMoves.map(move => (
+                  <div key={move.id} className="space-y-3">
+                    <LiveTrackingMap move={move} />
+                    <TrackingCard move={move} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         );
       })()}
