@@ -1,0 +1,59 @@
+{
+  "name": "DamageReport",
+  "type": "object",
+  "properties": {
+    "move_request_id": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "customer_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "driver_name": {
+      "type": "string"
+    },
+    "report_type": {
+      "type": "string",
+      "enum": [
+        "damaged",
+        "lost"
+      ],
+      "default": "damaged"
+    },
+    "item_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "evidence_photo_url": {
+      "type": "string"
+    },
+    "claimed_value": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "under_review",
+        "resolved",
+        "rejected"
+      ],
+      "default": "submitted"
+    },
+    "resolution_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "move_request_id",
+    "report_type",
+    "item_name",
+    "description"
+  ]
+}

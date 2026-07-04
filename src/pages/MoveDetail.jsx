@@ -8,6 +8,7 @@ import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
+import DamageReportForm from '@/components/go/DamageReportForm';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO } from 'date-fns';
 
@@ -76,6 +77,7 @@ export default function MoveDetail() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const { toast } = useToast();
 
   const handlePay = async () => {
@@ -103,12 +105,14 @@ export default function MoveDetail() {
   }, [toast]);
 
   const load = useCallback(async () => {
-    const [m, it] = await Promise.all([
+    const [m, it, u] = await Promise.all([
       base44.entities.MoveRequest.get(id),
       base44.entities.MoveItem.filter({ move_request_id: id }),
+      base44.auth.me().catch(() => null),
     ]);
     setMove(m);
     setItems(it);
+    setCurrentUser(u);
   }, [id]);
 
   useEffect(() => {
@@ -232,6 +236,13 @@ export default function MoveDetail() {
       {/* Customer rates driver on completed moves */}
       {move.status === 'completed' && move.assigned_driver_id && (
         <RatingSection move={move} />
+      )}
+
+      {/* Report damaged or lost item */}
+      {move.status !== 'cancelled' && currentUser && (
+        <div className="mt-4">
+          <DamageReportForm move={move} user={currentUser} onSubmitted={load} />
+        </div>
       )}
     </div>
     </PullToRefresh>
