@@ -11,6 +11,7 @@ const ComplianceManager = lazy(() => import('@/components/go/ComplianceManager')
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 import AdBanner from '@/components/go/AdBanner';
+import DriverMonthlyChart from '@/components/go/DriverMonthlyChart';
 const StripeConnectCard = lazy(() => import('@/components/go/StripeConnectCard'));
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
 
@@ -141,6 +142,9 @@ export default function DriverHub() {
           <p className="text-xs text-muted-foreground">Rating</p>
         </div>
       </div>
+
+      {/* Monthly performance chart */}
+      <DriverMonthlyChart driverProfile={profile} />
 
       <div className="flex gap-3 mb-6">
         <Link to="/available-jobs" className="flex-1">
