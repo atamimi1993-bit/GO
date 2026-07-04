@@ -6,7 +6,7 @@ import { Heart, Loader2, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { getCurrency } from '@/lib/pricing';
 
-const PRESETS = [10, 20, 50];
+const PRESETS = [15, 20, 25];
 
 export default function TipButton({ move }) {
   const [open, setOpen] = useState(false);
@@ -15,8 +15,10 @@ export default function TipButton({ move }) {
   const { toast } = useToast();
 
   const curr = getCurrency(move.currency || 'USD');
+  const baseTotal = move.total_price || 0;
 
   const handleTip = async (amount) => {
+    if (amount <= 0) return;
     if (window.self !== window.top) {
       alert('Checkout is only available from the published app, not the editor preview.');
       return;
@@ -59,43 +61,56 @@ export default function TipButton({ move }) {
       </p>
 
       {!open ? (
-        <Button className="w-full bg-pink-500 hover:bg-pink-600" onClick={() => setOpen(true)}>
-          <Heart size={16} className="mr-1" /> Add a Tip
-        </Button>
+        <div className="flex gap-2">
+          <Button className="flex-1 bg-pink-500 hover:bg-pink-600" onClick={() => setOpen(true)}>
+            <Heart size={16} className="mr-1" /> Add a Tip
+          </Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            No Tip
+          </Button>
+        </div>
       ) : (
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2">
-            {PRESETS.map((amt) => (
-              <Button
-                key={amt}
-                variant="outline"
-                disabled={paying}
-                onClick={() => handleTip(amt)}
-                className="flex flex-col h-auto py-3"
-              >
-                <span className="text-lg font-bold">{curr.symbol}{amt}</span>
-              </Button>
-            ))}
+            {PRESETS.map((pct) => {
+              const amount = Math.round((baseTotal * pct / 100) * 100) / 100;
+              return (
+                <Button
+                  key={pct}
+                  variant="outline"
+                  disabled={paying}
+                  onClick={() => handleTip(amount)}
+                  className="flex flex-col h-auto py-3"
+                >
+                  <span className="text-sm font-bold">{pct}%</span>
+                  <span className="text-xs text-muted-foreground">{curr.symbol}{amount.toFixed(curr.decimals)}</span>
+                </Button>
+              );
+            })}
           </div>
           <div className="flex gap-2">
-            <Input
-              type="number"
-              min="1"
-              placeholder="Custom amount"
-              value={customTip}
-              onChange={(e) => setCustomTip(e.target.value)}
-              disabled={paying}
-            />
+            <div className="relative flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{curr.symbol}</span>
+              <Input
+                type="number"
+                min="1"
+                placeholder="Custom amount"
+                value={customTip}
+                onChange={(e) => setCustomTip(e.target.value)}
+                disabled={paying}
+                className="pl-7"
+              />
+            </div>
             <Button
               disabled={paying || !customTip || parseFloat(customTip) <= 0}
               onClick={() => handleTip(parseFloat(customTip))}
               className="bg-pink-500 hover:bg-pink-600"
             >
-              {paying ? <Loader2 size={16} className="animate-spin" /> : `Tip ${curr.symbol}${customTip || ''}`}
+              {paying ? <Loader2 size={16} className="animate-spin" /> : `Tip${customTip ? ' ' + curr.symbol + customTip : ''}`}
             </Button>
           </div>
           <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => setOpen(false)}>
-            Maybe later
+            No Tip
           </Button>
         </div>
       )}
