@@ -231,7 +231,7 @@ export default function DriverDashboard() {
               key={opt.key}
               onClick={() => toggleSort(opt.key)}
               aria-pressed={sortKey === opt.key}
-              aria-label={`Sort by ${opt.label}, ${sortDir === 'desc' ? 'descending' : 'ascending'}`}
+              aria-label={`Sort by ${opt.label}, ${sortKey === opt.key ? (sortDir === 'desc' ? 'descending' : 'ascending') : 'unsorted'}`}
               className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap ${
                 sortKey === opt.key
                   ? 'bg-primary/10 border-primary/30 text-primary'

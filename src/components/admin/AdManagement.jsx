@@ -8,13 +8,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import SectionSkeleton from '@/components/admin/SectionSkeleton';
 import { Megaphone, Loader2, Plus, Pause, Play, ExternalLink, Eye, MousePointerClick } from 'lucide-react';
+import MobileSelect from '@/components/go/MobileSelect';
 
-const PLACEMENTS = [
+const PLACEMENT_OPTIONS = [
   { value: 'homepage_banner', label: 'Homepage Banner' },
   { value: 'sidebar', label: 'Sidebar' },
   { value: 'in_app', label: 'In-App' },
   { value: 'move_confirmation', label: 'Move Confirmation' },
   { value: 'email', label: 'Email Insert' },
+];
+
+const AUDIENCE_OPTIONS = [
+  { value: 'all', label: 'All Users' },
+  { value: 'customers', label: 'Customers' },
+  { value: 'drivers', label: 'Drivers' },
+  { value: 'business', label: 'Business' },
 ];
 
 export default function AdManagement() {
@@ -123,18 +131,21 @@ export default function AdManagement() {
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
               <Label className="text-xs">Placement</Label>
-              <select value={form.placement} onChange={e => setForm({...form, placement: e.target.value})} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
-                {PLACEMENTS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-              </select>
+              <MobileSelect
+                value={form.placement}
+                onValueChange={(v) => setForm({...form, placement: v})}
+                options={PLACEMENT_OPTIONS}
+                placeholder="Select placement"
+              />
             </div>
             <div>
               <Label className="text-xs">Audience</Label>
-              <select value={form.audience} onChange={e => setForm({...form, audience: e.target.value})} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
-                <option value="all">All Users</option>
-                <option value="customers">Customers</option>
-                <option value="drivers">Drivers</option>
-                <option value="business">Business</option>
-              </select>
+              <MobileSelect
+                value={form.audience}
+                onValueChange={(v) => setForm({...form, audience: v})}
+                options={AUDIENCE_OPTIONS}
+                placeholder="Select audience"
+              />
             </div>
           </div>
           <Button onClick={handleCreateCheckout} disabled={creating} className="w-full bg-indigo-500 hover:bg-indigo-600">
