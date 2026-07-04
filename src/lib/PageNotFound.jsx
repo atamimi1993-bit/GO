@@ -20,7 +20,7 @@ export default function PageNotFound({}) {
     });
     
     return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+        <div className="min-h-screen flex items-center justify-center p-6 bg-background" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
             <div className="max-w-md w-full">
                 <div className="text-center space-y-6">
                     {/* 404 Error Code */}

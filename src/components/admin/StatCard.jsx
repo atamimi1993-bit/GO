@@ -14,7 +14,7 @@ export default function StatCard({ icon: Icon, label, value, sublabel, accent = 
         <p className="text-sm text-muted-foreground font-medium">{label}</p>
         {Icon && (
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${accentMap[accent]}`}>
-            <Icon size={18} />
+            <Icon size={18} aria-hidden="true" />
           </div>
         )}
       </div>

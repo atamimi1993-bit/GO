@@ -13,7 +13,7 @@ export default function Logo({ size = 'md' }) {
   return (
     <div className="flex items-center gap-2">
       <div className="bg-emerald-500 rounded-xl p-1.5 flex items-center justify-center">
-        <Truck className="text-white" size={iconSizes[size]} />
+        <Truck className="text-white" size={iconSizes[size]} aria-hidden="true" />
       </div>
       <span className={`font-display font-black tracking-tight ${sizes[size]}`}>
         GO

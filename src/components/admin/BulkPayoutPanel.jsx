@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import PullToRefresh from '@/components/go/PullToRefresh';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Wallet, Loader2, CheckCircle2, ChevronDown, ChevronUp, DollarSign,
 } from 'lucide-react';
@@ -186,16 +187,12 @@ export default function BulkPayoutPanel({ scrollRef }) {
                   onClick={() => toggleExpand(driverId)}
                   className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors text-left"
                 >
-                  <div
-                    role="checkbox"
-                    aria-checked={allSelected}
-                    tabIndex={0}
-                    onClick={(e) => { e.stopPropagation(); toggleDriver(driverId, payoutIds); }}
-                    onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); toggleDriver(driverId, payoutIds); } }}
-                    className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 cursor-pointer ${allSelected ? 'bg-amber-500 border-amber-500' : someSelected ? 'border-amber-500' : 'border-muted-foreground/30'}`}
-                  >
-                    {allSelected && <CheckCircle2 size={12} className="text-white" />}
-                  </div>
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={() => toggleDriver(driverId, payoutIds)}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`Select all payouts for ${group.driver_name}`}
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{group.driver_name}</p>
                     {group.company_name && <p className="text-xs text-muted-foreground truncate">{group.company_name}</p>}
@@ -214,16 +211,11 @@ export default function BulkPayoutPanel({ scrollRef }) {
                       const isSel = selected.has(p.id);
                       return (
                         <div key={p.id} className="flex items-center gap-3 p-3 hover:bg-muted/30">
-                          <div
-                            role="checkbox"
-                            aria-checked={isSel}
-                            tabIndex={0}
-                            onClick={() => toggleSelect(p.id)}
-                            onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleSelect(p.id); } }}
-                            className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 cursor-pointer ${isSel ? 'bg-amber-500 border-amber-500' : 'border-muted-foreground/30'}`}
-                          >
-                            {isSel && <CheckCircle2 size={12} className="text-white" />}
-                          </div>
+                          <Checkbox
+                            checked={isSel}
+                            onCheckedChange={() => toggleSelect(p.id)}
+                            aria-label={`Select payout from ${p.pickup} to ${p.dropoff}`}
+                          />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm truncate">{p.pickup} → {p.dropoff}</p>
                             <p className="text-xs text-muted-foreground">

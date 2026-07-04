@@ -33,16 +33,16 @@ export default function FreightJobCard({ job, driver }) {
               {job.status?.replace('_', ' ')}
             </Badge>
             <Badge variant="outline" className="capitalize">
-              <Truck size={10} className="mr-1" />
+              <Truck size={10} className="mr-1" aria-hidden="true" />
               {job.truck_size_needed?.replace('_', ' ')}
             </Badge>
           </div>
           <div className="space-y-1 mt-2">
             <p className="flex items-center gap-2 text-sm">
-              <MapPin size={14} className="text-emerald-500 shrink-0" /> {job.pickup_address}
+              <MapPin size={14} className="text-emerald-500 shrink-0" aria-hidden="true" /> {job.pickup_address}
             </p>
             <p className="flex items-center gap-2 text-sm">
-              <MapPin size={14} className="text-red-400 shrink-0" /> {job.dropoff_address}
+              <MapPin size={14} className="text-red-400 shrink-0" aria-hidden="true" /> {job.dropoff_address}
             </p>
           </div>
         </div>
@@ -60,11 +60,11 @@ export default function FreightJobCard({ job, driver }) {
 
       <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3 flex-wrap">
         <span className="flex items-center gap-1">
-          <Calendar size={12} />
+          <Calendar size={12} aria-hidden="true" />
           {format(parseISO(job.move_date), 'MMM d, yyyy')}{job.move_time && ` at ${job.move_time}`}
         </span>
         <span className="flex items-center gap-1">
-          <Package size={12} />
+          <Package size={12} aria-hidden="true" />
           {job.total_weight_lbs?.toLocaleString()} lbs
         </span>
         <span>{job.distance_miles} {distUnit}</span>
@@ -75,7 +75,7 @@ export default function FreightJobCard({ job, driver }) {
         <div className="bg-muted/50 rounded-xl p-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="bg-emerald-500/10 rounded-full w-10 h-10 flex items-center justify-center shrink-0">
-              <User size={18} className="text-emerald-600 dark:text-emerald-400" />
+              <User size={18} className="text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
             </div>
             <div className="min-w-0">
               <p className="font-medium text-sm truncate">

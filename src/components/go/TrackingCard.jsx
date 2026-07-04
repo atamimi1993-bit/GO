@@ -56,17 +56,17 @@ export default function TrackingCard({ move }) {
             {move.assigned_driver_name ? `Driver: ${move.assigned_driver_name}` : 'Awaiting driver assignment'}
           </p>
         </div>
-        <ChevronRight size={18} className="text-muted-foreground shrink-0" />
+        <ChevronRight size={18} className="text-muted-foreground shrink-0" aria-hidden="true" />
       </div>
 
       {/* Addresses */}
       <div className="space-y-1 text-sm mb-4">
         <p className="flex items-center gap-2">
-          <MapPin size={14} className="text-emerald-500 shrink-0" />
+          <MapPin size={14} className="text-emerald-500 shrink-0" aria-hidden="true" />
           <span className="truncate">{move.pickup_address}</span>
         </p>
         <p className="flex items-center gap-2">
-          <MapPin size={14} className="text-red-400 shrink-0" />
+          <MapPin size={14} className="text-red-400 shrink-0" aria-hidden="true" />
           <span className="truncate">{move.dropoff_address}</span>
         </p>
       </div>
@@ -90,7 +90,7 @@ export default function TrackingCard({ move }) {
                         : 'bg-muted text-muted-foreground'
                   }`}
                 >
-                  <m.icon size={13} />
+                  <m.icon size={13} aria-hidden="true" />
                 </div>
               </div>
               {i < MILESTONES.length - 1 && (
