@@ -6,7 +6,7 @@ import { Heart, Loader2, CheckCircle2, Coffee, PartyPopper } from 'lucide-react'
 import { getCurrency } from '@/lib/pricing';
 import { useToast } from '@/components/ui/use-toast';
 
-const QUICK_TIPS = [5, 10, 15, 20];
+const TIP_PERCENTAGES = [15, 20, 25];
 
 export default function TipSection({ move }) {
   const [pings, setPings] = useState([]);
@@ -19,6 +19,7 @@ export default function TipSection({ move }) {
   const currencyCode = move.currency || 'USD';
   const curr = getCurrency(currencyCode);
   const fmt = (v) => curr.symbol + Number(v).toFixed(curr.decimals);
+  const basePrice = move.total_price || 0;
 
   useEffect(() => {
     base44.entities.LocationPing.filter({ move_request_id: move.id }, '-created_date', 100)
@@ -130,20 +131,24 @@ export default function TipSection({ move }) {
 
             {!section.paid && (
               <>
-                <div className="grid grid-cols-4 gap-2 mb-3">
-                  {QUICK_TIPS.map((amt) => (
-                    <button
-                      key={amt}
-                      onClick={() => { setSelectedTip(amt); setCustomTip(''); }}
-                      className={`py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
-                        selectedTip === amt
-                          ? 'bg-amber-500 text-white'
-                          : 'bg-white dark:bg-card border border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20'
-                      }`}
-                    >
-                      {fmt(amt)}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {TIP_PERCENTAGES.map((pct) => {
+                    const amt = Math.round(basePrice * (pct / 100) * 100) / 100;
+                    return (
+                      <button
+                        key={pct}
+                        onClick={() => { setSelectedTip(amt); setCustomTip(''); }}
+                        className={`flex flex-col items-center justify-center py-2 rounded-lg transition-colors min-h-[52px] ${
+                          selectedTip === amt
+                            ? 'bg-amber-500 text-white'
+                            : 'bg-white dark:bg-card border border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                        }`}
+                      >
+                        <span className="text-base font-bold">{pct}%</span>
+                        <span className="text-xs opacity-80">{fmt(amt)}</span>
+                      </button>
+                    );
+                  })}
                 </div>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
