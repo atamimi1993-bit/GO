@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import ReactMarkdown from 'react-markdown';
 import { CalendarClock, Send, Loader2, Bot, RefreshCw, AlertTriangle, CheckCircle2, Calendar } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 const QUICK_PROMPTS = [
   'Scan the calendar for scheduling conflicts and double-bookings',
@@ -103,6 +104,15 @@ export default function ScheduleOptimizer() {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
+  const { data: driverProfile } = useQuery({
+    queryKey: ['myDriverProfile', user?.id],
+    queryFn: () => base44.entities.DriverProfile.filter({ email: user.email }).then(r => r[0] || null),
+    enabled: !!user?.email && user?.role !== 'admin',
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const isAuthorized = user?.role === 'admin' || !!driverProfile;
+
   const loadConversation = useCallback(async () => {
     try {
       const convos = await base44.agents.listConversations({ agent_name: 'schedule_optimizer' });
@@ -155,10 +165,19 @@ export default function ScheduleOptimizer() {
     }
   };
 
-  if (loading) {
+  if (loading || (user?.role !== 'admin' && !driverProfile && !!user?.email)) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="animate-spin text-muted-foreground" size={32} />
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <AlertTriangle className="text-muted-foreground mb-3" size={32} />
+        <p className="text-muted-foreground">You don't have access to the Schedule Optimizer.</p>
       </div>
     );
   }

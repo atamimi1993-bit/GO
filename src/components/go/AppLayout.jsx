@@ -19,7 +19,7 @@ const navItems = [
   { label: 'Rentals', path: '/rentals', icon: Car },
   { label: 'Help Center', path: '/help', icon: HelpCircle },
   { label: 'Admin', path: '/admin', icon: ShieldCheck, adminOnly: true },
-  { label: 'Scheduler', path: '/scheduler', icon: CalendarClock, adminOnly: true },
+  { label: 'Scheduler', path: '/scheduler', icon: CalendarClock, adminOrDriver: true },
 ];
 
 export default function AppLayout() {
@@ -34,6 +34,7 @@ export default function AppLayout() {
   });
   const visibleNavItems = navItems.filter(item => {
     if (item.adminOnly) return user?.role === 'admin';
+    if (item.adminOrDriver) return user?.role === 'admin' || !!driverProfile;
     if (item.driverOnly) return user?.role !== 'admin' && !!driverProfile;
     if (item.cdlOrAdmin) return user?.role === 'admin' || driverProfile?.cdl_certified;
     return true;
