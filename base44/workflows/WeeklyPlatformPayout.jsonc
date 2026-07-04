@@ -1,0 +1,67 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_platform_payout",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_payout": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "auto-platform-payout",
+            "args": {}
+          },
+          "then": "check_result",
+          "x-base44": {
+            "title": "Run auto payout",
+            "description": "Deposit available balance to bank"
+          }
+        }
+      },
+      {
+        "check_result": {
+          "switch": [
+            {
+              "when": "${ .run_payout.success == true }",
+              "then": "end"
+            },
+            {
+              "when": "${ .run_payout.skipped == true }",
+              "then": "end"
+            },
+            {
+              "when": "${ true }",
+              "then": "end"
+            }
+          ],
+          "x-base44": {
+            "title": "Check result",
+            "description": "Verify payout outcome"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Automatically deposits the platform's available Stripe balance to the linked bank account every Monday at 9am ET.",
+  "name": "Weekly Platform Payout"
+}
