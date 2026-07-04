@@ -1,6 +1,30 @@
+import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { Navigation, MapPin, Flag, Loader2, ExternalLink, Smartphone } from 'lucide-react';
+
+const GEOCACHE_PREFIX = 'go_geocode_';
+
+async function geocodeWithCache(address) {
+  if (!address || address.trim().length < 3) return null;
+  const key = GEOCACHE_PREFIX + address;
+  try {
+    const cached = sessionStorage.getItem(key);
+    if (cached !== null) return cached === 'null' ? null : JSON.parse(cached);
+  } catch {}
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+      { headers: { 'Accept-Language': 'en' } }
+    );
+    const data = await res.json();
+    const coords = data.length > 0 ? [parseFloat(data[0].lat), parseFloat(data[0].lon)] : null;
+    try { sessionStorage.setItem(key, coords ? JSON.stringify(coords) : 'null'); } catch {}
+    return coords;
+  } catch {
+    return null;
+  }
+}
 
 // Fix default marker icons for Leaflet in bundler environments
 import L from 'leaflet';
@@ -36,13 +60,13 @@ export default function DriverNavigationCard({ job }) {
         return;
       }
       try {
-        const [pickupRes, dropoffRes] = await Promise.all([
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(job.pickup_address)}&limit=1`).then(r => r.json()),
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(job.dropoff_address)}&limit=1`).then(r => r.json()),
+        const [pickupCoordsResult, dropoffCoordsResult] = await Promise.all([
+          geocodeWithCache(job.pickup_address),
+          geocodeWithCache(job.dropoff_address),
         ]);
         if (cancelled) return;
-        if (pickupRes.length > 0) setPickupCoords([parseFloat(pickupRes[0].lat), parseFloat(pickupRes[0].lon)]);
-        if (dropoffRes.length > 0) setDropoffCoords([parseFloat(dropoffRes[0].lat), parseFloat(dropoffRes[0].lon)]);
+        if (pickupCoordsResult) setPickupCoords(pickupCoordsResult);
+        if (dropoffCoordsResult) setDropoffCoords(dropoffCoordsResult);
       } catch {}
       setGeocoding(false);
     })();

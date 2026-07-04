@@ -1,3 +1,4 @@
+import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, Marker, Tooltip } from 'react-leaflet';
 import { base44 } from '@/api/base44Client';
@@ -270,7 +271,7 @@ export default function AdminWorldMap() {
                     <p><strong>Name:</strong> {pin.name}</p>
                     <p><strong>Service Area:</strong> {pin.serviceArea}</p>
                     <p><strong>Status:</strong> {pin.status?.replace('_', ' ')}</p>
-                    <p><strong>Rating:</strong> {(pin.rating || 5).toFixed(1)} ★</p>
+                    <p><strong>Rating:</strong> {(pin.rating || 5).toFixed(1)} <span aria-hidden="true">★</span><span className="sr-only"> stars</span></p>
                     <p><strong>Jobs:</strong> {pin.totalJobs || 0}</p>
                   </div>
                 </Popup>

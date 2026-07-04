@@ -76,7 +76,7 @@ export default function DeliveryHistory() {
       ) : (
         <div className="space-y-2">
           {moves.map(m => (
-            <div key={m.id} className="bg-card border rounded-xl p-4" onClick={() => navigate(`/move/${m.id}`)} role="button">
+            <button key={m.id} type="button" className="w-full text-left bg-card border rounded-xl p-4" onClick={() => navigate(`/move/${m.id}`)}>
               <div className="flex items-start justify-between gap-2 mb-1">
                 <span className="text-sm font-semibold">{m.delivery_category?.replace(/_/g, ' ') || 'Delivery'}</span>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[m.status] || 'bg-muted'}`}>{m.status.replace(/_/g, ' ')}</span>
@@ -90,7 +90,7 @@ export default function DeliveryHistory() {
                 <TemperatureBadge show={m.temperature_controlled} small />
                 <SignatureBadge show={m.requires_signature} small />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
