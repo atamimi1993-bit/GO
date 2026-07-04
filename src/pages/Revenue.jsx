@@ -3,8 +3,9 @@ import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import RatingForm from '@/components/go/RatingForm';
+import RevenueForecastChart from '@/components/admin/RevenueForecastChart';
 import { formatCurrency } from '@/lib/pricing';
-import { DollarSign, TrendingUp, CheckCircle2, Clock, Star, Loader2, MessageSquare, Lock } from 'lucide-react';
+import { DollarSign, TrendingUp, CheckCircle2, Clock, Star, Loader2, MessageSquare, Lock, LineChart } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 export default function Revenue() {
@@ -101,6 +102,14 @@ export default function Revenue() {
               <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Revenue Forecast */}
+        <div className="bg-card border rounded-2xl p-5 mb-6">
+          <h3 className="font-display font-bold text-sm mb-4 flex items-center gap-2">
+            <LineChart size={16} className="text-orange-500" /> Revenue Forecast
+          </h3>
+          <RevenueForecastChart moves={moves} />
         </div>
 
         {/* Revenue by job type */}
