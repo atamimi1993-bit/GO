@@ -35,6 +35,7 @@ export default function DriverReport() {
   const [moves, setMoves] = useState([]);
   const [payouts, setPayouts] = useState([]);
   const [ratings, setRatings] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -49,14 +50,16 @@ export default function DriverReport() {
       const profile = profiles[0];
       setDriverProfile(profile);
 
-      const [allMoves, allPayouts, allRatings] = await Promise.all([
+      const [allMoves, allPayouts, allRatings, allExpenses] = await Promise.all([
         base44.entities.MoveRequest.list('-created_date', 500),
         base44.entities.DriverPayout.filter({ driver_profile_id: profile.id }, '-created_date', 200),
         base44.entities.Rating.filter({ direction: 'customer_to_driver', ratee_id: profile.id }, '-created_date', 50),
+        base44.entities.ExpenseReceipt.filter({ driver_profile_id: profile.id }, '-created_date', 50).catch(() => []),
       ]);
       setMoves(allMoves.filter((m) => m.assigned_driver_id === profile.id));
       setPayouts(allPayouts);
       setRatings(allRatings);
+      setExpenses(allExpenses);
     } catch {
       // ignore
     } finally {
@@ -278,6 +281,99 @@ export default function DriverReport() {
             </div>
           </div>
         )}
+
+        {/* Recent payouts & expenses side by side */}
+        <div className="grid lg:grid-cols-2 gap-6 mt-6">
+          {/* Recent Payouts */}
+          <div className="bg-card border rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-bold text-sm flex items-center gap-2">
+                <Wallet size={16} className="text-emerald-500" /> Recent Payouts
+              </h3>
+              <Link to="/my-payouts" className="text-xs text-primary font-medium hover:underline">View all</Link>
+            </div>
+            {payouts.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">No payouts yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {payouts.slice(0, 5).map((p) => (
+                  <div key={p.id} className="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-muted/50">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{fmt(p.amount)}</p>
+                      <p className="text-xs text-muted-foreground">{format(parseISO(p.created_date), 'MMM d, yyyy')}</p>
+                      {p.deduction_amount > 0 && (
+                        <p className="text-xs text-red-500">-{fmt(p.deduction_amount)} {p.deduction_reason}</p>
+                      )}
+                    </div>
+                    <Badge variant={p.status === 'paid' ? 'default' : 'secondary'}>{p.status}</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Expenses */}
+          <div className="bg-card border rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-bold text-sm flex items-center gap-2">
+                <Package size={16} className="text-blue-500" /> Recent Expenses
+              </h3>
+            </div>
+            {expenses.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">No expenses submitted.</p>
+            ) : (
+              <div className="space-y-2">
+                {expenses.slice(0, 5).map((e) => (
+                  <div key={e.id} className="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-muted/50">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium capitalize">{e.expense_type}</p>
+                      <p className="text-xs text-muted-foreground truncate">{e.description || '—'}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-semibold">{fmt(e.amount)}</p>
+                      <Badge variant={e.status === 'approved' ? 'default' : 'secondary'}>{e.status}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Ratings */}
+        <div className="bg-card border rounded-2xl p-5 mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display font-bold text-sm flex items-center gap-2">
+              <Star size={16} className="text-yellow-500" /> Recent Ratings
+            </h3>
+            <span className="text-xs text-muted-foreground">
+              {ratings.length} review{ratings.length !== 1 ? 's' : ''} · Avg {avgRating.toFixed(1)}★
+            </span>
+          </div>
+          {ratings.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">No ratings yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {ratings.slice(0, 5).map((r) => (
+                <div key={r.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50">
+                  <div className="flex shrink-0">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Star
+                        key={i}
+                        size={14}
+                        className={i <= r.stars ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground/30'}
+                      />
+                    ))}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">{r.rater_name || 'Anonymous'}</p>
+                    {r.comment && <p className="text-sm mt-0.5">{r.comment}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </PullToRefresh>
   );
