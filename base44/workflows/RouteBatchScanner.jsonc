@@ -1,0 +1,45 @@
+{
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 5,
+      "interval_unit": "minutes",
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Route Batch Scanner",
+  "description": "Scans upcoming unassigned bookings for batch candidates every 5 minutes and dispatches matched pairs to a single driver.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "route_batch_scanner",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "scan_batches": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "scan-batch-candidates",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Scan & dispatch batches",
+            "description": "Every 5 minutes"
+          }
+        }
+      }
+    ]
+  }
+}

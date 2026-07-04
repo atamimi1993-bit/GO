@@ -1,0 +1,115 @@
+{
+  "name": "RouteBatch",
+  "type": "object",
+  "properties": {
+    "batch_key": {
+      "type": "string"
+    },
+    "job_ids": {
+      "type": "string"
+    },
+    "job_count": {
+      "type": "number",
+      "default": 2
+    },
+    "driver_profile_id": {
+      "type": "string"
+    },
+    "driver_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "offered",
+        "accepted",
+        "declined",
+        "completed",
+        "expired",
+        "split"
+      ],
+      "default": "candidate"
+    },
+    "estimated_savings": {
+      "type": "number",
+      "default": 0
+    },
+    "batch_completion_bonus": {
+      "type": "number",
+      "default": 0
+    },
+    "total_driver_payout": {
+      "type": "number",
+      "default": 0
+    },
+    "total_customer_price": {
+      "type": "number",
+      "default": 0
+    },
+    "first_job_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "first_job_time": {
+      "type": "string"
+    },
+    "offered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "declined_driver_ids": {
+      "type": "string",
+      "default": ""
+    },
+    "violation_flagged": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "batch_key",
+    "job_ids",
+    "job_count"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.driver_profile_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
