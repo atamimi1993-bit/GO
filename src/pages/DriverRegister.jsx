@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Upload, Loader2 } from 'lucide-react';
+import { ArrowLeft, Upload, Loader2, ShieldCheck } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 export default function DriverRegister() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function DriverRegister() {
   const [uploading, setUploading] = useState({});
   const [form, setForm] = useState({
     full_name: '', email: '', phone: '', license_number: '', license_expiry: '',
-    service_area: '', company_name: '',
+    service_area: '', company_name: '', has_cdl: false,
     license_doc_url: '', insurance_doc_url: '', profile_photo_url: '',
   });
 
@@ -93,6 +94,14 @@ export default function DriverRegister() {
         <div className="grid grid-cols-2 gap-4">
           <div><Label htmlFor="license_number">License Number *</Label><Input id="license_number" value={form.license_number} onChange={e => setForm({ ...form, license_number: e.target.value })} /></div>
           <div><Label htmlFor="license_expiry">License Expiry *</Label><Input id="license_expiry" type="date" value={form.license_expiry} onChange={e => setForm({ ...form, license_expiry: e.target.value })} /></div>
+        </div>
+
+        <div className="flex items-center justify-between bg-emerald-500/10 rounded-xl p-4">
+          <div>
+            <p className="font-medium text-sm flex items-center gap-2"><ShieldCheck size={16} className="text-emerald-600" /> Commercial Driver's License (CDL)</p>
+            <p className="text-xs text-muted-foreground mt-0.5">CDL holders earn 15% per job instead of 5%.</p>
+          </div>
+          <Switch checked={form.has_cdl} onCheckedChange={v => setForm({ ...form, has_cdl: v })} aria-label="Toggle CDL" />
         </div>
 
         <div className="border-t pt-4 space-y-4">
