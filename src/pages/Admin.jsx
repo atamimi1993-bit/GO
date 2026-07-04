@@ -30,6 +30,7 @@ const DamageClaimsPanel = lazy(() => import('@/components/admin/DamageClaimsPane
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 const DriverRecruiter = lazy(() => import('@/components/admin/DriverRecruiter'));
+const LeadContactAssistant = lazy(() => import('@/components/admin/LeadContactAssistant'));
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -325,6 +326,11 @@ export default function Admin() {
         {/* Damage claims management */}
         <Suspense fallback={<SectionSkeleton />}>
           <DamageClaimsPanel />
+        </Suspense>
+
+        {/* AI Lead Contact Assistant — contacts & qualifies leads, refers to GO */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <LeadContactAssistant />
         </Suspense>
 
         {/* AI Lead Finder */}
