@@ -7,6 +7,7 @@ import { Plus, Package, MapPin, Calendar, Loader2, Navigation } from 'lucide-rea
 import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
+import MovePhaseBadge from '@/components/go/MovePhaseBadge';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
@@ -100,6 +101,9 @@ export default function MyMoves() {
               </div>
               {move.assigned_driver_name && (
                 <p className="mt-2 text-xs text-muted-foreground">Driver: <span className="font-medium">{move.assigned_driver_name}</span></p>
+              )}
+              {['accepted', 'in_progress', 'completed'].includes(move.status) && (
+                <MovePhaseBadge move={move} />
               )}
               {['accepted', 'in_progress'].includes(move.status) && (
                 <div className="mt-3 flex justify-end" onClick={(e) => e.preventDefault()}>

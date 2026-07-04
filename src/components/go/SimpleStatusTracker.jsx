@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useToast } from '@/components/ui/use-toast';
 import { PackageCheck, Truck, CheckCircle2, Loader2, Clock, Navigation } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -33,6 +34,8 @@ const PHASES = [
 export default function SimpleStatusTracker({ move }) {
   const [pings, setPings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const prevPhaseRef = useRef(null);
 
   useEffect(() => {
     base44.entities.LocationPing.filter({ move_request_id: move.id }, '-created_date', 50)
@@ -47,6 +50,39 @@ export default function SimpleStatusTracker({ move }) {
     return unsub;
   }, [move.id]);
 
+  const computePhase = (reachedMilestones, moveStatus) => {
+    if (reachedMilestones.has('delivered') || moveStatus === 'completed') return 2;
+    if (reachedMilestones.has('en_route_to_dropoff') || reachedMilestones.has('arrived_at_dropoff')) return 1;
+    return 0;
+  };
+
+  // Fire toast + app notification when phase changes
+  useEffect(() => {
+    if (loading || pings.length === 0) return;
+    const reachedMilestones = new Set(pings.map((p) => p.milestone));
+    const currentPhase = computePhase(reachedMilestones, move.status);
+
+    if (prevPhaseRef.current !== null && prevPhaseRef.current !== currentPhase) {
+      const phaseLabel = PHASES[currentPhase].label;
+      toast({
+        title: `Status: ${phaseLabel}`,
+        description: PHASES[currentPhase].desc,
+      });
+      // Persist notification for the customer
+      if (move.customer_email) {
+        base44.entities.AppNotification.create({
+          user_email: move.customer_email,
+          title: `Your move is now: ${phaseLabel}`,
+          body: PHASES[currentPhase].desc,
+          type: 'job',
+          link: `/move/${move.id}`,
+          icon: 'truck',
+        }).catch(() => {});
+      }
+    }
+    prevPhaseRef.current = currentPhase;
+  }, [pings, loading, move.status, move.id, move.customer_email, toast]);
+
   if (loading) {
     return (
       <div className="bg-card border rounded-2xl p-5 mb-4 flex justify-center">
@@ -58,23 +94,8 @@ export default function SimpleStatusTracker({ move }) {
   const reachedMilestones = new Set(pings.map((p) => p.milestone));
   const latestPing = pings[0];
 
-  // Determine current phase
-  let currentPhaseIdx = 0;
-  if (reachedMilestones.has('delivered')) {
-    currentPhaseIdx = 2;
-  } else if (
-    reachedMilestones.has('en_route_to_dropoff') ||
-    reachedMilestones.has('arrived_at_dropoff')
-  ) {
-    currentPhaseIdx = 1;
-  } else {
-    currentPhaseIdx = 0;
-  }
-
-  // If move is completed but no delivery ping, force delivered
-  if (move.status === 'completed' && currentPhaseIdx < 2) {
-    currentPhaseIdx = 2;
-  }
+  // If move is completed, force delivered phase
+  const currentPhaseIdx = move.status === 'completed' ? 2 : computePhase(reachedMilestones, move.status);
 
   const currentPhase = PHASES[currentPhaseIdx];
   const PhaseIcon = currentPhase.icon;
