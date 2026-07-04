@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import MobileSelect from '@/components/go/MobileSelect';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -171,7 +172,7 @@ export default function ExpenseSubmission({ driverProfile }) {
                 value={form.move_request_id}
                 onValueChange={(v) => setForm({ ...form, move_request_id: v })}
                 options={activeJobs.map((j) => ({ value: j.id, label: `${j.pickup_address} → ${j.dropoff_address}${j.status === 'in_progress' ? ' (in progress)' : ''}` }))}
-                placeholder="Select linked job"
+                placeholder="Select a job"
                 className={activeJobs.length === 0 ? 'opacity-50 pointer-events-none' : ''}
               />
             ) : (
@@ -184,7 +185,7 @@ export default function ExpenseSubmission({ driverProfile }) {
           {/* Description */}
           <div>
             <label className="text-sm font-medium mb-1 block">Description (optional)</label>
-            <textarea
+            <Textarea
               placeholder="e.g. Refueled at Shell on I-95"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
