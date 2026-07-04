@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Loader2, Camera, X, FileText, Upload } from 'lucide-react';
 import PageHeader from '@/components/go/PageHeader';
+import MobileSelect from '@/components/go/MobileSelect';
 import { useUserState } from '@/hooks/useUserState';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -26,7 +26,6 @@ export default function NewRental() {
   const insuranceDocRef = useRef(null);
 
   const REQUIRES_REGISTRATION = ['van', 'truck', 'box_truck', 'flatbed', 'semi', 'trailer', 'bus'];
-  const needsRegistration = REQUIRES_REGISTRATION.includes(form.vehicle_type);
 
   const [form, setForm] = useState({
     owner_type: 'customer',
@@ -45,6 +44,8 @@ export default function NewRental() {
     fuel_type: 'gasoline',
     features: '',
   });
+
+  const needsRegistration = REQUIRES_REGISTRATION.includes(form.vehicle_type);
 
   const { userState } = useUserState();
 
@@ -148,13 +149,7 @@ export default function NewRental() {
         {/* Owner type */}
         <div className="bg-card border rounded-2xl p-5 space-y-4">
           <h3 className="font-semibold text-sm">I am listing as a...</h3>
-          <Select value={form.owner_type} onValueChange={(v) => setForm(f => ({ ...f, owner_type: v }))}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="customer">Customer</SelectItem>
-              <SelectItem value="driver">Driver</SelectItem>
-            </SelectContent>
-          </Select>
+          <MobileSelect value={form.owner_type} onValueChange={(v) => setForm(f => ({ ...f, owner_type: v }))} options={[{value:'customer',label:'Customer'},{value:'driver',label:'Driver'}]} placeholder="Select owner type" />
         </div>
 
         {/* Vehicle details */}
@@ -162,23 +157,7 @@ export default function NewRental() {
           <h3 className="font-semibold text-sm">Vehicle Details</h3>
           <div className="space-y-1.5">
             <Label>Vehicle Type *</Label>
-            <Select value={form.vehicle_type} onValueChange={(v) => setForm(f => ({ ...f, vehicle_type: v }))}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="car">Car</SelectItem>
-                <SelectItem value="suv">SUV</SelectItem>
-                <SelectItem value="pickup">Pickup Truck</SelectItem>
-                <SelectItem value="van">Van</SelectItem>
-                <SelectItem value="truck">Truck</SelectItem>
-                <SelectItem value="box_truck">Box Truck</SelectItem>
-                <SelectItem value="flatbed">Flatbed</SelectItem>
-                <SelectItem value="semi">Semi / Tractor</SelectItem>
-                <SelectItem value="trailer">Trailer</SelectItem>
-                <SelectItem value="rv">RV / Camper</SelectItem>
-                <SelectItem value="motorcycle">Motorcycle</SelectItem>
-                <SelectItem value="bus">Bus</SelectItem>
-              </SelectContent>
-            </Select>
+            <MobileSelect value={form.vehicle_type} onValueChange={(v) => setForm(f => ({ ...f, vehicle_type: v }))} options={[{value:'car',label:'Car'},{value:'suv',label:'SUV'},{value:'pickup',label:'Pickup Truck'},{value:'van',label:'Van'},{value:'truck',label:'Truck'},{value:'box_truck',label:'Box Truck'},{value:'flatbed',label:'Flatbed'},{value:'semi',label:'Semi / Tractor'},{value:'trailer',label:'Trailer'},{value:'rv',label:'RV / Camper'},{value:'motorcycle',label:'Motorcycle'},{value:'bus',label:'Bus'}]} placeholder="Select vehicle type" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -203,25 +182,11 @@ export default function NewRental() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Transmission</Label>
-              <Select value={form.transmission} onValueChange={(v) => setForm(f => ({ ...f, transmission: v }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="automatic">Automatic</SelectItem>
-                  <SelectItem value="manual">Manual</SelectItem>
-                </SelectContent>
-              </Select>
+              <MobileSelect value={form.transmission} onValueChange={(v) => setForm(f => ({ ...f, transmission: v }))} options={[{value:'automatic',label:'Automatic'},{value:'manual',label:'Manual'}]} placeholder="Select transmission" />
             </div>
             <div className="space-y-1.5">
               <Label>Fuel Type</Label>
-              <Select value={form.fuel_type} onValueChange={(v) => setForm(f => ({ ...f, fuel_type: v }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gasoline">Gasoline</SelectItem>
-                  <SelectItem value="diesel">Diesel</SelectItem>
-                  <SelectItem value="hybrid">Hybrid</SelectItem>
-                  <SelectItem value="electric">Electric</SelectItem>
-                </SelectContent>
-              </Select>
+              <MobileSelect value={form.fuel_type} onValueChange={(v) => setForm(f => ({ ...f, fuel_type: v }))} options={[{value:'gasoline',label:'Gasoline'},{value:'diesel',label:'Diesel'},{value:'hybrid',label:'Hybrid'},{value:'electric',label:'Electric'}]} placeholder="Select fuel type" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">

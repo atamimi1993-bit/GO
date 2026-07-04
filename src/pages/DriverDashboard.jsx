@@ -192,7 +192,7 @@ export default function DriverDashboard() {
                 onClick={() => setStatusFilter(s)}
                 aria-label={`Filter drivers: ${s === 'all' ? 'All Drivers' : s === 'pending_review' ? 'Pending' : s.charAt(0).toUpperCase() + s.slice(1)}`}
                 aria-pressed={statusFilter === s}
-                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border transition-colors min-h-[40px] ${
+                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border transition-colors min-h-[44px] ${
                   statusFilter === s
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'bg-card border-border text-muted-foreground hover:bg-muted'

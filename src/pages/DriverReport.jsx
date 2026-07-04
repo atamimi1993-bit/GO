@@ -216,7 +216,7 @@ export default function DriverReport() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border transition-colors min-h-[40px] ${
+                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border transition-colors min-h-[44px] ${
                   statusFilter === s
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'bg-card border-border text-muted-foreground hover:bg-muted'
