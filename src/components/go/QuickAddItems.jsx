@@ -118,7 +118,7 @@ export default function QuickAddItems({ onAdd, existingItems }) {
                 min={1}
                 value={qty}
                 onChange={e => setQuantities({ ...quantities, [item.name]: Number(e.target.value) || 1 })}
-                className="w-14 h-9 text-center text-sm"
+                className="w-14 min-h-[44px] text-center text-sm"
                 aria-label={`Quantity for ${item.name}`}
               />
               <Button

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Receipt, Loader2, CheckCircle2, XCircle, Fuel, Milestone, Wrench, FileQuestion, Calculator,
@@ -158,13 +159,13 @@ export default function ExpenseReviewPanel() {
                     <div className="flex flex-col sm:flex-row gap-2">
                       <div className="flex items-center gap-2 flex-1">
                         <span className="text-xs text-muted-foreground shrink-0">Approve $</span>
-                        <input
+                        <Input
                           type="number"
                           step="0.01"
                           placeholder={(r.use_estimate ? r.estimated_amount : r.amount).toFixed(2)}
                           value={approveAmounts[r.id] || ''}
                           onChange={(e) => setApproveAmounts({ ...approveAmounts, [r.id]: e.target.value })}
-                          className="flex-1 h-9 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          className="flex-1"
                         />
                       </div>
                       <div className="flex gap-2">

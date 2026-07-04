@@ -9,6 +9,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
+import MobileSelect from "@/components/go/MobileSelect";
 import { toast } from "@/components/ui/use-toast";
 
 export default function Register() {
@@ -261,23 +262,22 @@ export default function Register() {
                 className="h-11"
                 required
               />
-              <select
+              <MobileSelect
                 value={phoneCarrier}
-                onChange={(e) => setPhoneCarrier(e.target.value)}
-                className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                required
-              >
-                <option value="">Select carrier…</option>
-                <option value="att">AT&T</option>
-                <option value="verizon">Verizon</option>
-                <option value="tmobile">T-Mobile</option>
-                <option value="sprint">Sprint</option>
-                <option value="boost">Boost Mobile</option>
-                <option value="cricket">Cricket</option>
-                <option value="metropcs">Metro PCS</option>
-                <option value="uscellular">US Cellular</option>
-                <option value="googlefi">Google Fi</option>
-              </select>
+                onValueChange={setPhoneCarrier}
+                placeholder="Select carrier…"
+                options={[
+                  { value: 'att', label: 'AT&T' },
+                  { value: 'verizon', label: 'Verizon' },
+                  { value: 'tmobile', label: 'T-Mobile' },
+                  { value: 'sprint', label: 'Sprint' },
+                  { value: 'boost', label: 'Boost Mobile' },
+                  { value: 'cricket', label: 'Cricket' },
+                  { value: 'metropcs', label: 'Metro PCS' },
+                  { value: 'uscellular', label: 'US Cellular' },
+                  { value: 'googlefi', label: 'Google Fi' },
+                ]}
+              />
             </div>
           )}
         </div>

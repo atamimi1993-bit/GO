@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import MobileSelect from '@/components/go/MobileSelect';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Receipt, Camera, Loader2, Fuel, Milestone, Wrench, FileQuestion,
@@ -158,32 +160,20 @@ export default function ExpenseSubmission({ driverProfile }) {
           {/* Amount */}
           <div>
             <label className="text-sm font-medium mb-1 block">Amount ($)</label>
-            <input
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: e.target.value })}
-              className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            />
+            <Input type="number" step="0.01" placeholder="0.00" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
           </div>
 
           {/* Current job (auto-linked) */}
           <div>
             <label className="text-sm font-medium mb-1 block">Linked Job</label>
             {activeJobs.length > 0 ? (
-              <select
+              <MobileSelect
                 value={form.move_request_id}
-                onChange={(e) => setForm({ ...form, move_request_id: e.target.value })}
-                className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                {activeJobs.map((j) => (
-                  <option key={j.id} value={j.id}>
-                    {j.pickup_address} → {j.dropoff_address}
-                    {j.status === 'in_progress' ? ' (in progress)' : ''}
-                  </option>
-                ))}
-              </select>
+                onValueChange={(v) => setForm({ ...form, move_request_id: v })}
+                options={activeJobs.map((j) => ({ value: j.id, label: `${j.pickup_address} → ${j.dropoff_address}${j.status === 'in_progress' ? ' (in progress)' : ''}` }))}
+                placeholder="Select linked job"
+                className={activeJobs.length === 0 ? 'opacity-50 pointer-events-none' : ''}
+              />
             ) : (
               <div className="flex items-center gap-2 h-11 rounded-md border border-input bg-muted/30 px-3 text-sm text-muted-foreground">
                 <Briefcase size={14} /> No active job — receipt will be unlinked

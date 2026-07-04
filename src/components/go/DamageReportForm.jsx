@@ -103,7 +103,7 @@ export default function DamageReportForm({ move, user, onSubmitted }) {
         <h3 className="font-display font-bold text-sm flex items-center gap-2 text-red-700 dark:text-red-300">
           <AlertTriangle size={16} /> Report Damaged or Lost Item
         </h3>
-        <button onClick={reset} className="text-muted-foreground hover:text-foreground p-1" aria-label="Close">
+        <button onClick={reset} className="text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Close">
           <X size={18} />
         </button>
       </div>
