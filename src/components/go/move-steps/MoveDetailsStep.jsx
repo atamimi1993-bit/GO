@@ -1,7 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import MobileSelect from '@/components/go/MobileSelect';
+import IntermediateStops from '@/components/go/move-steps/IntermediateStops';
 import { MapPin, Ruler, Loader2, Sparkles, Footprints, UserPlus, ArrowUpDown } from 'lucide-react';
 import { COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES, EXTRA_HELPER_FEE, ELEVATOR_SERVICE_FEE } from '@/lib/pricing';
 
@@ -31,28 +32,39 @@ async function geocodeAddress(address) {
   }
 }
 
-export default function MoveDetailsStep({ form, setForm, handleCountryChange }) {
+export default function MoveDetailsStep({ form, setForm, handleCountryChange, intermediateStops, setIntermediateStops }) {
   const [autoFilling, setAutoFilling] = useState(false);
   const [autoFilled, setAutoFilled] = useState(false);
   const debounceRef = useRef(null);
 
-  const autoFillDistanceAndTolls = useCallback(async (pickup, dropoff) => {
+  const autoFillDistanceAndTolls = useCallback(async (pickup, dropoff, stops) => {
+    const validStops = (stops || []).filter(s => s && s.trim().length >= 5);
     if (!pickup || !dropoff || pickup.trim().length < 5 || dropoff.trim().length < 5) return;
     setAutoFilling(true);
     try {
-      const [pickupCoord, dropoffCoord] = await Promise.all([
-        geocodeAddress(pickup),
-        geocodeAddress(dropoff),
-      ]);
+      const pickupCoord = await geocodeAddress(pickup);
+      const dropoffCoord = await geocodeAddress(dropoff);
 
       if (!pickupCoord || !dropoffCoord) {
         setAutoFilling(false);
         return;
       }
 
+      // Geocode all intermediate stops
+      const stopCoords = [];
+      for (const stop of validStops) {
+        const coord = await geocodeAddress(stop);
+        if (coord) stopCoords.push(coord);
+      }
+
+      // Build OSRM coordinates string: pickup;stop1;stop2;...;dropoff
+      const allCoords = [pickupCoord, ...stopCoords, dropoffCoord]
+        .map(c => `${c[0]},${c[1]}`)
+        .join(';');
+
       // OSRM routing API — returns driving distance in meters
       const routeRes = await fetch(
-        `https://router.project-osrm.org/route/v1/driving/${pickupCoord[0]},${pickupCoord[1]};${dropoffCoord[0]},${dropoffCoord[1]}?overview=false`
+        `https://router.project-osrm.org/route/v1/driving/${allCoords}?overview=false`
       );
       const routeData = await routeRes.json();
 
@@ -85,9 +97,21 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange }) 
   const handleAddressBlur = () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      autoFillDistanceAndTolls(form.pickup_address, form.dropoff_address);
+      autoFillDistanceAndTolls(form.pickup_address, form.dropoff_address, intermediateStops);
     }, 300);
   };
+
+  // Recalculate distance when intermediate stops change
+  useEffect(() => {
+    if (!form.pickup_address || !form.dropoff_address) return;
+    const hasValidStop = intermediateStops.some(s => s && s.trim().length >= 5);
+    if (!hasValidStop) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      autoFillDistanceAndTolls(form.pickup_address, form.dropoff_address, intermediateStops);
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intermediateStops]);
 
   return (
     <div className="space-y-6">
@@ -133,6 +157,10 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange }) 
             onBlur={handleAddressBlur}
             placeholder="456 Oak Ave, City, Country"
           />
+        </div>
+
+        <div className="border-t border-border pt-4">
+          <IntermediateStops stops={intermediateStops} onChange={setIntermediateStops} />
         </div>
 
         {/* Access details — steps and distance from street */}

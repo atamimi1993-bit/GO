@@ -41,6 +41,7 @@ export default function NewMove() {
     materials_fee: 0,
     extra_helper: false, elevator_service: false,
   });
+  const [intermediateStops, setIntermediateStops] = useState([]);
   const [items, setItems] = useState([]);
   const [media, setMedia] = useState([]);
   const [accessMedia, setAccessMedia] = useState([]);
@@ -189,6 +190,7 @@ export default function NewMove() {
         items_summary: items.map(i => `${i.quantity}x ${i.name} (${i.weight_lbs}lbs)`).join(', '),
         needs_storage: form.needs_storage,
         notes: form.notes,
+        intermediate_stops: intermediateStops.filter(s => s && s.trim()).length > 0 ? JSON.stringify(intermediateStops.filter(s => s && s.trim())) : undefined,
         media_urls: JSON.stringify(media.map(m => ({ url: m.url, type: m.type }))),
         access_media_urls: JSON.stringify(accessMedia.map(m => ({ url: m.url, type: m.type }))),
         base_cost: pricing.baseCost,
@@ -254,7 +256,7 @@ export default function NewMove() {
       {step === 0 && (
         <div className="space-y-6">
           <CustomerInfoStep form={form} setForm={setForm} />
-          <MoveDetailsStep form={form} setForm={setForm} handleCountryChange={handleCountryChange} />
+          <MoveDetailsStep form={form} setForm={setForm} handleCountryChange={handleCountryChange} intermediateStops={intermediateStops} setIntermediateStops={setIntermediateStops} />
           <TimingStep form={form} setForm={setForm} />
         </div>
       )}

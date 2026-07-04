@@ -238,6 +238,19 @@ export default function MoveDetail() {
           <MapPin className="text-emerald-500 mt-0.5" size={18} />
           <div><p className="text-xs text-muted-foreground">Pickup</p><p className="font-medium text-sm">{move.pickup_address}</p></div>
         </div>
+        {(() => {
+          try {
+            const stops = JSON.parse(move.intermediate_stops || '[]');
+            return stops.map((stop, idx) => (
+              <div key={idx} className="flex items-start gap-3">
+                <div className="w-[18px] h-[18px] rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">
+                  {idx + 1}
+                </div>
+                <div><p className="text-xs text-muted-foreground">Stop {idx + 1}</p><p className="font-medium text-sm">{stop}</p></div>
+              </div>
+            ));
+          } catch { return null; }
+        })()}
         <div className="flex items-start gap-3">
           <MapPin className="text-red-400 mt-0.5" size={18} />
           <div><p className="text-xs text-muted-foreground">Drop-off</p><p className="font-medium text-sm">{move.dropoff_address}</p></div>

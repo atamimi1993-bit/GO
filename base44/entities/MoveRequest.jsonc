@@ -21,6 +21,9 @@
     "dropoff_address": {
       "type": "string"
     },
+    "intermediate_stops": {
+      "type": "string"
+    },
     "move_date": {
       "type": "string",
       "format": "date"
