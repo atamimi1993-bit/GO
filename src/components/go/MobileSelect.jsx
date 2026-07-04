@@ -33,15 +33,16 @@ export default function MobileSelect({ value, onValueChange, options, placeholde
           <ChevronDown size={16} className="opacity-50" />
         </button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent aria-modal="true">
         <DrawerHeader>
           <DrawerTitle>{placeholder || 'Select an option'}</DrawerTitle>
         </DrawerHeader>
         <div className="overflow-y-auto max-h-[50vh] pb-4">
-          {options?.map(o => (
+          {options?.map((o, i) => (
             <button
               key={o.value}
               type="button"
+              autoFocus={i === 0}
               onClick={() => { onValueChange(o.value); setOpen(false); }}
               className="flex w-full items-center justify-between min-h-[44px] px-4 py-3 text-sm hover:bg-accent transition-colors text-left"
             >

@@ -61,7 +61,7 @@ export default function Profile() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={async () => { setDeleting(true); try { await base44.auth.deleteAccount(); window.location.href = '/'; } catch { setDeleting(false); } }}>
+              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { base44.auth.deleteAccount().catch(() => {}); base44.auth.logout('/'); }}>
                 {deleting ? 'Deleting...' : 'Delete Account'}
               </AlertDialogAction>
             </AlertDialogFooter>

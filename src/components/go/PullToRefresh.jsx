@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
 
 const THRESHOLD = 70;
@@ -9,6 +9,14 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
+  const wrapperRef = useRef(null);
+
+  const pullingRef = useRef(false);
+  const pullDistanceRef = useRef(0);
+  const refreshingRef = useRef(false);
+  const disabledRef = useRef(disabled);
+
+  useEffect(() => { disabledRef.current = disabled; }, [disabled]);
 
   const isAtTop = () => {
     if (scrollRef && scrollRef.current) {
@@ -18,43 +26,68 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   };
 
   const handleTouchStart = (e) => {
-    if (disabled || refreshing || !isAtTop()) return;
+    if (disabledRef.current || refreshingRef.current || !isAtTop()) return;
     startY.current = e.touches[0].clientY;
+    pullingRef.current = true;
     setPulling(true);
   };
 
   const handleTouchMove = (e) => {
-    if (disabled || !pulling || refreshing) return;
+    if (disabledRef.current || !pullingRef.current || refreshingRef.current) return;
     const diff = e.touches[0].clientY - startY.current;
     if (diff > 0) {
-      setPullDistance(Math.min(diff * 0.5, MAX_PULL));
+      const newPull = Math.min(diff * 0.5, MAX_PULL);
+      pullDistanceRef.current = newPull;
+      setPullDistance(newPull);
+      e.preventDefault();
     }
   };
 
   const handleTouchEnd = async () => {
-    if (!pulling) return;
+    if (!pullingRef.current) return;
+    pullingRef.current = false;
     setPulling(false);
-    if (pullDistance >= THRESHOLD) {
+    if (pullDistanceRef.current >= THRESHOLD) {
+      refreshingRef.current = true;
       setRefreshing(true);
       setPullDistance(THRESHOLD);
+      pullDistanceRef.current = THRESHOLD;
       try {
         await onRefresh();
       } finally {
+        refreshingRef.current = false;
         setRefreshing(false);
         setPullDistance(0);
+        pullDistanceRef.current = 0;
       }
     } else {
       setPullDistance(0);
+      pullDistanceRef.current = 0;
     }
   };
 
+  useEffect(() => {
+    const node = wrapperRef.current;
+    if (!node) return;
+    node.addEventListener('touchstart', handleTouchStart, { passive: false });
+    node.addEventListener('touchmove', handleTouchMove, { passive: false });
+    node.addEventListener('touchend', handleTouchEnd, { passive: false });
+    return () => {
+      node.removeEventListener('touchstart', handleTouchStart);
+      node.removeEventListener('touchmove', handleTouchMove);
+      node.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
+
   return (
     <div
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      ref={wrapperRef}
       className="relative"
-      style={{ isolation: 'isolate', willChange: 'transform' }}
+      style={{
+        isolation: 'isolate',
+        willChange: 'transform',
+        overscrollBehaviorY: pulling ? 'contain' : undefined,
+      }}
     >
       {(pullDistance > 0 || refreshing) && (
         <div

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,8 @@ import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCi
 
 export default function DriverHub() {
   const { scrollRef } = useOutletContext();
+  const location = useLocation();
+  const pendingApplication = location.state?.pendingApplication;
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -29,11 +31,23 @@ export default function DriverHub() {
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
+  // Show pending banner if navigated from registration
+  const pendingBanner = pendingApplication && (
+    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-6 flex items-start gap-3">
+      <Loader2 className="text-yellow-700 dark:text-yellow-300 mt-0.5 animate-spin" size={18} />
+      <div>
+        <p className="font-medium text-sm text-yellow-700 dark:text-yellow-300">Application submitting...</p>
+        <p className="text-xs text-yellow-700 dark:text-yellow-300">Your registration is being saved. You'll see your profile here shortly.</p>
+      </div>
+    </div>
+  );
+
   // Not a driver yet
   if (!profile) {
     return (
       <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
       <div className="max-w-xl mx-auto text-center py-16">
+        {pendingBanner}
         <div className="w-20 h-20 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Truck className="text-emerald-600 dark:text-emerald-400" size={36} />
         </div>
@@ -62,6 +76,7 @@ export default function DriverHub() {
   return (
     <PullToRefresh scrollRef={scrollRef} onRefresh={load}>
     <div>
+      {pendingBanner}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-display font-bold">Driver Dashboard</h1>
