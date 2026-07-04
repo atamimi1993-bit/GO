@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json();
-    const { move_request_id, promo_code, validate_only } = body;
+    const { move_request_id, promo_code, validate_only, payment_plan, pay_balance } = body;
 
     if (!move_request_id) {
       return Response.json({ error: 'move_request_id is required' }, { status: 400 });
@@ -88,9 +88,30 @@ Deno.serve(async (req) => {
 
     const currencyCode = (move.currency || 'USD').toUpperCase();
     const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.includes(currencyCode);
+
+    // Determine charge amount: full, deposit (50%), or remaining balance
+    let chargeAmount;
+    let paymentType = 'full';
+
+    if (pay_balance && move.balance_due > 0) {
+      chargeAmount = move.balance_due;
+      paymentType = 'balance';
+    } else if (payment_plan) {
+      chargeAmount = Math.round(discountedTotal * 0.5 * 100) / 100;
+      paymentType = 'deposit';
+    } else {
+      chargeAmount = discountedTotal;
+    }
+
     const unitAmount = isZeroDecimal
-      ? Math.round(discountedTotal)
-      : Math.round(discountedTotal * 100);
+      ? Math.round(chargeAmount)
+      : Math.round(chargeAmount * 100);
+
+    const productLabel = paymentType === 'deposit'
+      ? 'GO Move Service — Deposit (50%)'
+      : paymentType === 'balance'
+        ? 'GO Move Service — Remaining Balance'
+        : 'GO Move Service';
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -98,7 +119,7 @@ Deno.serve(async (req) => {
         price_data: {
           currency: currencyCode.toLowerCase(),
           product_data: {
-            name: 'GO Move Service',
+            name: productLabel,
             description: 'Move from ' + move.pickup_address + ' to ' + move.dropoff_address,
           },
           unit_amount: unitAmount,
@@ -111,6 +132,7 @@ Deno.serve(async (req) => {
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         move_request_id: move.id,
+        payment_type: paymentType,
       },
     });
 
@@ -118,6 +140,14 @@ Deno.serve(async (req) => {
     const updateData = {
       stripe_session_id: session.id,
     };
+
+    // Store payment plan details when a deposit is being charged
+    if (payment_plan && paymentType === 'deposit') {
+      updateData.payment_plan = true;
+      updateData.deposit_amount = chargeAmount;
+      updateData.balance_due = Math.round((discountedTotal - chargeAmount) * 100) / 100;
+    }
+
     if (appliedPromoCode) {
       updateData.promo_code = appliedPromoCode.code;
       updateData.discount_amount = discountAmount;

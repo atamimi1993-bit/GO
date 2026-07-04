@@ -22,12 +22,21 @@ Deno.serve(async (req) => {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const moveRequestId = session.metadata?.move_request_id;
+      const paymentType = session.metadata?.payment_type || 'full';
 
       if (moveRequestId) {
-        await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
-          paid: true,
-        });
-        console.log('Marked move ' + moveRequestId + ' as paid');
+        if (paymentType === 'deposit') {
+          await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
+            deposit_paid: true,
+          });
+          console.log('Marked deposit paid for move ' + moveRequestId);
+        } else {
+          await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
+            paid: true,
+            deposit_paid: true,
+          });
+          console.log('Marked move ' + moveRequestId + ' as fully paid');
+        }
       }
     }
 

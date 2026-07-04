@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
 import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield, Wallet, CalendarClock } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import PromoCodeInput from '@/components/go/PromoCodeInput';
@@ -84,6 +84,8 @@ export default function MoveDetail() {
   const [contract, setContract] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [promoData, setPromoData] = useState(null);
+  const [usePaymentPlan, setUsePaymentPlan] = useState(false);
+  const [payingBalance, setPayingBalance] = useState(false);
   const { toast } = useToast();
 
   const handleConfirmDelivery = async () => {
@@ -114,11 +116,30 @@ export default function MoveDetail() {
       const res = await base44.functions.invoke('create-move-checkout', {
         move_request_id: id,
         promo_code: promoData?.promo?.code || undefined,
+        payment_plan: usePaymentPlan,
       });
       window.location.href = res.data.url;
     } catch {
       toast({ title: 'Payment error', description: 'Could not start checkout. Please try again.', variant: 'destructive' });
       setPaying(false);
+    }
+  };
+
+  const handlePayBalance = async () => {
+    if (window.self !== window.top) {
+      alert('Checkout is only available from the published app, not the editor preview.');
+      return;
+    }
+    try {
+      setPayingBalance(true);
+      const res = await base44.functions.invoke('create-move-checkout', {
+        move_request_id: id,
+        pay_balance: true,
+      });
+      window.location.href = res.data.url;
+    } catch {
+      toast({ title: 'Payment error', description: 'Could not start checkout. Please try again.', variant: 'destructive' });
+      setPayingBalance(false);
     }
   };
 
@@ -244,7 +265,34 @@ export default function MoveDetail() {
         <PriceConfirmation move={move} onConfirmed={load} />
       )}
 
-      {!move.paid && move.status !== 'cancelled' && (
+      {/* Payment plan balance — deposit already paid, show balance due */}
+      {!move.paid && move.deposit_paid && move.balance_due > 0 && move.status !== 'cancelled' && (
+        <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 mt-2 space-y-3">
+          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-medium">
+            <CalendarClock size={16} /> Payment Plan Active
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Deposit Paid</span>
+            <span className="text-emerald-600 dark:text-emerald-400">{curr.symbol}{(move.deposit_amount || 0).toFixed(curr.decimals)}</span>
+          </div>
+          <div className="flex justify-between text-sm font-bold pt-1 border-t border-blue-500/20">
+            <span>Remaining Balance</span>
+            <span className="text-blue-600 dark:text-blue-400">{curr.symbol}{(move.balance_due || 0).toFixed(curr.decimals)}</span>
+          </div>
+          <Button
+            onClick={handlePayBalance}
+            disabled={payingBalance}
+            className="w-full bg-blue-600 hover:bg-blue-700"
+          >
+            {payingBalance
+              ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting...</>
+              : <><CreditCard size={16} className="mr-1" /> Pay Balance {curr.symbol}{(move.balance_due || 0).toFixed(curr.decimals)}</>}
+          </Button>
+        </div>
+      )}
+
+      {/* Standard checkout — not yet paid and no deposit outstanding */}
+      {!move.paid && !move.deposit_paid && move.status !== 'cancelled' && (
         <>
           <PromoCodeInput move={move} onApplied={setPromoData} />
           {promoData && (
@@ -263,14 +311,42 @@ export default function MoveDetail() {
               </div>
             </div>
           )}
+
+          {/* Payment plan toggle */}
+          {(() => {
+            const chargeTotal = promoData?.discounted_total || move.total_price || 0;
+            return (
+              <button
+                type="button"
+                onClick={() => setUsePaymentPlan(!usePaymentPlan)}
+                className={`w-full mt-2 flex items-center gap-3 rounded-xl border p-3 text-left transition-colors ${usePaymentPlan ? 'border-blue-500 bg-blue-500/5' : 'border-border hover:bg-muted'}`}
+              >
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${usePaymentPlan ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-muted text-muted-foreground'}`}>
+                  <Wallet size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">Pay in 2 installments</p>
+                  <p className="text-xs text-muted-foreground">
+                    {curr.symbol}{(chargeTotal * 0.5).toFixed(curr.decimals)} now · {curr.symbol}{(chargeTotal * 0.5).toFixed(curr.decimals)} later
+                  </p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${usePaymentPlan ? 'border-blue-500' : 'border-muted-foreground/30'}`}>
+                  {usePaymentPlan && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                </div>
+              </button>
+            );
+          })()}
+
           <Button
             onClick={handlePay}
             disabled={paying}
-            className="w-full mt-2 bg-emerald-500 hover:bg-emerald-600"
+            className={`w-full mt-2 ${usePaymentPlan ? 'bg-blue-600 hover:bg-blue-700' : 'bg-emerald-500 hover:bg-emerald-600'}`}
           >
             {paying
               ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</>
-              : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{(promoData?.discounted_total || move.total_price)?.toFixed(curr.decimals)}</>}
+              : usePaymentPlan
+                ? <><Wallet size={16} className="mr-1" /> Pay Deposit {curr.symbol}{((promoData?.discounted_total || move.total_price || 0) * 0.5).toFixed(curr.decimals)}</>
+                : <><CreditCard size={16} className="mr-1" /> Pay {curr.symbol}{(promoData?.discounted_total || move.total_price || 0).toFixed(curr.decimals)}</>}
           </Button>
         </>
       )}

@@ -169,6 +169,22 @@
     "customer_price_confirmed": {
       "type": "boolean",
       "default": false
+    },
+    "payment_plan": {
+      "type": "boolean",
+      "default": false
+    },
+    "deposit_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "balance_due": {
+      "type": "number",
+      "default": 0
+    },
+    "deposit_paid": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
