@@ -25,16 +25,24 @@ export default function MyMoves() {
   const [moves, setMoves] = useState(optimisticMove ? [optimisticMove] : []);
   const [loading, setLoading] = useState(!optimisticMove);
 
-  const loadMoves = async () => {
-    const moves = await base44.entities.MoveRequest.list('-created_date', 50);
-    setMoves(moves);
+  const loadMoves = async (isRetry = false) => {
+    try {
+      const moves = await base44.entities.MoveRequest.list('-created_date', 50);
+      setMoves(moves);
+    } catch (err) {
+      if (String(err.message || '').includes('Rate limit') && !isRetry) {
+        await new Promise((r) => setTimeout(r, 2000));
+        return loadMoves(true);
+      }
+      throw err;
+    }
   };
   useEffect(() => {
     if (!optimisticMove) {
-      loadMoves().finally(() => setLoading(false));
+      loadMoves().catch(() => {}).finally(() => setLoading(false));
     } else {
       setLoading(false);
-      loadMoves();
+      loadMoves().catch(() => {});
     }
     const unsub = base44.entities.MoveRequest.subscribe((event) => {
       if (event.type === 'create') {
