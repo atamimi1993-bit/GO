@@ -15,7 +15,7 @@ const EstimateStep = lazy(() => import('@/components/go/move-steps/EstimateStep'
 const ContractSign = lazy(() => import('@/components/go/ContractSign'));
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
-const STEPS = ['Info', 'Move', 'Items', 'Media', 'Timing', 'Quote', 'Sign'];
+const STEPS = ['Details', 'Items', 'Quote', 'Sign'];
 
 export default function NewMove() {
   const navigate = useNavigate();
@@ -145,7 +145,7 @@ export default function NewMove() {
     setPricing(finalPricing);
     setServiceLevel(serviceLevelKey);
     setTruckSize(truck);
-    setStep(6);
+    setStep(3);
   };
 
   const handleSign = async (contractRecord) => {
@@ -205,12 +205,11 @@ export default function NewMove() {
   };
 
   const canNextStep = () => {
-    if (step === 0) return form.customer_name && form.customer_email && form.customer_phone;
-    if (step === 1) return form.pickup_address && form.dropoff_address && form.distance_miles && form.country_code;
-    if (step === 2) return items.length > 0;
-    if (step === 3) return media.length > 0;
-    if (step === 4) return form.move_date && form.move_time;
-    if (step === 5) return !!selectedTier;
+    if (step === 0) return form.customer_name && form.customer_email && form.customer_phone
+      && form.pickup_address && form.dropoff_address && form.distance_miles && form.country_code
+      && form.move_date && form.move_time;
+    if (step === 1) return items.length > 0;
+    if (step === 2) return !!selectedTier;
     return true;
   };
 
@@ -223,33 +222,32 @@ export default function NewMove() {
       <StepProgress steps={STEPS} currentStep={step} />
 
       <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>}>
-      {step === 0 && <CustomerInfoStep form={form} setForm={setForm} />}
+      {step === 0 && (
+        <div className="space-y-6">
+          <CustomerInfoStep form={form} setForm={setForm} />
+          <MoveDetailsStep form={form} setForm={setForm} handleCountryChange={handleCountryChange} />
+          <TimingStep form={form} setForm={setForm} />
+        </div>
+      )}
 
       {step === 1 && (
-        <MoveDetailsStep form={form} setForm={setForm} handleCountryChange={handleCountryChange} />
+        <div className="space-y-6">
+          <InventoryStep
+            items={items}
+            onAddItem={handleAddItem}
+            onAddItems={handleAddItems}
+            onRemoveItem={handleRemoveItem}
+            onUpdateQuantity={handleUpdateQuantity}
+            onUploadPDF={handleUploadPDF}
+            uploading={uploading}
+            form={form}
+            liveEstimate={liveEstimate}
+          />
+          <PhotoVideoStep media={media} onAddMedia={handleAddMedia} onRemoveMedia={handleRemoveMedia} onAnalysis={setMediaAnalysis} />
+        </div>
       )}
 
       {step === 2 && (
-        <InventoryStep
-          items={items}
-          onAddItem={handleAddItem}
-          onAddItems={handleAddItems}
-          onRemoveItem={handleRemoveItem}
-          onUpdateQuantity={handleUpdateQuantity}
-          onUploadPDF={handleUploadPDF}
-          uploading={uploading}
-          form={form}
-          liveEstimate={liveEstimate}
-        />
-      )}
-
-      {step === 3 && (
-        <PhotoVideoStep media={media} onAddMedia={handleAddMedia} onRemoveMedia={handleRemoveMedia} onAnalysis={setMediaAnalysis} />
-      )}
-
-      {step === 4 && <TimingStep form={form} setForm={setForm} />}
-
-      {step === 5 && (
         <EstimateStep
           form={form}
           totalWeight={totalWeight}
@@ -260,7 +258,7 @@ export default function NewMove() {
         />
       )}
 
-      {step === 6 && (
+      {step === 3 && (
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-display font-bold mb-1">Review & Sign</h2>
@@ -300,7 +298,7 @@ export default function NewMove() {
         <Button variant="ghost" onClick={handleBack}>
           <ArrowLeft size={16} className="mr-1" /> Back
         </Button>
-        {step < 5 && (
+        {step < 2 && (
           <Button
             onClick={() => setStep(step + 1)}
             disabled={!canNextStep()}

@@ -42,8 +42,8 @@ export default function PhotoVideoStep({ media, onAddMedia, onRemoveMedia, onAna
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-display font-bold mb-1">Photos & Video</h2>
-        <p className="text-muted-foreground text-sm">Upload photos or videos of your rooms and items so drivers know what to expect.</p>
+        <h2 className="text-xl font-display font-bold mb-1">Photos & Video (Optional)</h2>
+        <p className="text-muted-foreground text-sm">Add photos or videos of your space so drivers know what to expect.</p>
       </div>
 
       {blurryCount > 0 && (
