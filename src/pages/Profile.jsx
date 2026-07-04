@@ -20,6 +20,7 @@ export default function Profile() {
   const { user, checkUserAuth } = useAuth();
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
   const { toast } = useToast();
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
@@ -65,17 +66,29 @@ export default function Profile() {
         >
           Sign Out
         </Button>
+      </div>
+
+      <DriverProfileDashboard />
+      <LoyaltyCard />
+      <ReferralCard />
+      <StripeConnectCard />
+
+      <div className="bg-card border border-destructive/30 rounded-2xl p-6 mt-6">
+        <h2 className="text-lg font-display font-bold text-destructive mb-2">Danger Zone</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Permanently delete your account and all associated data. This cannot be undone.
+        </p>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" className="w-full border-destructive text-destructive hover:bg-destructive/10 mt-2 min-h-[44px]">
-              <Trash2 size={16} className="mr-2" /> Delete Account
+            <Button variant="destructive" className="w-full min-h-[44px]">
+              <Trash2 size={16} className="mr-2" /> Delete My Account
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete your account?</AlertDialogTitle>
               <AlertDialogDescription asChild>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-3 text-sm">
                   <p>This will permanently and irreversibly delete:</p>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                     <li>Your account and login credentials</li>
@@ -85,14 +98,24 @@ export default function Profile() {
                     <li>Loyalty points and referral records</li>
                   </ul>
                   <p className="font-medium text-destructive">This action cannot be undone.</p>
+                  <div>
+                    <p className="mb-2">Type <strong className="text-destructive">DELETE</strong> to confirm:</p>
+                    <Input
+                      value={confirmText}
+                      onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
+                      placeholder="DELETE"
+                      className="uppercase"
+                      autoComplete="off"
+                    />
+                  </div>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={deleting} onClick={() => setConfirmText('')}>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                disabled={deleting}
+                disabled={deleting || confirmText !== 'DELETE'}
                 onClick={(e) => { e.preventDefault(); handleDeleteAccount(); }}
               >
                 {deleting ? <><Loader2 size={14} className="mr-1 animate-spin" /> Deleting...</> : 'Delete Account'}
@@ -101,11 +124,6 @@ export default function Profile() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-
-      <DriverProfileDashboard />
-      <LoyaltyCard />
-      <ReferralCard />
-      <StripeConnectCard />
     </div>
     </PullToRefresh>
   );

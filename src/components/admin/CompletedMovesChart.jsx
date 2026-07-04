@@ -29,7 +29,7 @@ export default function CompletedMovesChart({ chartData }) {
   }
 
   return (
-    <div className="w-full h-72" role="img" aria-label="Bar chart showing completed moves per month">
+    <div className="w-full h-72" role="img" tabIndex={0} aria-label="Bar chart showing completed moves per month">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -53,6 +53,7 @@ export default function CompletedMovesChart({ chartData }) {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      <p className="sr-only">Monthly completed moves: {chartData.map((d) => MONTH_LABEL(d.month) + ' — ' + (d.completed_moves || 0) + ' moves').join('; ')}.</p>
     </div>
   );
 }

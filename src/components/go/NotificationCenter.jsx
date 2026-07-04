@@ -59,20 +59,32 @@ export default function NotificationCenter({ user }) {
   useEffect(() => { requestPermission(); }, []);
 
   const markRead = async (id) => {
+    const prevNotifs = notifications;
+    const prevUnread = unread;
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    setUnread(prev => Math.max(0, prev - 1));
     try {
       await base44.entities.AppNotification.update(id, { read: true });
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-      setUnread(prev => Math.max(0, prev - 1));
-    } catch {}
+    } catch {
+      setNotifications(prevNotifs);
+      setUnread(prevUnread);
+    }
   };
 
   const markAllRead = async () => {
-    const unreadNotifs = notifications.filter(n => !n.read);
-    for (const n of unreadNotifs) {
-      try { await base44.entities.AppNotification.update(n.id, { read: true }); } catch {}
-    }
+    const prevNotifs = notifications;
+    const prevUnread = unread;
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setUnread(0);
+    const unreadNotifs = prevNotifs.filter(n => !n.read);
+    let failed = false;
+    for (const n of unreadNotifs) {
+      try { await base44.entities.AppNotification.update(n.id, { read: true }); } catch { failed = true; }
+    }
+    if (failed) {
+      setNotifications(prevNotifs);
+      setUnread(prevUnread);
+    }
   };
 
   const handleClick = (notif) => {

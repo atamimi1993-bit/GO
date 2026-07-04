@@ -15,7 +15,7 @@ L.Icon.Default.mergeOptions({
 
 // Driver icon (glass-style blue marker)
 const driverIcon = L.divIcon({
-  html: `<div style="background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);">🚚</div>`,
+  html: `<div style="background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);"><span aria-hidden="true">🚚</span></div>`,
   className: '',
   iconSize: [28, 28],
   iconAnchor: [14, 14],
@@ -256,7 +256,7 @@ export default function AdminWorldMap() {
               >
                 <Popup>
                   <div className="text-sm">
-                    <p className="font-bold mb-1">💰 Sale</p>
+                    <p className="font-bold mb-1"><span aria-hidden="true">💰</span> Sale</p>
                     <p><strong>Customer:</strong> {pin.customer}</p>
                     <p><strong>Address:</strong> {pin.address}</p>
                     <p><strong>Status:</strong> {pin.status?.replace('_', ' ')}</p>
@@ -265,7 +265,7 @@ export default function AdminWorldMap() {
                   </div>
                 </Popup>
                 <Tooltip>
-                  <span>💰 {pin.customer} — ${(pin.price || 0).toFixed(0)}</span>
+                  <span><span aria-hidden="true">💰</span> {pin.customer} — ${(pin.price || 0).toFixed(0)}</span>
                 </Tooltip>
               </Marker>
             ))}
@@ -287,7 +287,7 @@ export default function AdminWorldMap() {
                 >
                   <Popup>
                     <div className="text-sm">
-                      <p className="font-bold mb-1">📦 Active Job</p>
+                      <p className="font-bold mb-1"><span aria-hidden="true">📦</span> Active Job</p>
                       <p><strong>Customer:</strong> {pin.customer}</p>
                       <p><strong>Address:</strong> {pin.address}</p>
                       <p><strong>Status:</strong> {pin.status?.replace('_', ' ')}</p>
@@ -296,7 +296,7 @@ export default function AdminWorldMap() {
                     </div>
                   </Popup>
                   <Tooltip>
-                    <span>📦 {pin.customer}</span>
+                    <span><span aria-hidden="true">📦</span> {pin.customer}</span>
                   </Tooltip>
                 </CircleMarker>
               );
@@ -311,7 +311,7 @@ export default function AdminWorldMap() {
               >
                 <Popup>
                   <div className="text-sm">
-                    <p className="font-bold mb-1">🚚 Driver</p>
+                    <p className="font-bold mb-1"><span aria-hidden="true">🚚</span> Driver</p>
                     <p><strong>Name:</strong> {pin.name}</p>
                     <p><strong>Service Area:</strong> {pin.serviceArea}</p>
                     <p><strong>Status:</strong> {pin.status?.replace('_', ' ')}</p>
@@ -320,7 +320,7 @@ export default function AdminWorldMap() {
                   </div>
                 </Popup>
                 <Tooltip>
-                  <span>🚚 {pin.name}</span>
+                  <span><span aria-hidden="true">🚚</span> {pin.name}</span>
                 </Tooltip>
               </Marker>
             ))}

@@ -44,7 +44,7 @@ export default function FinancialAreaChart({ chartData }) {
   }).join('; ');
 
   return (
-    <div className="w-full h-72" role="img" aria-label="Area chart showing monthly platform earnings, app fees, and driver payouts">
+    <div className="w-full h-72" role="img" tabIndex={0} aria-label="Area chart showing monthly platform earnings, app fees, and driver payouts">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
           <defs>

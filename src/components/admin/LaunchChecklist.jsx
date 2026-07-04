@@ -186,7 +186,12 @@ First job might come in soon. Call me right when you get the notification so I c
                   {copied === 'customer' ? 'Copied' : 'Copy'}
                 </Button>
               </div>
-              <pre className="text-xs whitespace-pre-wrap font-body text-foreground/90">{customerMessage}</pre>
+              <pre className="text-xs whitespace-pre-wrap font-body text-foreground/90">{customerMessage.split('🚚').map((part, i, arr) => (
+                <React.Fragment key={i}>
+                  {part}
+                  {i < arr.length - 1 && <span aria-hidden="true">🚚</span>}
+                </React.Fragment>
+              ))}</pre>
             </div>
 
             {/* Driver message */}
