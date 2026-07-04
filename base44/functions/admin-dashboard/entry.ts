@@ -162,7 +162,17 @@ Deno.serve(async (req) => {
         if (p.status === 'pending') entry.pending_payouts += p.amount || 0;
       }
 
-      const driverStats = Object.values(byDriver).sort((a, b) => b.total_earnings - a.total_earnings);
+      // Count ratings received per driver (customer_to_driver direction)
+      const ratings = await base44.asServiceRole.entities.Rating.filter({ direction: 'customer_to_driver' }, '-created_date', 500);
+      for (const r of ratings) {
+        const entry = r.ratee_id ? byDriver[r.ratee_id] : null;
+        if (!entry) continue;
+        entry.total_ratings = (entry.total_ratings || 0) + 1;
+      }
+
+      const driverStats = Object.values(byDriver)
+        .map((d) => ({ ...d, total_ratings: d.total_ratings || 0 }))
+        .sort((a, b) => b.total_earnings - a.total_earnings);
       const totals = {
         totalEarnings: driverStats.reduce((s, d) => s + d.total_earnings, 0),
         pendingPayouts: driverStats.reduce((s, d) => s + d.pending_payouts, 0),

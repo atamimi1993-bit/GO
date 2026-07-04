@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import StatCard from '@/components/admin/StatCard';
 const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
+const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
 const BulkPayoutPanel = lazy(() => import('@/components/admin/BulkPayoutPanel'));
 const MoveCalendar = lazy(() => import('@/components/admin/MoveCalendar'));
 const EarningsCharts = lazy(() => import('@/components/admin/EarningsCharts'));
@@ -165,6 +166,11 @@ export default function Admin() {
         {/* Driver performance */}
         <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
           <DriverPerformance />
+        </Suspense>
+
+        {/* Top performers ranking */}
+        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+          <DriverTopPerformers />
         </Suspense>
 
         {/* Marketing & promotions */}
