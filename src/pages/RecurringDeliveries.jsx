@@ -105,7 +105,7 @@ export default function RecurringDeliveries() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="min-h-[44px] min-w-[44px]">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="min-h-[44px] min-w-[44px]" aria-label="Go back">
           <ArrowLeft size={20} />
         </Button>
         <div>
@@ -236,7 +236,7 @@ export default function RecurringDeliveries() {
                   <Button variant="ghost" size="sm" className="min-h-[36px]" onClick={() => toggleActive(s.id, s.active)}>
                     {s.active ? 'Pause' : 'Resume'}
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-destructive min-h-[36px] min-w-[36px]" onClick={() => handleDelete(s.id)}>
+                  <Button variant="ghost" size="icon" className="text-destructive min-h-[36px] min-w-[36px]" onClick={() => handleDelete(s.id)} aria-label="Delete recurring delivery">
                     <Trash2 size={14} />
                   </Button>
                 </div>

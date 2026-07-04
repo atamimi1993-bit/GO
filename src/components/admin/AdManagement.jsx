@@ -188,7 +188,7 @@ export default function AdManagement() {
                   )}
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => toggleAd(ad)} title={ad.status === 'active' ? 'Pause' : 'Resume'}>
+              <Button variant="ghost" size="icon" onClick={() => toggleAd(ad)} title={ad.status === 'active' ? 'Pause' : 'Resume'} aria-label={ad.status === 'active' ? 'Pause ad' : 'Resume ad'}>
                 {ad.status === 'active' ? <Pause size={16} /> : <Play size={16} />}
               </Button>
             </div>

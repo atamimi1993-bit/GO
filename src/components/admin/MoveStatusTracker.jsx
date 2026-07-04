@@ -30,17 +30,18 @@ export default function MoveStatusTracker() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState({ pending: true, in_progress: true, completed: false });
   const [showAll, setShowAll] = useState({});
+  const [limit, setLimit] = useState(50);
 
   const load = useCallback(async () => {
     try {
-      const data = await base44.entities.MoveRequest.list('-created_date', 200);
+      const data = await base44.entities.MoveRequest.list('-created_date', limit);
       setMoves(data);
     } catch (err) {
       toast({ title: 'Failed to load moves', description: err.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, limit]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -123,11 +124,18 @@ export default function MoveStatusTracker() {
         </div>
       )}
 
-      <div className="mt-4 flex justify-end">
-        <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-          {loading ? <Loader2 size={14} className="animate-spin mr-1" /> : <Clock size={14} className="mr-1" />}
-          Refresh
-        </Button>
+      <div className="mt-4 flex flex-col gap-2">
+        {moves.length >= limit && (
+          <Button size="sm" variant="outline" className="w-full min-h-[44px]" onClick={() => setLimit((l) => l + 50)} aria-label="Load more moves">
+            Load more moves
+          </Button>
+        )}
+        <div className="flex justify-end">
+          <Button size="sm" variant="outline" onClick={load} disabled={loading} aria-label="Refresh moves list">
+            {loading ? <Loader2 size={14} className="animate-spin mr-1" /> : <Clock size={14} className="mr-1" />}
+            Refresh
+          </Button>
+        </div>
       </div>
     </div>
   );

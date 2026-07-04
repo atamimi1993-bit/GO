@@ -119,7 +119,7 @@ export default function DriverRecruiter() {
           <h2 className="font-display font-bold text-lg">AI Driver Recruiter</h2>
           <p className="text-muted-foreground text-sm">Find driver job boards, generate postings, and create outreach content.</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => { loadConversation(); loadPosts(); }} title="Refresh">
+        <Button variant="ghost" size="icon" onClick={() => { loadConversation(); loadPosts(); }} title="Refresh" aria-label="Refresh conversation and posts">
           <RefreshCw size={18} />
         </Button>
       </div>
@@ -174,7 +174,7 @@ export default function DriverRecruiter() {
             disabled={sending}
             className="flex-1"
           />
-          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0 bg-blue-500 hover:bg-blue-600">
+          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0 bg-blue-500 hover:bg-blue-600" aria-label="Send message">
             {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </Button>
         </div>

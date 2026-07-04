@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useCallback, memo } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
@@ -10,12 +10,12 @@ import FaqSection from '@/components/go/FaqSection';
 import { Gift } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-const HomeStats = lazy(() => import('@/components/go/HomeStats'));
-const CustomerQuickActions = lazy(() => import('@/components/go/CustomerQuickActions'));
-const Testimonials = lazy(() => import('@/components/go/Testimonials'));
-const ReviewGallery = lazy(() => import('@/components/go/ReviewGallery'));
-const DriverRecruitmentBanner = lazy(() => import('@/components/go/DriverRecruitmentBanner'));
-const CustomerChatWidget = lazy(() => import('@/components/go/CustomerChatWidget'));
+const HomeStats = memo(lazy(() => import('@/components/go/HomeStats')));
+const CustomerQuickActions = memo(lazy(() => import('@/components/go/CustomerQuickActions')));
+const Testimonials = memo(lazy(() => import('@/components/go/Testimonials')));
+const ReviewGallery = memo(lazy(() => import('@/components/go/ReviewGallery')));
+const DriverRecruitmentBanner = memo(lazy(() => import('@/components/go/DriverRecruitmentBanner')));
+const CustomerChatWidget = memo(lazy(() => import('@/components/go/CustomerChatWidget')));
 
 const LazyFallback = () => <div className="animate-pulse bg-muted rounded-2xl h-32 w-full" />;
 
@@ -29,8 +29,12 @@ export default function Home() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+  }, [queryClient]);
+
   return (
-    <PullToRefresh scrollRef={scrollRef} onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['currentUser'] }); }}>
+    <PullToRefresh scrollRef={scrollRef} onRefresh={handleRefresh}>
     <div className="space-y-16">
       {/* Promotional Ad Banner */}
       <AdBanner audience="customers" />

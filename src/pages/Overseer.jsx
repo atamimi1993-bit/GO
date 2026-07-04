@@ -251,7 +251,7 @@ export default function Overseer() {
             disabled={sending}
             className="flex-1"
           />
-          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0">
+          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0" aria-label="Send message">
             {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </Button>
         </div>

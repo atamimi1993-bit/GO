@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { format, parseISO, subWeeks, isAfter } from 'date-fns';
 import {
@@ -22,19 +23,14 @@ function inLastMonth(dateStr) {
 }
 
 export default function DriverMonthlyChart({ driverProfile }) {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
-
-  const load = useCallback(async () => {
-    if (!driverProfile?.id) {
-      setLoading(false);
-      return;
-    }
-    try {
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['driverMonthlyChart', driverProfile?.id],
+    queryFn: async () => {
+      if (!driverProfile?.id) return null;
       const [moves, payouts, ratings] = await Promise.all([
-        base44.entities.MoveRequest.filter({ assigned_driver_id: driverProfile.id }, '-created_date', 200).catch(() => []),
-        base44.entities.DriverPayout.filter({ driver_profile_id: driverProfile.id }, '-created_date', 200).catch(() => []),
-        base44.entities.Rating.filter({ direction: 'customer_to_driver', ratee_id: driverProfile.id }, '-created_date', 100).catch(() => []),
+        base44.entities.MoveRequest.filter({ assigned_driver_id: driverProfile.id }, '-created_date', 50).catch(() => []),
+        base44.entities.DriverPayout.filter({ driver_profile_id: driverProfile.id }, '-created_date', 50).catch(() => []),
+        base44.entities.Rating.filter({ direction: 'customer_to_driver', ratee_id: driverProfile.id }, '-created_date', 50).catch(() => []),
       ]);
 
       const monthMoves = moves.filter((m) => m.status === 'completed' && inLastMonth(m.updated_date || m.created_date));
@@ -50,13 +46,8 @@ export default function DriverMonthlyChart({ driverProfile }) {
       // Weekly breakdown for chart
       const weeks = [];
       for (let i = 3; i >= 0; i--) {
-        const weekStart = subWeeks(new Date(), i);
         const weekLabel = i === 0 ? 'This week' : `${i}w ago`;
-        const weekMoves = monthMoves.filter((m) => {
-          const d = parseISO(m.updated_date || m.created_date);
-          return isAfter(d, subWeeks(new Date(), i + 1)) && isAfter(d, subWeeks(new Date(), i + 1)) && !isAfter(d, i === 0 ? new Date() : subWeeks(new Date(), i - 1 < 0 ? 0 : i - 1));
-        });
-        // simpler: check if within [i weeks ago, (i-1) weeks ago]
+        // check if within [i weeks ago, (i-1) weeks ago]
         const inWeek = (dateStr) => {
           if (!dateStr) return false;
           try {
@@ -79,15 +70,11 @@ export default function DriverMonthlyChart({ driverProfile }) {
         });
       }
 
-      setData({ totalJobs, totalEarnings, avgRating, weeks });
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
-  }, [driverProfile?.id]);
-
-  useEffect(() => { load(); }, [load]);
+      return { totalJobs, totalEarnings, avgRating, weeks };
+    },
+    enabled: !!driverProfile?.id,
+    staleTime: 5 * 60 * 1000,
+  });
 
   if (loading) {
     return (

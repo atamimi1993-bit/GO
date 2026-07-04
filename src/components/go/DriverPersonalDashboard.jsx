@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Badge } from '@/components/ui/badge';
@@ -26,45 +27,35 @@ const STATUS_COLORS = {
 export default function DriverPersonalDashboard({ user: propUser }) {
   const { user: authUser } = useAuth();
   const user = propUser || authUser;
-  const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState(null);
-  const [moves, setMoves] = useState([]);
-  const [payouts, setPayouts] = useState([]);
-  const [ratings, setRatings] = useState([]);
 
-  const load = useCallback(async () => {
-    if (!user?.email) { setLoading(false); return; }
-    try {
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['driverPersonalDashboard', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
       const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
-      if (profiles.length === 0) {
-        setLoading(false);
-        return;
-      }
+      if (profiles.length === 0) return null;
       const p = profiles[0];
-      setProfile(p);
-
       const [allMoves, allPayouts, allRatings] = await Promise.all([
-        base44.entities.MoveRequest.list('-created_date', 500),
-        base44.entities.DriverPayout.filter({ driver_profile_id: p.id }, '-created_date', 200),
+        base44.entities.MoveRequest.list('-created_date', 50),
+        base44.entities.DriverPayout.filter({ driver_profile_id: p.id }, '-created_date', 50),
         base44.entities.Rating.filter({ direction: 'customer_to_driver', ratee_id: p.id }, '-created_date', 50),
       ]);
-      setMoves(allMoves.filter((m) => m.assigned_driver_id === p.id));
-      setPayouts(allPayouts);
-      setRatings(allRatings);
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { load(); }, [load, user]);
+      return {
+        profile: p,
+        moves: allMoves.filter((m) => m.assigned_driver_id === p.id),
+        payouts: allPayouts,
+        ratings: allRatings,
+      };
+    },
+    enabled: !!user?.email,
+    staleTime: 5 * 60 * 1000,
+  });
 
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
   }
 
-  if (!profile) {
+  if (!data) {
     return (
       <div className="text-center py-20">
         <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
@@ -80,6 +71,8 @@ export default function DriverPersonalDashboard({ user: propUser }) {
       </div>
     );
   }
+
+  const { profile, moves, payouts, ratings } = data;
 
   const completedMoves = moves.filter((m) => m.status === 'completed');
   const activeMoves = moves.filter((m) => ['accepted', 'in_progress', 'quoted'].includes(m.status));

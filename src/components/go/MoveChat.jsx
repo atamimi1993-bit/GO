@@ -130,14 +130,17 @@ export default function MoveChat({ move, currentUser, driverProfile }) {
       </div>
 
       <form onSubmit={handleSend} className="flex gap-2">
+        <label htmlFor="move-chat-input" className="sr-only">Type a message</label>
         <Input
+          id="move-chat-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message..."
           disabled={sending}
           className="flex-1"
+          aria-label="Type a message"
         />
-        <Button type="submit" size="icon" disabled={sending || !input.trim()}>
+        <Button type="submit" size="icon" disabled={sending || !input.trim()} aria-label="Send message">
           {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
         </Button>
       </form>

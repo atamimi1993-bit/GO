@@ -52,7 +52,7 @@ export default function DeliveryHistory() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="min-h-[44px] min-w-[44px]">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="min-h-[44px] min-w-[44px]" aria-label="Go back">
           <ArrowLeft size={20} />
         </Button>
         <div className="flex-1">

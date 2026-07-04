@@ -16,17 +16,18 @@ export default function FleetManagement() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [editingId, setEditingId] = useState(null);
+  const [truckLimit, setTruckLimit] = useState(50);
   const [editForm, setEditForm] = useState({ current_mileage: '', last_maintenance_date: '', next_maintenance_date: '', maintenance_notes: '' });
 
   const { data: trucks, isLoading } = useQuery({
-    queryKey: ['fleetTrucks'],
-    queryFn: () => base44.entities.Truck.list('-created_date', 500),
+    queryKey: ['fleetTrucks', truckLimit],
+    queryFn: () => base44.entities.Truck.list('-created_date', truckLimit),
     staleTime: 60 * 1000,
   });
 
   const { data: drivers } = useQuery({
     queryKey: ['fleetDrivers'],
-    queryFn: () => base44.entities.DriverProfile.list('-created_date', 500),
+    queryFn: () => base44.entities.DriverProfile.list('-created_date', 50),
     staleTime: 60 * 1000,
   });
 
@@ -284,6 +285,11 @@ export default function FleetManagement() {
             );
           })}
         </div>
+      )}
+      {(trucks || []).length >= truckLimit && (
+        <Button variant="outline" size="sm" className="w-full mt-3 min-h-[44px]" onClick={() => setTruckLimit((l) => l + 50)} aria-label="Load more trucks">
+          Load more trucks
+        </Button>
       )}
     </div>
   );

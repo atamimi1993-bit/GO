@@ -89,11 +89,11 @@ export default function DriverAvailabilityCalendar({ driverProfile }) {
       </div>
 
       <div className="flex items-center justify-between mb-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}>
+        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, -1))} aria-label="Previous month">
           <ChevronLeft size={18} />
         </Button>
         <span className="font-medium text-sm">{format(currentMonth, 'MMMM yyyy')}</span>
-        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} aria-label="Next month">
           <ChevronRight size={18} />
         </Button>
       </div>

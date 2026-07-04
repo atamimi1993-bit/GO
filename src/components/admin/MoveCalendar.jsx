@@ -125,13 +125,13 @@ export default function MoveCalendar({ scrollRef }) {
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" className="min-h-[44px]" onClick={handleToday}>Today</Button>
-          <Button size="icon" variant="outline" className="min-h-[44px] min-w-[44px]" onClick={handlePrev}>
+          <Button size="icon" variant="outline" className="min-h-[44px] min-w-[44px]" onClick={handlePrev} aria-label="Previous month">
             <ChevronLeft size={16} />
           </Button>
           <span className="text-sm font-medium min-w-[120px] text-center">
             {format(currentMonth, 'MMMM yyyy')}
           </span>
-          <Button size="icon" variant="outline" className="min-h-[44px] min-w-[44px]" onClick={handleNext}>
+          <Button size="icon" variant="outline" className="min-h-[44px] min-w-[44px]" onClick={handleNext} aria-label="Next month">
             <ChevronRight size={16} />
           </Button>
         </div>
@@ -271,7 +271,7 @@ export default function MoveCalendar({ scrollRef }) {
             <h3 className="font-display font-bold text-sm">
               {format(selectedDay, 'EEEE, MMMM d, yyyy')}
             </h3>
-            <Button size="icon" variant="ghost" className="h-11 w-11" onClick={() => setSelectedDay(null)}>
+            <Button size="icon" variant="ghost" className="h-11 w-11" onClick={() => setSelectedDay(null)} aria-label="Close day details">
               <X size={16} />
             </Button>
           </div>

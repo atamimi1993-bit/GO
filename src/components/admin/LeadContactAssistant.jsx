@@ -132,7 +132,7 @@ export default function LeadContactAssistant() {
           <h2 className="font-display font-bold text-lg">AI Lead Contact Assistant</h2>
           <p className="text-muted-foreground text-sm">Contacts leads, generates personalized outreach, and refers them to GO.</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => { loadConversation(); loadData(); }} title="Refresh">
+        <Button variant="ghost" size="icon" onClick={() => { loadConversation(); loadData(); }} title="Refresh" aria-label="Refresh conversation and leads">
           <RefreshCw size={18} />
         </Button>
       </div>
@@ -205,7 +205,7 @@ export default function LeadContactAssistant() {
             disabled={sending}
             className="flex-1"
           />
-          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0 bg-purple-500 hover:bg-purple-600">
+          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0 bg-purple-500 hover:bg-purple-600" aria-label="Send message">
             {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </Button>
         </div>

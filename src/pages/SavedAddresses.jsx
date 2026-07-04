@@ -134,7 +134,7 @@ export default function SavedAddresses() {
                   <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{addr.category.replace(/_/g, ' ')}</span>
                 )}
               </div>
-              <Button variant="ghost" size="icon" className="text-destructive min-h-[40px] min-w-[40px]" onClick={() => handleDelete(addr.id)}>
+              <Button variant="ghost" size="icon" className="text-destructive min-h-[40px] min-w-[40px]" onClick={() => handleDelete(addr.id)} aria-label={`Delete address ${addr.label}`}>
                 <Trash2 size={16} />
               </Button>
             </div>

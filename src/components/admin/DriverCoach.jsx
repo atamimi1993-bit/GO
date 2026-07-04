@@ -92,7 +92,7 @@ export default function DriverCoach() {
           <h2 className="font-display font-bold text-lg">AI Driver Performance Coach</h2>
           <p className="text-muted-foreground text-sm">Analyzes driver metrics and sends personalized coaching tips.</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={loadConversation} title="Refresh">
+        <Button variant="ghost" size="icon" onClick={loadConversation} title="Refresh" aria-label="Refresh conversation">
           <RefreshCw size={18} />
         </Button>
       </div>
@@ -147,7 +147,7 @@ export default function DriverCoach() {
             disabled={sending}
             className="flex-1"
           />
-          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0 bg-orange-500 hover:bg-orange-600">
+          <Button onClick={() => handleSend()} disabled={sending || !input.trim()} size="icon" className="shrink-0 bg-orange-500 hover:bg-orange-600" aria-label="Send message">
             {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </Button>
         </div>

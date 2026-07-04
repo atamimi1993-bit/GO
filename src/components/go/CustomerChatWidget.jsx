@@ -185,6 +185,7 @@ export default function CustomerChatWidget() {
               disabled={sending || !input.trim()}
               size="icon"
               className="shrink-0 h-9 w-9"
+              aria-label="Send message"
             >
               {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
             </Button>

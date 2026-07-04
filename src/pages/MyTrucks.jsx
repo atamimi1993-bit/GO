@@ -202,7 +202,7 @@ export default function MyTrucks() {
                 ) : (
                   <span className="text-xs text-yellow-600">Pending verification</span>
                 )}
-                <Button variant="ghost" size="icon" className="text-destructive min-h-[40px] min-w-[40px]" onClick={() => handleDelete(truck.id)}>
+                <Button variant="ghost" size="icon" className="text-destructive min-h-[40px] min-w-[40px]" onClick={() => handleDelete(truck.id)} aria-label={`Delete truck ${truck.name || truck.make + ' ' + truck.model}`}>
                   <Trash2 size={16} />
                 </Button>
               </div>

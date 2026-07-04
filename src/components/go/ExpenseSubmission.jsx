@@ -177,13 +177,13 @@ export default function ExpenseSubmission({ driverProfile }) {
 
           {/* Amount */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Amount ($)</label>
-            <Input type="number" step="0.01" placeholder="0.00" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+            <label htmlFor="expense-amount" className="text-sm font-medium mb-1 block">Amount ($)</label>
+            <Input id="expense-amount" type="number" step="0.01" placeholder="0.00" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
           </div>
 
           {/* Current job (auto-linked) */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Linked Job</label>
+            <label htmlFor="expense-job" className="text-sm font-medium mb-1 block">Linked Job</label>
             {activeJobs.length > 0 ? (
               <MobileSelect
                 value={form.move_request_id}
@@ -201,8 +201,9 @@ export default function ExpenseSubmission({ driverProfile }) {
 
           {/* Description */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Description (optional)</label>
+            <label htmlFor="expense-description" className="text-sm font-medium mb-1 block">Description (optional)</label>
             <Textarea
+              id="expense-description"
               placeholder="e.g. Refueled at Shell on I-95"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
