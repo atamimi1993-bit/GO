@@ -104,6 +104,22 @@
       "type": "number",
       "default": 0
     },
+    "pickup_tip": {
+      "type": "number",
+      "default": 0
+    },
+    "delivery_tip": {
+      "type": "number",
+      "default": 0
+    },
+    "pickup_tip_paid": {
+      "type": "boolean",
+      "default": false
+    },
+    "delivery_tip_paid": {
+      "type": "boolean",
+      "default": false
+    },
     "assigned_driver_id": {
       "type": "string"
     },

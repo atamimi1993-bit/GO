@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PriceBreakdown from '@/components/go/PriceBreakdown';
+import TipSection from '@/components/go/TipSection';
 import { getCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2 } from 'lucide-react';
@@ -53,6 +54,11 @@ export default function MoveDetail() {
     } else if (params.get('payment') === 'cancelled') {
       toast({ title: 'Payment cancelled', description: 'You can pay later from this page.' });
     }
+    if (params.get('tip') === 'pickup' && params.get('status') === 'success') {
+      toast({ title: 'Tip sent! 🎉', description: 'Thank you for tipping your driver.' });
+    } else if (params.get('tip') === 'delivery' && params.get('status') === 'success') {
+      toast({ title: 'Tip sent! 🎉', description: 'Thank you for tipping your driver.' });
+    }
   }, [toast]);
 
   const load = useCallback(async () => {
@@ -78,6 +84,8 @@ export default function MoveDetail() {
     baseCost: move.base_cost, fuelCost: move.fuel_cost, taxRate: move.tax_rate,
     taxAmount: move.tax_amount, appFee: move.app_fee, driverFee: move.driver_fee,
     totalPrice: move.total_price, driverPayout: move.driver_payout,
+    pickupTip: move.pickup_tip || 0,
+    deliveryTip: move.delivery_tip || 0,
     currency: curr,
     displayDistance: (move.distance_miles || 0) * 2,
     displayDistanceUnit: distUnit,
@@ -154,6 +162,11 @@ export default function MoveDetail() {
             <MoveTracker moveId={move.id} />
           </Suspense>
         </div>
+      )}
+
+      {/* Driver Tips */}
+      {move.assigned_driver_id && ['accepted', 'in_progress', 'completed'].includes(move.status) && (
+        <TipSection move={move} />
       )}
 
       {/* Price */}

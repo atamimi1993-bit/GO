@@ -36,6 +36,22 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode }) {
           {fmt(pricing.totalPrice)}
         </span>
       </div>
+      {(pricing.pickupTip > 0 || pricing.deliveryTip > 0) && (
+        <div className="space-y-1 pt-1">
+          {pricing.pickupTip > 0 && (
+            <div className="flex justify-between text-xs text-amber-600 dark:text-amber-400">
+              <span>✓ Pickup tip paid</span>
+              <span className="font-medium">{fmt(pricing.pickupTip)}</span>
+            </div>
+          )}
+          {pricing.deliveryTip > 0 && (
+            <div className="flex justify-between text-xs text-amber-600 dark:text-amber-400">
+              <span>✓ Delivery tip paid</span>
+              <span className="font-medium">{fmt(pricing.deliveryTip)}</span>
+            </div>
+          )}
+        </div>
+      )}
       <div className="bg-emerald-500/10 rounded-lg p-3 text-sm text-emerald-600 dark:text-emerald-400">
         Driver payout for this job: <span className="font-bold">{fmt(pricing.driverPayout)}</span>
       </div>
