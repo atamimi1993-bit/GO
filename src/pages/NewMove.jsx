@@ -156,15 +156,15 @@ export default function NewMove() {
       <div className="flex items-center gap-2 mb-8">
         {STEPS.map((s, i) => (
           <React.Fragment key={s}>
-            <div className={`flex items-center gap-2 ${i <= step ? 'text-emerald-600' : 'text-gray-400'}`}>
+            <div className={`flex items-center gap-2 ${i <= step ? 'text-emerald-600' : 'text-muted-foreground'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                i < step ? 'bg-emerald-500 text-white' : i === step ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100'
+                i < step ? 'bg-emerald-500 text-white' : i === step ? 'bg-emerald-100 text-emerald-700' : 'bg-muted'
               }`}>
                 {i + 1}
               </div>
               <span className="hidden sm:inline text-sm font-medium">{s}</span>
             </div>
-            {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 ${i < step ? 'bg-emerald-500' : 'bg-gray-200'}`} />}
+            {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 ${i < step ? 'bg-emerald-500' : 'bg-border'}`} />}
           </React.Fragment>
         ))}
       </div>
@@ -174,9 +174,9 @@ export default function NewMove() {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-display font-bold mb-1">Move Details</h2>
-            <p className="text-gray-500 text-sm">Tell us about your move.</p>
+            <p className="text-muted-foreground text-sm">Tell us about your move.</p>
           </div>
-          <div className="bg-white border rounded-2xl p-6 space-y-4">
+          <div className="bg-card border rounded-2xl p-6 space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label>Your Name</Label>
@@ -199,7 +199,7 @@ export default function NewMove() {
               <Label className="flex items-center gap-2"><MapPin size={14} /> Drop-off Address</Label>
               <Input value={form.dropoff_address} onChange={e => setForm({ ...form, dropoff_address: e.target.value })} placeholder="456 Oak Ave, City, State" />
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <Label className="flex items-center gap-2"><Calendar size={14} /> Move Date</Label>
                 <Input type="date" value={form.move_date} onChange={e => setForm({ ...form, move_date: e.target.value })} />
@@ -227,7 +227,7 @@ export default function NewMove() {
             <div className="flex items-center justify-between bg-blue-50 rounded-xl p-4">
               <div>
                 <p className="font-medium text-sm">Need storage?</p>
-                <p className="text-xs text-gray-500">We'll help you find a facility near your move.</p>
+                <p className="text-xs text-muted-foreground">We'll help you find a facility near your move.</p>
               </div>
               <Switch checked={form.needs_storage} onCheckedChange={v => setForm({ ...form, needs_storage: v })} />
             </div>
@@ -244,13 +244,13 @@ export default function NewMove() {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-display font-bold mb-1">Add Your Items</h2>
-            <p className="text-gray-500 text-sm">List everything you're moving — or upload a file.</p>
+            <p className="text-muted-foreground text-sm">List everything you're moving — or upload a file.</p>
           </div>
 
           {/* Upload */}
-          <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-6 text-center">
-            <FileText className="mx-auto text-gray-400 mb-2" size={32} />
-            <p className="text-sm text-gray-600 mb-3">Upload a PDF or CSV inventory list</p>
+          <div className="bg-card border border-dashed border-border rounded-2xl p-6 text-center">
+            <FileText className="mx-auto text-muted-foreground mb-2" size={32} />
+            <p className="text-sm text-muted-foreground mb-3">Upload a PDF or CSV inventory list</p>
             <label className="cursor-pointer">
               <Button variant="outline" size="sm" disabled={uploading} asChild>
                 <span>
@@ -266,8 +266,8 @@ export default function NewMove() {
 
           {/* Item list */}
           {items.length > 0 && (
-            <div className="bg-white border rounded-2xl overflow-hidden">
-              <div className="px-4 py-3 bg-gray-50 border-b flex justify-between items-center">
+            <div className="bg-card border rounded-2xl overflow-hidden">
+              <div className="px-4 py-3 bg-muted border-b flex justify-between items-center">
                 <span className="text-sm font-medium">{items.length} item{items.length > 1 ? 's' : ''}</span>
                 <span className="text-sm font-bold text-emerald-600">{totalWeight.toLocaleString()} lbs total</span>
               </div>
@@ -276,9 +276,9 @@ export default function NewMove() {
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div>
                       <p className="text-sm font-medium">{item.quantity}x {item.name}</p>
-                      <p className="text-xs text-gray-500">{item.weight_lbs} lbs each · {item.category}{item.special_handling ? ' · ⚠️ Fragile' : ''}</p>
+                      <p className="text-xs text-muted-foreground">{item.weight_lbs} lbs each · {item.category}{item.special_handling ? ' · ⚠️ Fragile' : ''}</p>
                     </div>
-                    <button onClick={() => handleRemoveItem(i)} className="text-gray-400 hover:text-red-500">
+                    <button onClick={() => handleRemoveItem(i)} className="text-muted-foreground hover:text-destructive min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label={`Remove ${item.name}`}>
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -294,7 +294,7 @@ export default function NewMove() {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-display font-bold mb-1">Your Quote</h2>
-            <p className="text-gray-500 text-sm">Review the price breakdown for your move.</p>
+            <p className="text-muted-foreground text-sm">Review the price breakdown for your move.</p>
           </div>
 
           {!pricing && (
@@ -307,12 +307,12 @@ export default function NewMove() {
 
           {pricing && (
             <>
-              <div className="bg-white border rounded-2xl p-4 space-y-2">
-                <div className="flex justify-between text-sm"><span className="text-gray-500">From</span><span className="font-medium">{form.pickup_address}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-gray-500">To</span><span className="font-medium">{form.dropoff_address}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-gray-500">Distance</span><span className="font-medium">{form.distance_miles} mi (one way)</span></div>
-                <div className="flex justify-between text-sm"><span className="text-gray-500">Total Weight</span><span className="font-medium">{totalWeight.toLocaleString()} lbs</span></div>
-                <div className="flex justify-between text-sm"><span className="text-gray-500">Items</span><span className="font-medium">{items.length}</span></div>
+              <div className="bg-card border rounded-2xl p-4 space-y-2">
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">From</span><span className="font-medium">{form.pickup_address}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">To</span><span className="font-medium">{form.dropoff_address}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Distance</span><span className="font-medium">{form.distance_miles} mi (one way)</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total Weight</span><span className="font-medium">{totalWeight.toLocaleString()} lbs</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Items</span><span className="font-medium">{items.length}</span></div>
               </div>
 
               <div>
@@ -343,11 +343,11 @@ export default function NewMove() {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-display font-bold mb-1">Sign Agreement</h2>
-            <p className="text-gray-500 text-sm">Review and sign before we submit your move request.</p>
+            <p className="text-muted-foreground text-sm">Review and sign before we submit your move request.</p>
           </div>
           <LiabilityAgreement onSign={handleSign} />
           {saving && (
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Loader2 size={16} className="animate-spin" /> Submitting your move...
             </div>
           )}

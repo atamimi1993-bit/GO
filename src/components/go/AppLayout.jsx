@@ -19,9 +19,9 @@ export default function AppLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Top nav */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <header className="bg-card border-b border-border sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center">
             <Logo size="sm" />
@@ -36,7 +36,7 @@ export default function AppLayout() {
                 className={`select-none px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === item.path
                     ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -57,7 +57,7 @@ export default function AppLayout() {
               variant="ghost"
               size="sm"
               onClick={() => base44.auth.logout('/')}
-              className="text-gray-500"
+              className="text-muted-foreground"
             >
               <LogOut size={16} />
             </Button>
@@ -65,8 +65,10 @@ export default function AppLayout() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -74,7 +76,7 @@ export default function AppLayout() {
 
         {/* Mobile nav */}
         {mobileOpen && (
-          <div className="md:hidden border-t bg-white pb-4">
+          <div className="md:hidden border-t bg-card pb-4">
             {navItems.map(item => (
               <Link
                 key={item.path}
@@ -83,7 +85,7 @@ export default function AppLayout() {
                 className={`select-none flex items-center gap-3 px-6 py-3 text-sm font-medium ${
                   location.pathname === item.path
                     ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-gray-600'
+                    : 'text-muted-foreground'
                 }`}
               >
                 <item.icon size={18} />
@@ -91,10 +93,10 @@ export default function AppLayout() {
               </Link>
             ))}
             <div className="border-t mt-2 pt-2 px-6 flex flex-col gap-1">
-              <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 text-sm text-gray-600">
+              <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 text-sm text-muted-foreground">
                 <User size={18} /> Account
               </Link>
-              <button onClick={() => base44.auth.logout('/')} className="flex items-center gap-3 py-3 text-sm text-gray-500">
+              <button onClick={() => base44.auth.logout('/')} className="flex items-center gap-3 py-3 text-sm text-muted-foreground">
                 <LogOut size={18} /> Sign Out
               </button>
             </div>

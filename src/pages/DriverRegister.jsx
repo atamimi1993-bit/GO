@@ -74,13 +74,13 @@ export default function DriverRegister() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <button onClick={() => navigate('/driver-hub')} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
         <ArrowLeft size={16} /> Back
       </button>
       <h1 className="text-2xl font-display font-bold mb-1">Driver Registration</h1>
-      <p className="text-gray-500 text-sm mb-6">Fill in your details and upload required documents.</p>
+      <p className="text-muted-foreground text-sm mb-6">Fill in your details and upload required documents.</p>
 
-      <form onSubmit={handleSubmit} className="bg-white border rounded-2xl p-6 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-card border rounded-2xl p-6 space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div><Label>Full Name *</Label><Input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} /></div>
           <div><Label>Email *</Label><Input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>

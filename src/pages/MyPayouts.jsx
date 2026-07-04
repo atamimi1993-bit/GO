@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, DollarSign, Loader2 } from 'lucide-react';
-import moment from 'moment';
+import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 const STATUS_COLORS = {
@@ -14,6 +14,7 @@ const STATUS_COLORS = {
 };
 
 export default function MyPayouts() {
+  const navigate = useNavigate();
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
@@ -34,16 +35,16 @@ export default function MyPayouts() {
     load();
   }, []);
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
     <PullToRefresh onRefresh={load}>
     <div className="max-w-2xl mx-auto">
-      <Link to="/driver-hub" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6">
-        <ArrowLeft size={16} /> Driver Hub
-      </Link>
+      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
+        <ArrowLeft size={16} /> Back
+      </button>
       <h1 className="text-2xl font-display font-bold mb-1">Payouts</h1>
-      <p className="text-gray-500 text-sm mb-6">Track your earnings from completed jobs.</p>
+      <p className="text-muted-foreground text-sm mb-6">Track your earnings from completed jobs.</p>
 
       <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-6 text-center">
         <p className="text-sm text-emerald-700 mb-1">Total Earnings</p>
@@ -51,17 +52,17 @@ export default function MyPayouts() {
       </div>
 
       {payouts.length === 0 ? (
-        <div className="text-center py-16 bg-white border rounded-2xl">
-          <DollarSign className="mx-auto text-gray-300 mb-3" size={48} />
-          <p className="text-gray-500 text-sm">No payouts yet. Accept a job to start earning!</p>
+        <div className="text-center py-16 bg-card border rounded-2xl">
+          <DollarSign className="mx-auto text-muted-foreground mb-3" size={48} />
+          <p className="text-muted-foreground text-sm">No payouts yet. Accept a job to start earning!</p>
         </div>
       ) : (
         <div className="space-y-2">
           {payouts.map(p => (
-            <div key={p.id} className="bg-white border rounded-xl px-5 py-4 flex items-center justify-between">
+            <div key={p.id} className="bg-card border rounded-xl px-5 py-4 flex items-center justify-between">
               <div>
                 <p className="font-medium text-sm">${p.amount.toFixed(2)}</p>
-                <p className="text-xs text-gray-500">{moment(p.created_date).format('MMM D, YYYY')}</p>
+                <p className="text-xs text-muted-foreground">{format(parseISO(p.created_date), 'MMM d, yyyy')}</p>
                 {p.deduction_amount > 0 && (
                   <p className="text-xs text-red-500">-${p.deduction_amount.toFixed(2)} deduction: {p.deduction_reason}</p>
                 )}

@@ -7,14 +7,14 @@ export default function LiabilityAgreement({ onSign }) {
   const [agreed, setAgreed] = useState(false);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6">
+    <div className="bg-card border border-border rounded-2xl p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
           <Shield className="text-amber-600" size={20} />
         </div>
         <h3 className="font-display font-bold text-lg">Liability Agreement</h3>
       </div>
-      <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 space-y-3 max-h-48 overflow-y-auto mb-4">
+      <div className="bg-muted rounded-xl p-4 text-sm text-foreground space-y-3 max-h-48 overflow-y-auto mb-4">
         <p><strong>By signing this agreement, you acknowledge and agree to the following terms:</strong></p>
         <p>1. You agree to work with GO and its network of independent drivers for the transportation of your listed items.</p>
         <p>2. In the event of any stolen, damaged, or lost items during the move, you must first contact the driver(s) assigned to your job to resolve the issue directly.</p>
@@ -25,7 +25,7 @@ export default function LiabilityAgreement({ onSign }) {
       </div>
       <div className="flex items-start gap-3 mb-4">
         <Checkbox checked={agreed} onCheckedChange={setAgreed} id="liability" />
-        <label htmlFor="liability" className="text-sm text-gray-700 cursor-pointer leading-relaxed">
+        <label htmlFor="liability" className="text-sm text-foreground cursor-pointer leading-relaxed">
           I have read, understand, and agree to the terms above. I acknowledge that I must contact the assigned driver first for any damage or loss claims.
         </label>
       </div>

@@ -13,12 +13,12 @@ export default function PriceBreakdown({ pricing, truckSize }) {
   ];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-3">
+    <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
       <h3 className="font-display font-bold text-lg mb-1">Price Breakdown</h3>
       <div className="space-y-2">
         {lines.map((line, i) => (
           <div key={i} className="flex justify-between text-sm">
-            <span className="text-gray-600">{line.label}</span>
+            <span className="text-muted-foreground">{line.label}</span>
             <span className="font-medium">${line.value.toFixed(2)}</span>
           </div>
         ))}

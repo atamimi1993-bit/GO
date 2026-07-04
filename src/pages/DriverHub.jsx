@@ -23,7 +23,7 @@ export default function DriverHub() {
     load();
   }, []);
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   // Not a driver yet
   if (!profile) {
@@ -33,12 +33,12 @@ export default function DriverHub() {
           <Truck className="text-emerald-600" size={36} />
         </div>
         <h1 className="text-3xl font-display font-bold mb-3">Become a GO Driver</h1>
-        <p className="text-gray-500 mb-6 max-w-md mx-auto">
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           Earn money by helping people move. Register your truck, upload your docs, and start accepting local jobs.
         </p>
         <ul className="text-left max-w-sm mx-auto space-y-3 mb-8">
           {['Set your own schedule', 'Get paid per job (5% driver bonus)', 'Any truck size welcome', 'All companies accepted'].map(t => (
-            <li key={t} className="flex items-center gap-2 text-sm text-gray-700">
+            <li key={t} className="flex items-center gap-2 text-sm text-foreground">
               <ShieldCheck size={16} className="text-emerald-500" /> {t}
             </li>
           ))}
@@ -58,7 +58,7 @@ export default function DriverHub() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-display font-bold">Driver Dashboard</h1>
-          <p className="text-gray-500 text-sm">Welcome back, {profile.full_name}.</p>
+          <p className="text-muted-foreground text-sm">Welcome back, {profile.full_name}.</p>
         </div>
         <Badge className={profile.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}>
           {profile.status?.replace('_', ' ')}
@@ -77,20 +77,20 @@ export default function DriverHub() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-white border rounded-2xl p-5 text-center">
-          <Briefcase className="mx-auto text-gray-400 mb-1" size={20} />
+        <div className="bg-card border rounded-2xl p-5 text-center">
+          <Briefcase className="mx-auto text-muted-foreground mb-1" size={20} />
           <p className="text-2xl font-display font-bold">{profile.total_jobs || 0}</p>
-          <p className="text-xs text-gray-500">Jobs</p>
+          <p className="text-xs text-muted-foreground">Jobs</p>
         </div>
-        <div className="bg-white border rounded-2xl p-5 text-center">
-          <DollarSign className="mx-auto text-gray-400 mb-1" size={20} />
+        <div className="bg-card border rounded-2xl p-5 text-center">
+          <DollarSign className="mx-auto text-muted-foreground mb-1" size={20} />
           <p className="text-2xl font-display font-bold">${(profile.total_earnings || 0).toFixed(0)}</p>
-          <p className="text-xs text-gray-500">Earnings</p>
+          <p className="text-xs text-muted-foreground">Earnings</p>
         </div>
-        <div className="bg-white border rounded-2xl p-5 text-center">
+        <div className="bg-card border rounded-2xl p-5 text-center">
           <Star className="mx-auto text-yellow-400 fill-yellow-400 mb-1" size={20} />
           <p className="text-2xl font-display font-bold">{(profile.rating || 5.0).toFixed(1)}</p>
-          <p className="text-xs text-gray-500">Rating</p>
+          <p className="text-xs text-muted-foreground">Rating</p>
         </div>
       </div>
 

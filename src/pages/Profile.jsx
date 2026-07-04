@@ -16,27 +16,27 @@ export default function Profile() {
     base44.auth.me().then(setUser).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
     <div className="max-w-md mx-auto">
       <h1 className="text-2xl font-display font-bold mb-6">My Account</h1>
 
-      <div className="bg-white border rounded-2xl p-6 space-y-4">
+      <div className="bg-card border rounded-2xl p-6 space-y-4">
         <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto">
           <User className="text-emerald-600" size={32} />
         </div>
         <div>
           <Label>Full Name</Label>
-          <Input value={user?.full_name || ''} readOnly className="bg-gray-50" />
+          <Input value={user?.full_name || ''} readOnly className="bg-muted" />
         </div>
         <div>
           <Label>Email</Label>
-          <Input value={user?.email || ''} readOnly className="bg-gray-50" />
+          <Input value={user?.email || ''} readOnly className="bg-muted" />
         </div>
         <div>
           <Label>Role</Label>
-          <Input value={user?.role || 'user'} readOnly className="bg-gray-50" />
+          <Input value={user?.role || 'user'} readOnly className="bg-muted" />
         </div>
         <Button
           variant="outline"

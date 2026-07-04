@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
-import moment from 'moment';
+import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 export default function AvailableJobs() {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(null);
@@ -52,45 +53,45 @@ export default function AvailableJobs() {
     setAccepting(null);
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
     <PullToRefresh onRefresh={load}>
     <div>
-      <Link to="/driver-hub" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6">
-        <ArrowLeft size={16} /> Driver Hub
-      </Link>
+      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
+        <ArrowLeft size={16} /> Back
+      </button>
       <h1 className="text-2xl font-display font-bold mb-1">Available Jobs</h1>
-      <p className="text-gray-500 text-sm mb-6">Accept a move to get started.</p>
+      <p className="text-muted-foreground text-sm mb-6">Accept a move to get started.</p>
 
       {jobs.length === 0 ? (
-        <div className="text-center py-20 bg-white border rounded-2xl">
-          <Truck className="mx-auto text-gray-300 mb-3" size={48} />
-          <p className="text-gray-500">No jobs available right now. Check back soon!</p>
+        <div className="text-center py-20 bg-card border rounded-2xl">
+          <Truck className="mx-auto text-muted-foreground mb-3" size={48} />
+          <p className="text-muted-foreground">No jobs available right now. Check back soon!</p>
         </div>
       ) : (
         <div className="space-y-3">
           {jobs.map(job => (
-            <div key={job.id} className="bg-white border rounded-2xl p-5">
+            <div key={job.id} className="bg-card border rounded-2xl p-5">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <DollarSign size={18} className="text-emerald-600" />
                     <span className="font-display font-bold text-lg text-emerald-600">${job.driver_payout?.toFixed(2)} payout</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     <Calendar size={12} className="inline mr-1" />
-                    {moment(job.move_date).format('MMM D, YYYY')}{job.move_time && ` at ${job.move_time}`}
+                    {format(parseISO(job.move_date), 'MMM d, yyyy')}{job.move_time && ` at ${job.move_time}`}
                   </p>
                 </div>
-                <Badge className="bg-gray-100 text-gray-600 capitalize">{job.truck_size_needed?.replace('_', ' ')}</Badge>
+                <Badge className="bg-muted text-muted-foreground capitalize">{job.truck_size_needed?.replace('_', ' ')}</Badge>
               </div>
-              <div className="space-y-1 text-sm text-gray-600 mb-3">
+              <div className="space-y-1 text-sm text-muted-foreground mb-3">
                 <p className="flex items-center gap-2"><MapPin size={14} className="text-emerald-500" /> {job.pickup_address}</p>
                 <p className="flex items-center gap-2"><MapPin size={14} className="text-red-400" /> {job.dropoff_address}</p>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-xs text-gray-500">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span><Package size={12} className="inline mr-1" />{job.total_weight_lbs?.toLocaleString()} lbs</span>
                   <span>{job.distance_miles} mi</span>
                 </div>

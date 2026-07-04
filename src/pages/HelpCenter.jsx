@@ -41,7 +41,7 @@ export default function HelpCenter() {
     return db.length > 0 ? db : DEFAULT_FAQ[category] || [];
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-gray-400" size={32} /></div>;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" size={32} /></div>;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -50,7 +50,7 @@ export default function HelpCenter() {
           <HelpCircle className="text-emerald-600" size={32} />
         </div>
         <h1 className="text-3xl font-display font-bold mb-2">Help Center</h1>
-        <p className="text-gray-500">Find answers for customers, drivers, and general questions.</p>
+        <p className="text-muted-foreground">Find answers for customers, drivers, and general questions.</p>
       </div>
 
       <Tabs defaultValue="customer">
@@ -62,11 +62,11 @@ export default function HelpCenter() {
 
         {['customer', 'driver', 'general'].map(cat => (
           <TabsContent key={cat} value={cat}>
-            <Accordion type="single" collapsible className="bg-white border rounded-2xl overflow-hidden">
+            <Accordion type="single" collapsible className="bg-card border rounded-2xl overflow-hidden">
               {getArticles(cat).map((article, i) => (
                 <AccordionItem key={article.id || i} value={`${cat}-${i}`}>
                   <AccordionTrigger className="px-5 text-sm font-medium">{article.title}</AccordionTrigger>
-                  <AccordionContent className="px-5 text-sm text-gray-600 leading-relaxed">
+                  <AccordionContent className="px-5 text-sm text-muted-foreground leading-relaxed">
                     {article.content}
                   </AccordionContent>
                 </AccordionItem>

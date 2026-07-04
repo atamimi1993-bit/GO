@@ -46,27 +46,27 @@ export default function Home() {
       {/* How It Works */}
       <section>
         <h2 className="text-2xl font-display font-bold text-center mb-10">How It Works</h2>
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { icon: Package, title: 'List Your Items', desc: 'Add items manually or upload a PDF inventory — we calculate weight and truck size.' },
             { icon: DollarSign, title: 'Get a Quote', desc: 'Instant pricing with mileage, fuel, tax, and fees — no surprises.' },
             { icon: Truck, title: 'Driver Accepts', desc: 'Verified local drivers with licensed trucks accept your job.' },
             { icon: Shield, title: 'Move with Confidence', desc: 'Sign our liability agreement and track your move from start to finish.' },
           ].map((step, i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-shadow">
+            <div key={i} className="bg-card rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-4">
                 <step.icon className="text-emerald-600" size={24} />
               </div>
               <div className="text-xs font-bold text-emerald-600 mb-1">STEP {i + 1}</div>
               <h3 className="font-display font-bold text-lg mb-2">{step.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Stats */}
-      <section className="bg-white rounded-2xl border border-gray-100 p-8">
+      <section className="bg-card rounded-2xl border border-border p-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
             { value: '10K+', label: 'Moves Completed' },
@@ -75,11 +75,11 @@ export default function Home() {
             { value: '50', label: 'States Covered' },
           ].map((stat, i) => (
             <div key={i}>
-              <div className="text-3xl font-display font-black text-gray-900 flex items-center justify-center gap-1">
+              <div className="text-3xl font-display font-black text-foreground flex items-center justify-center gap-1">
                 {stat.value}
                 {stat.icon && <stat.icon size={20} className="text-yellow-500 fill-yellow-500" />}
               </div>
-              <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+              <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -89,12 +89,12 @@ export default function Home() {
       <section className="grid md:grid-cols-2 gap-4">
         <Link to="/storage" className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 hover:shadow-md transition-shadow group">
           <h3 className="font-display font-bold text-lg mb-1">Need Storage?</h3>
-          <p className="text-sm text-gray-600 mb-3">Find climate-controlled storage facilities near your move.</p>
+          <p className="text-sm text-muted-foreground mb-3">Find climate-controlled storage facilities near your move.</p>
           <span className="text-blue-600 font-semibold text-sm group-hover:underline">Browse Storage →</span>
         </Link>
         <Link to="/help" className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-2xl p-6 hover:shadow-md transition-shadow group">
           <h3 className="font-display font-bold text-lg mb-1">Need Help?</h3>
-          <p className="text-sm text-gray-600 mb-3">Visit our Help Center for guides, FAQs, and support.</p>
+          <p className="text-sm text-muted-foreground mb-3">Visit our Help Center for guides, FAQs, and support.</p>
           <span className="text-amber-600 font-semibold text-sm group-hover:underline">Get Help →</span>
         </Link>
       </section>

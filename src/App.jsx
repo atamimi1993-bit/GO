@@ -4,32 +4,30 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
 import { AnimatePresence, motion } from 'framer-motion';
-import PageNotFound from './lib/PageNotFound';
+import { Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
-
-// Auth pages
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
-
-// App pages
 import AppLayout from '@/components/go/AppLayout';
-import Home from '@/pages/Home';
-import NewMove from '@/pages/NewMove';
-import MyMoves from '@/pages/MyMoves';
-import MoveDetail from '@/pages/MoveDetail';
-import DriverHub from '@/pages/DriverHub';
-import DriverRegister from '@/pages/DriverRegister';
-import AvailableJobs from '@/pages/AvailableJobs';
-import MyTrucks from '@/pages/MyTrucks';
-import MyPayouts from '@/pages/MyPayouts';
-import Storage from '@/pages/Storage';
-import HelpCenter from '@/pages/HelpCenter';
-import Profile from '@/pages/Profile';
+
+const PageNotFound = lazy(() => import('./lib/PageNotFound'));
+const Login = lazy(() => import('@/pages/Login'));
+const Register = lazy(() => import('@/pages/Register'));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const Home = lazy(() => import('@/pages/Home'));
+const NewMove = lazy(() => import('@/pages/NewMove'));
+const MyMoves = lazy(() => import('@/pages/MyMoves'));
+const MoveDetail = lazy(() => import('@/pages/MoveDetail'));
+const DriverHub = lazy(() => import('@/pages/DriverHub'));
+const DriverRegister = lazy(() => import('@/pages/DriverRegister'));
+const AvailableJobs = lazy(() => import('@/pages/AvailableJobs'));
+const MyTrucks = lazy(() => import('@/pages/MyTrucks'));
+const MyPayouts = lazy(() => import('@/pages/MyPayouts'));
+const Storage = lazy(() => import('@/pages/Storage'));
+const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
+const Profile = lazy(() => import('@/pages/Profile'));
 
 const PageTransition = ({ children }) => (
   <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
@@ -44,7 +42,7 @@ const AuthenticatedApp = () => {
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -60,6 +58,11 @@ const AuthenticatedApp = () => {
 
   return (
     <AnimatePresence mode="wait">
+    <Suspense fallback={
+      <div className="fixed inset-0 flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
+      </div>
+    }>
     <Routes location={location} key={location.pathname}>
       <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
       <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
@@ -85,6 +88,7 @@ const AuthenticatedApp = () => {
 
       <Route path="*" element={<PageTransition><PageNotFound /></PageTransition>} />
     </Routes>
+    </Suspense>
     </AnimatePresence>
   );
 };

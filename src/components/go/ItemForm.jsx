@@ -30,10 +30,10 @@ export default function ItemForm({ onAdd }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-4 space-y-3">
-      <div className="grid grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} className="bg-muted rounded-xl p-4 space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <Label className="text-xs text-gray-500">Item Name</Label>
+          <Label className="text-xs text-muted-foreground">Item Name</Label>
           <Input
             placeholder="e.g. Couch, TV, Box of books"
             value={item.name}
@@ -41,7 +41,7 @@ export default function ItemForm({ onAdd }) {
           />
         </div>
         <div>
-          <Label className="text-xs text-gray-500">Category</Label>
+          <Label className="text-xs text-muted-foreground">Category</Label>
           <Select value={item.category} onValueChange={v => setItem({ ...item, category: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -50,9 +50,9 @@ export default function ItemForm({ onAdd }) {
           </Select>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div>
-          <Label className="text-xs text-gray-500">Weight (lbs)</Label>
+          <Label className="text-xs text-muted-foreground">Weight (lbs)</Label>
           <Input
             type="number"
             placeholder="50"
@@ -61,7 +61,7 @@ export default function ItemForm({ onAdd }) {
           />
         </div>
         <div>
-          <Label className="text-xs text-gray-500">Quantity</Label>
+          <Label className="text-xs text-muted-foreground">Quantity</Label>
           <Input
             type="number"
             min={1}
