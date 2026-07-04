@@ -67,7 +67,7 @@ export default function DriverHub() {
           Earn money by helping people move. Register your truck, upload your docs, and start accepting local jobs.
         </p>
         <ul className="text-left max-w-sm mx-auto space-y-3 mb-8">
-          {['Set your own schedule', 'Get paid per job (5% driver bonus)', 'Any truck size welcome', 'All companies accepted'].map(t => (
+          {['Set your own schedule', 'Get paid per job', 'Any truck size welcome', 'All companies accepted'].map(t => (
             <li key={t} className="flex items-center gap-2 text-sm text-foreground">
               <ShieldCheck size={16} className="text-emerald-500" /> {t}
             </li>
