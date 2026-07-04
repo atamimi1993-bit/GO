@@ -42,32 +42,41 @@ export default function ExpenseReviewPanel() {
   useEffect(() => { load(); }, [load]);
 
   const handleApprove = async (receipt) => {
+    const prevStatus = receipt.status;
+    const prevApproved = receipt.approved_amount;
+    const amount = approveAmounts[receipt.id] !== undefined
+      ? parseFloat(approveAmounts[receipt.id])
+      : receipt.use_estimate
+        ? receipt.estimated_amount || receipt.amount
+        : receipt.amount;
+    // Optimistic update
+    setReceipts((prev) => prev.map((r) => r.id === receipt.id ? { ...r, status: 'approved', approved_amount: amount } : r));
     setProcessingId(receipt.id);
     try {
-      const amount = approveAmounts[receipt.id] !== undefined
-        ? parseFloat(approveAmounts[receipt.id])
-        : receipt.use_estimate
-          ? receipt.estimated_amount || receipt.amount
-          : receipt.amount;
       await base44.entities.ExpenseReceipt.update(receipt.id, {
         status: 'approved',
         approved_amount: amount,
       });
       toast({ title: 'Expense approved', description: `$${amount.toFixed(2)} approved for ${receipt.driver_name}.` });
-      load();
     } catch (err) {
+      // Revert on error
+      setReceipts((prev) => prev.map((r) => r.id === receipt.id ? { ...r, status: prevStatus, approved_amount: prevApproved } : r));
       toast({ title: 'Approval failed', description: err.message, variant: 'destructive' });
     }
     setProcessingId(null);
   };
 
   const handleDeny = async (receipt) => {
+    const prevStatus = receipt.status;
+    // Optimistic update
+    setReceipts((prev) => prev.map((r) => r.id === receipt.id ? { ...r, status: 'denied' } : r));
     setProcessingId(receipt.id);
     try {
       await base44.entities.ExpenseReceipt.update(receipt.id, { status: 'denied' });
       toast({ title: 'Expense denied', description: `Receipt from ${receipt.driver_name} has been denied.` });
-      load();
     } catch (err) {
+      // Revert on error
+      setReceipts((prev) => prev.map((r) => r.id === receipt.id ? { ...r, status: prevStatus } : r));
       toast({ title: 'Action failed', description: err.message, variant: 'destructive' });
     }
     setProcessingId(null);

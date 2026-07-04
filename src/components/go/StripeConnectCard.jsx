@@ -109,7 +109,7 @@ export default function StripeConnectCard({ profile: initialProfile, onUpdated }
         <p className="text-sm text-muted-foreground mb-3">
           Your earnings are automatically transferred to your bank account via Stripe after each completed job.
         </p>
-        <Button variant="outline" size="sm" onClick={handleConnect} disabled={connecting}>
+        <Button variant="outline" size="sm" aria-label="Update bank details on Stripe" onClick={handleConnect} disabled={connecting}>
           {connecting ? <Loader2 size={14} className="animate-spin mr-1" /> : <CreditCard size={14} className="mr-1" />}
           Update Bank Details
         </Button>
@@ -128,7 +128,7 @@ export default function StripeConnectCard({ profile: initialProfile, onUpdated }
         <p className="text-sm text-muted-foreground mb-4">
           You started setting up automatic payouts but haven't finished. Complete your Stripe account to receive earnings directly to your bank.
         </p>
-        <Button className="w-full bg-amber-500 hover:bg-amber-600" onClick={handleConnect} disabled={connecting}>
+        <Button className="w-full bg-amber-500 hover:bg-amber-600" aria-label="Finish Stripe Connect onboarding" onClick={handleConnect} disabled={connecting}>
           {connecting ? <Loader2 size={16} className="animate-spin mr-1" /> : <CreditCard size={16} className="mr-1" />}
           Finish Stripe Setup
         </Button>
@@ -146,7 +146,7 @@ export default function StripeConnectCard({ profile: initialProfile, onUpdated }
       <p className="text-sm text-muted-foreground mb-4">
         Connect your bank account through Stripe to receive earnings automatically after each completed job — no more waiting for manual payouts.
       </p>
-      <Button className="w-full bg-emerald-500 hover:bg-emerald-600" onClick={handleConnect} disabled={connecting}>
+      <Button className="w-full bg-emerald-500 hover:bg-emerald-600" aria-label="Connect your bank account with Stripe" onClick={handleConnect} disabled={connecting}>
         {connecting ? <Loader2 size={16} className="animate-spin mr-1" /> : <CreditCard size={16} className="mr-1" />}
         Connect with Stripe
       </Button>

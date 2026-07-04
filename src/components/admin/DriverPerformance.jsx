@@ -215,7 +215,7 @@ export default function DriverPerformance() {
             ))}
           </div>
           {drivers.length > MAX_ROWS && !showAllDrivers && (
-            <Button variant="outline" size="sm" className="w-full mt-2 min-h-[44px]" onClick={() => setShowAllDrivers(true)}>
+            <Button variant="outline" size="sm" className="w-full mt-2 min-h-[44px]" aria-label={`Show all ${drivers.length} drivers`} onClick={() => setShowAllDrivers(true)}>
               Show all {drivers.length} drivers
             </Button>
           )}

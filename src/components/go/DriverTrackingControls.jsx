@@ -181,7 +181,7 @@ export default function DriverTrackingControls({ driverProfile }) {
                 <p className="text-sm font-medium truncate">{activeMove.pickup_address}</p>
                 <p className="text-xs text-muted-foreground truncate">→ {activeMove.dropoff_address}</p>
               </div>
-              <Button size="sm" variant="outline" onClick={() => navigate(`/move/${activeMove.id}`)}>
+              <Button size="sm" variant="outline" className="min-h-[44px]" onClick={() => navigate(`/move/${activeMove.id}`)}>
                 View
               </Button>
             </div>
@@ -204,7 +204,7 @@ export default function DriverTrackingControls({ driverProfile }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {MILESTONES.map((m) => (
-                <Button key={m.key} size="sm" variant="outline" onClick={() => sendPing(m.key)} aria-label={m.label}>
+                <Button key={m.key} size="sm" className="min-h-[44px]" variant="outline" onClick={() => sendPing(m.key)} aria-label={m.label}>
                   <m.icon size={14} className="mr-1" /> {m.label}
                 </Button>
               ))}

@@ -154,15 +154,19 @@ export default function RouteLogForm({ move, driverProfile, onSaved }) {
             <div className="flex gap-2">
               <button
                 type="button"
+                aria-label="Set distance unit to miles"
+                aria-pressed={distanceUnit === 'mi'}
                 onClick={() => setDistanceUnit('mi')}
-                className={`flex-1 py-2 rounded-md text-sm font-medium border transition-colors ${distanceUnit === 'mi' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-border'}`}
+                className={`flex-1 py-2 min-h-[44px] rounded-md text-sm font-medium border transition-colors ${distanceUnit === 'mi' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-border'}`}
               >
                 Miles
               </button>
               <button
                 type="button"
+                aria-label="Set distance unit to kilometers"
+                aria-pressed={distanceUnit === 'km'}
                 onClick={() => setDistanceUnit('km')}
-                className={`flex-1 py-2 rounded-md text-sm font-medium border transition-colors ${distanceUnit === 'km' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-border'}`}
+                className={`flex-1 py-2 min-h-[44px] rounded-md text-sm font-medium border transition-colors ${distanceUnit === 'km' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' : 'border-border'}`}
               >
                 KM
               </button>
