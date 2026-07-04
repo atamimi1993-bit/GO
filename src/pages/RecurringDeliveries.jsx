@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Repeat, Loader2, Trash2, Plus, Calendar, Clock, Thermometer, PenLine } from 'lucide-react';
+import MobileSelect from '@/components/go/MobileSelect';
 
 const CATEGORIES = ['hospital','bank','office','pharmacy','lab_medical','legal_documents','retail','restaurant','other'];
 const FREQUENCIES = [
@@ -100,23 +101,32 @@ export default function RecurringDeliveries() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label className="mb-1 block">Frequency</Label>
-              <select className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm" value={form.frequency} onChange={e => setForm({...form, frequency: e.target.value})}>
-                {FREQUENCIES.map(f => <option key={f.key} value={f.key}>{f.label}</option>)}
-              </select>
+              <MobileSelect
+                value={form.frequency}
+                onValueChange={(v) => setForm({ ...form, frequency: v })}
+                options={FREQUENCIES.map(f => ({ value: f.key, label: f.label }))}
+                placeholder="Select frequency"
+              />
             </div>
             {form.frequency === 'weekly' || form.frequency === 'biweekly' ? (
               <div>
                 <Label className="mb-1 block">Day of Week</Label>
-                <select className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm" value={form.day_of_week} onChange={e => setForm({...form, day_of_week: Number(e.target.value)})}>
-                  {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
-                </select>
+                <MobileSelect
+                  value={String(form.day_of_week)}
+                  onValueChange={(v) => setForm({ ...form, day_of_week: Number(v) })}
+                  options={DAYS.map((d, i) => ({ value: String(i), label: d }))}
+                  placeholder="Select day"
+                />
               </div>
             ) : (
               <div>
                 <Label className="mb-1 block">Time Slot</Label>
-                <select className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm" value={form.time_slot} onChange={e => setForm({...form, time_slot: e.target.value})}>
-                  {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
+                <MobileSelect
+                  value={form.time_slot}
+                  onValueChange={(v) => setForm({ ...form, time_slot: v })}
+                  options={TIME_SLOTS.map(t => ({ value: t, label: t }))}
+                  placeholder="Select time slot"
+                />
               </div>
             )}
           </div>
@@ -131,16 +141,22 @@ export default function RecurringDeliveries() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label className="mb-1 block">Category</Label>
-              <select className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm" value={form.delivery_category} onChange={e => setForm({...form, delivery_category: e.target.value})}>
-                {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}
-              </select>
+              <MobileSelect
+                value={form.delivery_category}
+                onValueChange={(v) => setForm({ ...form, delivery_category: v })}
+                options={CATEGORIES.map(c => ({ value: c, label: c.replace(/_/g, ' ') }))}
+                placeholder="Select category"
+              />
             </div>
             {form.frequency !== 'weekly' && form.frequency !== 'biweekly' && (
               <div>
                 <Label className="mb-1 block">Time Slot</Label>
-                <select className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm" value={form.time_slot} onChange={e => setForm({...form, time_slot: e.target.value})}>
-                  {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
+                <MobileSelect
+                  value={form.time_slot}
+                  onValueChange={(v) => setForm({ ...form, time_slot: v })}
+                  options={TIME_SLOTS.map(t => ({ value: t, label: t }))}
+                  placeholder="Select time slot"
+                />
               </div>
             )}
           </div>

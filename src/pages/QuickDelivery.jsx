@@ -11,6 +11,7 @@ import { calculateCourierPrice, formatCurrency } from '@/lib/pricing';
 import SavedAddressPicker from '@/components/go/SavedAddressPicker';
 import MultiStopEditor from '@/components/go/MultiStopEditor';
 import TemperatureBadge, { SignatureBadge } from '@/components/go/TemperatureBadge';
+import MobileSelect from '@/components/go/MobileSelect';
 
 const CATEGORIES = [
   { key: 'hospital', label: 'Hospital', icon: Hospital, color: 'text-red-500', bg: 'bg-red-500/10', autoTemp: false, autoSig: true },
@@ -314,13 +315,12 @@ export default function QuickDelivery() {
         </div>
         <div>
           <Label className="mb-1.5 block">Time</Label>
-          <select
-            className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm min-h-[44px]"
+          <MobileSelect
             value={form.delivery_time}
-            onChange={(e) => setForm({ ...form, delivery_time: e.target.value })}
-          >
-            {TIME_SLOTS.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
+            onValueChange={(v) => setForm({ ...form, delivery_time: v })}
+            options={TIME_SLOTS.map((t) => ({ value: t, label: t }))}
+            placeholder="Select time"
+          />
         </div>
       </div>
 

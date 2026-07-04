@@ -79,14 +79,17 @@ export default function LeadVehicleMatcher({ lead, onAssigned }) {
       </Button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50" onClick={() => setOpen(false)} role="presentation">
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="lead-vehicle-matcher-title"
             className="bg-card w-full sm:max-w-lg max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 bg-card border-b px-5 py-4 flex items-center justify-between z-10">
               <div className="min-w-0">
-                <h3 className="font-display font-bold text-sm truncate">Match Vehicle & Driver</h3>
+                <h3 id="lead-vehicle-matcher-title" className="font-display font-bold text-sm truncate">Match Vehicle & Driver</h3>
                 <p className="text-xs text-muted-foreground truncate">{lead.lead_name} · {lead.location}</p>
               </div>
               <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg hover:bg-muted shrink-0" aria-label="Close">

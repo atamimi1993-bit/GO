@@ -35,16 +35,19 @@ export default function DriverHub() {
     try {
       const profiles = await base44.entities.DriverProfile.filter({ email: user.email });
       if (profiles.length > 0) {
-        setProfile(profiles[0]);
-        const contracts = await base44.entities.Contract.filter({
-          driver_profile_id: profiles[0].id,
-          contract_type: 'driver_service',
-        }).catch(() => []);
+        const p = profiles[0];
+        setProfile(p);
+        const [contracts, jobs] = await Promise.all([
+          base44.entities.Contract.filter({
+            driver_profile_id: p.id,
+            contract_type: 'driver_service',
+          }).catch(() => []),
+          base44.entities.MoveRequest.filter({
+            assigned_driver_id: p.id,
+            status: { $in: ['accepted', 'in_progress'] },
+          }, '-created_date', 10).catch(() => []),
+        ]);
         setContract(contracts?.[0] || null);
-        const jobs = await base44.entities.MoveRequest.filter({
-          assigned_driver_id: profiles[0].id,
-          status: { $in: ['accepted', 'in_progress'] },
-        }, '-created_date', 10).catch(() => []);
         setActiveJobs(jobs);
       }
     } catch {}

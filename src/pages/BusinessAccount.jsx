@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Building2, Loader2, Check, FileText } from 'lucide-react';
+import MobileSelect from '@/components/go/MobileSelect';
 
 const INDUSTRIES = [
   { key: 'hospital', label: 'Hospital / Medical' },
@@ -101,9 +102,12 @@ export default function BusinessAccount() {
           </div>
           <div>
             <Label className="mb-1 block">Industry</Label>
-            <select className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm" value={form.industry} onChange={e => setForm({...form, industry: e.target.value})}>
-              {INDUSTRIES.map(i => <option key={i.key} value={i.key}>{i.label}</option>)}
-            </select>
+            <MobileSelect
+              value={form.industry}
+              onValueChange={(v) => setForm({ ...form, industry: v })}
+              options={INDUSTRIES.map(i => ({ value: i.key, label: i.label }))}
+              placeholder="Select industry"
+            />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">

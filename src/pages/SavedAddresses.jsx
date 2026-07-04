@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Plus, Trash2, MapPin, Loader2 } from 'lucide-react';
+import MobileSelect from '@/components/go/MobileSelect';
 
 const CATEGORIES = ['hospital','bank','office','pharmacy','lab_medical','legal_documents','retail','restaurant','other'];
 
@@ -85,9 +86,12 @@ export default function SavedAddresses() {
           </div>
           <div>
             <Label className="mb-1 block">Category</Label>
-            <select className="w-full h-11 rounded-md border border-input bg-transparent px-3 text-sm" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-              {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}
-            </select>
+            <MobileSelect
+              value={form.category}
+              onValueChange={(v) => setForm({ ...form, category: v })}
+              options={CATEGORIES.map(c => ({ value: c, label: c.replace(/_/g, ' ') }))}
+              placeholder="Select category"
+            />
           </div>
           <div className="flex gap-2">
             <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 min-h-[44px]" disabled={saving || !form.label || !form.address} onClick={handleSave}>
