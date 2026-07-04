@@ -37,6 +37,7 @@ const Revenue = lazy(() => import('@/pages/Revenue'));
 const Leaderboard = lazy(() => import('@/pages/Leaderboard'));
 const DriverDashboard = lazy(() => import('@/pages/DriverDashboard'));
 const Terms = lazy(() => import('@/pages/Terms'));
+const FinancialDashboard = lazy(() => import('@/pages/FinancialDashboard'));
 
 const PageTransition = ({ children }) => {
   const navType = useNavigationType();
@@ -110,6 +111,7 @@ const AuthenticatedApp = () => {
           <Route path="/driver-dashboard" element={<PageTransition><DriverDashboard /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+          <Route path="/financials" element={<PageTransition><FinancialDashboard /></PageTransition>} />
         </Route>
       </Route>
 

@@ -130,6 +130,56 @@ Deno.serve(async (req) => {
       return Response.json({ drivers: driverStats, totals });
     }
 
+    // Financial dashboard — monthly time series of platform earnings, app fee income, and driver payouts
+    if (action === 'financials') {
+      const [allMoves, allPayouts] = await Promise.all([
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverPayout.list('-created_date', 500),
+      ]);
+
+      const completedMoves = allMoves.filter((m) => m.status === 'completed' && (m.total_price || 0) > 0);
+      const validPayouts = allPayouts.filter((p) => (p.amount || 0) > 0);
+
+      const monthKey = (iso) => {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+      };
+
+      const months = {};
+
+      const ensureMonth = (key) => {
+        if (!key) return;
+        if (!months[key]) {
+          months[key] = { month: key, platform_earnings: 0, app_fee_income: 0, driver_payouts: 0 };
+        }
+      };
+
+      for (const m of completedMoves) {
+        const key = monthKey(m.move_date || m.created_date);
+        if (!key) continue;
+        ensureMonth(key);
+        months[key].platform_earnings += m.total_price || 0;
+        months[key].app_fee_income += m.app_fee || (m.total_price || 0) * 0.25;
+      }
+
+      for (const p of validPayouts) {
+        const key = monthKey(p.created_date);
+        if (!key) continue;
+        ensureMonth(key);
+        months[key].driver_payouts += p.amount || 0;
+      }
+
+      const series = Object.values(months).sort((a, b) => a.month.localeCompare(b.month));
+      const totals = {
+        platformEarnings: series.reduce((s, r) => s + r.platform_earnings, 0),
+        appFeeIncome: series.reduce((s, r) => s + r.app_fee_income, 0),
+        driverPayouts: series.reduce((s, r) => s + r.driver_payouts, 0),
+      };
+      return Response.json({ series, totals });
+    }
+
     // Overview — aggregate everything
     const [moves, drivers, payouts, trucks, users, leads] = await Promise.all([
       base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
