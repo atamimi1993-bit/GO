@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { MapContainer, TileLayer, CircleMarker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Navigation, MapPin, PackageCheck, Truck, CheckCircle2, Loader2 } from 'lucide-react';
+import { Navigation, MapPin, PackageCheck, Truck, CheckCircle2, Loader2, Flag } from 'lucide-react';
 import { format } from 'date-fns';
+
+function FitBounds({ positions }) {
+  const map = useMap();
+  useEffect(() => {
+    if (positions.length > 1) {
+      map.fitBounds(positions, { padding: [40, 40] });
+    }
+  }, [positions, map]);
+  return null;
+}
 
 const MILESTONES = [
   { key: 'en_route_to_pickup', label: 'En route to pickup', icon: Navigation },
@@ -40,8 +50,12 @@ export default function MoveTracker({ moveId }) {
   }
 
   const latestPing = pings[0];
-  const path = pings.filter((p) => p.lat && p.lng).reverse().map((p) => [p.lat, p.lng]);
+  const validPings = pings.filter((p) => p.lat && p.lng);
+  const path = validPings.slice().reverse().map((p) => [p.lat, p.lng]);
+  const startPing = path[0];
+  const endPing = path[path.length - 1];
   const reachedMilestones = new Set(pings.map((p) => p.milestone));
+  const isDelivered = reachedMilestones.has('delivered');
 
   return (
     <div className="bg-card border rounded-2xl overflow-hidden">
@@ -61,8 +75,8 @@ export default function MoveTracker({ moveId }) {
             zoom={13}
             className="h-full w-full"
             scrollWheelZoom={false}
-            dragging={false}
-            touchZoom={false}
+            dragging={true}
+            touchZoom={true}
             doubleClickZoom={false}
             aria-hidden={true}
           >
@@ -70,16 +84,32 @@ export default function MoveTracker({ moveId }) {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; OpenStreetMap"
             />
+            <FitBounds positions={path} />
             {path.length > 1 && (
               <Polyline positions={path} pathOptions={{ color: '#10b981', weight: 3 }} />
             )}
-            <CircleMarker
-              center={[latestPing.lat, latestPing.lng]}
-              radius={10}
-              pathOptions={{ color: '#10b981', fillColor: '#10b981', fillOpacity: 0.8 }}
-            >
-              <Popup>Driver's current location</Popup>
-            </CircleMarker>
+            {startPing && (
+              <CircleMarker
+                center={startPing}
+                radius={8}
+                pathOptions={{ color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.8 }}
+              >
+                <Popup>Driver started here — after accepting the request</Popup>
+              </CircleMarker>
+            )}
+            {endPing && endPing !== startPing && (
+              <CircleMarker
+                center={endPing}
+                radius={isDelivered ? 10 : 8}
+                pathOptions={{
+                  color: isDelivered ? '#10b981' : '#f59e0b',
+                  fillColor: isDelivered ? '#10b981' : '#f59e0b',
+                  fillOpacity: 0.8,
+                }}
+              >
+                <Popup>{isDelivered ? 'Job completed — final location' : "Driver's current location"}</Popup>
+              </CircleMarker>
+            )}
           </MapContainer>
         </div>
         <div aria-live="polite" className="sr-only">
