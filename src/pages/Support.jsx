@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import MessageBubble from '@/components/go/MessageBubble';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Send, Plus, MessageSquare, Loader2, Bot, ChevronLeft } from 'lucide-react';
+import { ArrowLeft, Send, Plus, MessageSquare, Loader2, Bot } from 'lucide-react';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 const AGENT_NAME = 'go_support';
@@ -157,9 +157,10 @@ export default function Support() {
           ) : (
             <>
               <div className="sm:hidden flex items-center gap-2 px-3 py-2 border-b border-border">
-                <button onClick={handleBackToList} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground min-h-[44px]">
-                  <ChevronLeft size={18} /> Conversations
+                <button onClick={handleBackToList} aria-label="Back to conversations" className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <ArrowLeft size={20} />
                 </button>
+                <span className="text-sm font-medium">Conversations</span>
               </div>
               <div className="flex-1 overflow-y-auto px-4 py-4">
                 {messages.length === 0 ? (

@@ -331,6 +331,8 @@ export default function MoveDetail() {
               <button
                 type="button"
                 onClick={() => setUsePaymentPlan(!usePaymentPlan)}
+                aria-label="Toggle payment plan: pay in 3 installments"
+                aria-pressed={usePaymentPlan}
                 className={`w-full mt-2 flex items-center gap-3 rounded-xl border p-3 text-left transition-colors ${usePaymentPlan ? 'border-blue-500 bg-blue-500/5' : 'border-border hover:bg-muted'}`}
               >
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${usePaymentPlan ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-muted text-muted-foreground'}`}>

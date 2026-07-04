@@ -120,6 +120,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
           onClick={handleSearch}
           disabled={searching}
           aria-label="Find leads"
+          aria-busy={searching}
         >
           {searching && !worldwideMode ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
           {searching && !worldwideMode ? 'Searching...' : 'Find Leads'}
@@ -154,6 +155,7 @@ export default function LeadFinder({ onLeadsGenerated }) {
           className="mt-3 text-xs text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
           onClick={handleWorldwide}
           disabled={searching}
+          aria-label="Search leads worldwide across all countries"
         >
           <Globe size={12} /> Search worldwide ({COUNTRIES.length} countries)
         </button>
