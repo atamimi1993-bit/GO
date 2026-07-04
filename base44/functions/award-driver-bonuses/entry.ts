@@ -11,6 +11,20 @@ const VEHICLE_BONUSES = {
 };
 const DEFAULT_BONUS = { sign_on: 250, referral: 250 };
 
+// Truck-size payout multipliers — incentivizes diverse fleet growth.
+// Drivers with bigger trucks earn a multiplier on top of their base bonus.
+const TRUCK_SIZE_MULTIPLIERS = {
+  small:        { tier: 'Light-duty',       multiplier: 1.0 },
+  medium:       { tier: 'Medium-duty',      multiplier: 1.5 },
+  large:        { tier: 'Heavy-duty',       multiplier: 2.0 },
+  extra_large:  { tier: 'Extra Heavy-duty', multiplier: 2.5 },
+};
+const DEFAULT_TRUCK_MULTIPLIER = { tier: 'Light-duty', multiplier: 1.0 };
+
+function applyMultiplier(amount, multiplier) {
+  return Math.round(amount * multiplier);
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -64,8 +78,30 @@ Deno.serve(async (req) => {
     // Determine bonus amounts based on the driver's vehicle category
     const vehicleCategory = driver.vehicle_category || 'truck';
     const bonusTier = VEHICLE_BONUSES[vehicleCategory] || DEFAULT_BONUS;
-    const signOnBonus = bonusTier.sign_on;
-    const driverReferralBonus = bonusTier.referral;
+
+    // Look up the driver's truck to apply a size-based payout multiplier
+    let truckSizeCategory = null;
+    let truckTier = null;
+    let truckMultiplier = 1.0;
+    try {
+      const trucks = await base44.asServiceRole.entities.Truck.filter({ driver_profile_id: driverId });
+      if (trucks.length > 0) {
+        // Pick the truck with the largest capacity (or first if no capacity set)
+        const primaryTruck = trucks.sort((a, b) => (b.capacity_lbs || 0) - (a.capacity_lbs || 0))[0];
+        truckSizeCategory = primaryTruck.size_category;
+        const sizeConfig = TRUCK_SIZE_MULTIPLIERS[truckSizeCategory] || DEFAULT_TRUCK_MULTIPLIER;
+        truckTier = sizeConfig.tier;
+        truckMultiplier = sizeConfig.multiplier;
+      }
+    } catch (err) {
+      console.error('Failed to look up driver truck for multiplier:', err.message);
+    }
+
+    const signOnBonus = applyMultiplier(bonusTier.sign_on, truckMultiplier);
+    const driverReferralBonus = applyMultiplier(bonusTier.referral, truckMultiplier);
+    const truckInfo = truckSizeCategory
+      ? `${truckTier} (${truckSizeCategory.replace('_', ' ')}, ${truckMultiplier}x)`
+      : 'no truck on file (1.0x)';
 
     // --- Sign-on bonus ---
     if (driver.sign_on_bonus_eligible) {
@@ -82,10 +118,10 @@ Deno.serve(async (req) => {
             amount: signOnBonus,
             currency: move.currency || 'USD',
             status: 'pending',
-            notes: `Sign-on bonus (${vehicleCategory}) — first completed job`,
+            notes: `Sign-on bonus (${vehicleCategory}, ${truckInfo}) — first completed job`,
             deduction_reason: 'sign_on_bonus',
           });
-          payouts.push({ type: 'sign_on_bonus', amount: signOnBonus, vehicle_category: vehicleCategory, payout_id: payout.id });
+          payouts.push({ type: 'sign_on_bonus', amount: signOnBonus, vehicle_category: vehicleCategory, truck_tier: truckTier, truck_multiplier: truckMultiplier, payout_id: payout.id });
 
           await base44.asServiceRole.entities.DriverProfile.update(driverId, {
             sign_on_bonus_eligible: false,
@@ -123,10 +159,10 @@ Deno.serve(async (req) => {
               amount: driverReferralBonus,
               currency: move.currency || 'USD',
               status: 'pending',
-              notes: `Driver referral bonus (${vehicleCategory}) — referred ${driver.full_name}`,
+              notes: `Driver referral bonus (${vehicleCategory}, ${truckInfo}) — referred ${driver.full_name}`,
               deduction_reason: 'driver_referral_bonus',
             });
-            payouts.push({ type: 'driver_referral_bonus', amount: driverReferralBonus, vehicle_category: vehicleCategory, payout_id: refPayout.id, referrer: referrer.email });
+            payouts.push({ type: 'driver_referral_bonus', amount: driverReferralBonus, vehicle_category: vehicleCategory, truck_tier: truckTier, truck_multiplier: truckMultiplier, payout_id: refPayout.id, referrer: referrer.email });
 
             // Update referrer's earnings
             await base44.asServiceRole.entities.DriverProfile.update(referrer.id, {
@@ -164,7 +200,7 @@ Deno.serve(async (req) => {
                   `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;color:#1f2937;">`,
                   `<h2 style="color:#16a34a;">Driver Referral Bonus Earned!</h2>`,
                   `<p>A driver you referred — <strong>${driver.full_name}</strong> — just completed their first move with GO.</p>`,
-                  `<p>You've earned a <strong>$${driverReferralBonus} referral bonus</strong> (based on their ${vehicleCategory.replace('_', ' ')} vehicle), added to your pending payouts.</p>`,
+                  `<p>You've earned a <strong>$${driverReferralBonus} referral bonus</strong> (based on their ${vehicleCategory.replace('_', ' ')} vehicle${truckTier ? `, ${truckTier} tier (${truckMultiplier}x multiplier)` : ''}), added to your pending payouts.</p>`,
                   `<p style="color:#6b7280;margin-top:24px;">Keep sharing your code to earn more!</p>`,
                   `</div>`,
                 ].join('\n'),
