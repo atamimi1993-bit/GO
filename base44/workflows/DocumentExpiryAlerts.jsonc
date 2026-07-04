@@ -1,0 +1,45 @@
+{
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Weekly check for drivers with expiring or expired licenses \u2014 sends email reminders and suspends expired drivers.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "document_expiry_alerts",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "check_expiry": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "check-document-expiry",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Check document expiry",
+            "description": "Scan drivers for expiring licenses"
+          }
+        }
+      }
+    ]
+  },
+  "name": "Document Expiry Alerts"
+}

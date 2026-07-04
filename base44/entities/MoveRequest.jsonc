@@ -352,6 +352,14 @@
     "tip_session_id": {
       "type": "string"
     },
+    "insurance_selected": {
+      "type": "boolean",
+      "default": false
+    },
+    "insurance_fee": {
+      "type": "number",
+      "default": 0
+    },
     "business_account_id": {
       "type": "string"
     },

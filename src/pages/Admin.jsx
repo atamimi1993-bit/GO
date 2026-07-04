@@ -18,6 +18,7 @@ const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'))
 const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
 const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApprovalPanel'));
 const InstantPayoutCard = lazy(() => import('@/components/admin/InstantPayoutCard'));
+const TaxReportPanel = lazy(() => import('@/components/admin/TaxReportPanel'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 import { Button } from '@/components/ui/button';
@@ -338,6 +339,11 @@ export default function Admin() {
             </div>
           </div>
         </div>
+
+        {/* 1099 Tax Report */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <TaxReportPanel />
+        </Suspense>
 
         {/* Recent users */}
         <div className="bg-card border rounded-2xl p-5 mt-6">

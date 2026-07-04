@@ -61,7 +61,9 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { move_request_id, promo_code, validate_only, payment_plan, pay_balance, pay_installment, payment_option, credit_tier, installment_term_months } = body;
+    const { move_request_id, promo_code, validate_only, payment_plan, pay_balance, pay_installment, payment_option, credit_tier, installment_term_months, add_insurance } = body;
+
+    const INSURANCE_FEE = 25; // Flat fee for move damage protection (covers up to $5,000)
 
     if (!move_request_id) {
       return Response.json({ error: 'move_request_id is required' }, { status: 400 });
@@ -198,17 +200,30 @@ Deno.serve(async (req) => {
         afterpay_clearpay: { limit: 400000 },
         klarna: { preferred_locale: 'en-US' },
       },
-      line_items: [{
-        price_data: {
-          currency: currencyCode.toLowerCase(),
-          product_data: {
-            name: productLabel,
-            description: 'Move from ' + move.pickup_address + ' to ' + move.dropoff_address,
+      line_items: [
+        {
+          price_data: {
+            currency: currencyCode.toLowerCase(),
+            product_data: {
+              name: productLabel,
+              description: 'Move from ' + move.pickup_address + ' to ' + move.dropoff_address,
+            },
+            unit_amount: unitAmount,
           },
-          unit_amount: unitAmount,
+          quantity: 1,
         },
-        quantity: 1,
-      }],
+        ...(add_insurance ? [{
+          price_data: {
+            currency: currencyCode.toLowerCase(),
+            product_data: {
+              name: 'GO Move Insurance — Damage Protection',
+              description: 'Covers up to $5,000 in damage to your belongings during the move',
+            },
+            unit_amount: isZeroDecimal ? INSURANCE_FEE : INSURANCE_FEE * 100,
+          },
+          quantity: 1,
+        }] : []),
+      ],
       mode: 'payment',
       success_url: origin + '/move/' + move.id + '?payment=success',
       cancel_url: origin + '/move/' + move.id + '?payment=cancelled',
@@ -251,6 +266,11 @@ Deno.serve(async (req) => {
     const updateData = {
       stripe_session_id: session.id,
     };
+
+    if (add_insurance) {
+      updateData.insurance_selected = true;
+      updateData.insurance_fee = INSURANCE_FEE;
+    }
 
     // Store payment plan details based on payment type
     if (paymentType === 'full') {

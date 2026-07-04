@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Loader2, Wallet, Zap, CalendarClock, TrendingUp, Info } from 'lucide-react';
+import { CreditCard, Loader2, Wallet, Zap, CalendarClock, TrendingUp, Info, Shield } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { calculateInstallmentPlan, getInstallmentAPR, CREDIT_TIERS, INSTALLMENT_TERM_OPTIONS, formatCurrency, getCurrency } from '@/lib/pricing';
 import { useToast } from '@/components/ui/use-toast';
@@ -14,6 +14,7 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
   const [creditTier, setCreditTier] = useState(move.credit_tier || 'good');
   const [termMonths, setTermMonths] = useState(move.installment_term_months || 12);
   const [paying, setPaying] = useState(false);
+  const [addInsurance, setAddInsurance] = useState(false);
   const [promoData, setPromoData] = useState(null);
   const { toast } = useToast();
 
@@ -39,6 +40,7 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
         move_request_id: move.id,
         promo_code: promoData?.promo?.code || undefined,
         payment_option: selectedOption,
+        add_insurance: addInsurance,
       };
       if (selectedOption === 'installment_plan') {
         payload.credit_tier = creditTier;
@@ -211,6 +213,22 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
         </div>
       )}
 
+      {/* Insurance upsell */}
+      <div className={`border-2 rounded-2xl p-4 transition-all ${addInsurance ? 'border-emerald-500 bg-emerald-500/5' : 'border-border'}`}>
+        <button type="button" onClick={() => setAddInsurance(!addInsurance)} className="w-full text-left">
+          <div className="flex items-center gap-3">
+            <div className={`rounded-xl p-2 shrink-0 ${addInsurance ? 'bg-emerald-500 text-white' : 'bg-muted'}`}>
+              <Shield size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm">Damage Protection Insurance</p>
+              <p className="text-xs text-muted-foreground">Covers up to $5,000 if your belongings are damaged or lost during the move</p>
+            </div>
+            <span className="font-display font-bold text-emerald-600 dark:text-emerald-400 text-sm shrink-0">+$25</span>
+          </div>
+        </button>
+      </div>
+
       {/* Summary + pay button */}
       <div className="bg-card border rounded-2xl p-4 space-y-2">
         {selectedOption === 'full' && (
@@ -235,6 +253,12 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
           <div className="flex justify-between font-bold">
             <span>First Installment Due Now</span>
             <span className="text-blue-600 dark:text-blue-400">{fmt(installmentPlan.monthlyPayment)}</span>
+          </div>
+        )}
+        {addInsurance && (
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span className="flex items-center gap-1"><Shield size={12} /> Damage Protection</span>
+            <span>+$25</span>
           </div>
         )}
       </div>
