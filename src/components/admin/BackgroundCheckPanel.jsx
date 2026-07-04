@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ShieldCheck, ShieldAlert, Clock, FileSearch, UserCheck } from 'lucide-react';
+import { Loader2, ShieldCheck, ShieldAlert, Clock, FileSearch, Eye, Scan, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import SectionSkeleton from '@/components/admin/SectionSkeleton';
 
 export default function BackgroundCheckPanel({ drivers }) {
   const [processing, setProcessing] = useState(null);
   const [localDrivers, setLocalDrivers] = useState(drivers || []);
   const [filter, setFilter] = useState('all');
+  const [reportDriver, setReportDriver] = useState(null);
   const { toast } = useToast();
 
   useEffect(() => { setLocalDrivers(drivers || []); }, [drivers]);
@@ -18,10 +18,16 @@ export default function BackgroundCheckPanel({ drivers }) {
     setProcessing(driverId);
     try {
       const res = await base44.functions.invoke('initiate-background-check', { driver_id: driverId });
-      setLocalDrivers(prev => prev.map(d => d.id === driverId ? { ...d, background_check_status: 'pending', background_check_date: new Date().toISOString() } : d));
-      toast({ title: 'Background check initiated', description: res.data.message || 'Driver has been notified.' });
+      const updated = res.data;
+      setLocalDrivers(prev => prev.map(d => d.id === driverId ? {
+        ...d,
+        background_check_status: 'pending',
+        background_check_date: new Date().toISOString(),
+        background_check_report: updated?.report || d.background_check_report,
+      } : d));
+      toast({ title: 'Screening complete', description: 'AI screening report has been generated. Review the results below.' });
     } catch (err) {
-      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+      toast({ title: 'Screening failed', description: err.message, variant: 'destructive' });
     }
     setProcessing(null);
   };
@@ -60,81 +66,128 @@ export default function BackgroundCheckPanel({ drivers }) {
     failed: localDrivers.filter(d => d.background_check_status === 'failed').length,
   };
 
+  const selectedDriver = reportDriver ? localDrivers.find(d => d.id === reportDriver) : null;
+
   return (
-    <div className="bg-card border rounded-2xl p-5 mb-6">
-      <div className="flex items-center gap-2 mb-4">
-        <ShieldCheck size={20} className="text-blue-600" />
-        <h2 className="font-display font-bold text-lg">Background Checks</h2>
-      </div>
+    <>
+      <div className="bg-card border rounded-2xl p-5 mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <ShieldCheck size={20} className="text-blue-600" />
+          <h2 className="font-display font-bold text-lg">Background Screening</h2>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">
+          Free AI-powered screening using public records search and document verification. Not a certified background check — review results before making decisions.
+        </p>
 
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-        {[
-          { key: 'all', label: 'All' },
-          { key: 'needs_action', label: 'Needs Action' },
-          { key: 'not_started', label: `Not Started (${counts.not_started})` },
-          { key: 'pending', label: `Pending (${counts.pending})` },
-          { key: 'clear', label: `Cleared (${counts.clear})` },
-          { key: 'consider', label: `Review (${counts.consider})` },
-        ].map(f => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-              filter === f.key ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'needs_action', label: 'Needs Action' },
+            { key: 'not_started', label: `Not Started (${counts.not_started})` },
+            { key: 'pending', label: `Pending (${counts.pending})` },
+            { key: 'clear', label: `Cleared (${counts.clear})` },
+            { key: 'consider', label: `Review (${counts.consider})` },
+          ].map(f => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                filter === f.key ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
 
-      {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-6">No drivers in this category.</p>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map(d => {
-            const s = d.background_check_status || 'not_started';
-            const cfg = statusConfig[s];
-            const Icon = cfg.icon;
-            return (
-              <div key={d.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-muted/30 border">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium truncate">{d.full_name}</p>
-                    <Badge className={`${cfg.bg} ${cfg.color} border-transparent`}>
-                      <Icon size={10} className="mr-1" />{cfg.label}
-                    </Badge>
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">No drivers in this category.</p>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map(d => {
+              const s = d.background_check_status || 'not_started';
+              const cfg = statusConfig[s];
+              const Icon = cfg.icon;
+              const hasReport = !!d.background_check_report;
+              return (
+                <div key={d.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-muted/30 border">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-medium truncate">{d.full_name}</p>
+                      <Badge className={`${cfg.bg} ${cfg.color} border-transparent`}>
+                        <Icon size={10} className="mr-1" />{cfg.label}
+                      </Badge>
+                      {hasReport && (
+                        <button
+                          onClick={() => setReportDriver(d.id)}
+                          className="flex items-center gap-1 text-xs text-primary hover:underline"
+                        >
+                          <Eye size={12} /> Report
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">{d.email}</p>
+                    {d.background_check_date && (
+                      <p className="text-xs text-muted-foreground">Checked: {new Date(d.background_check_date).toLocaleDateString()}</p>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground truncate">{d.email}</p>
-                  {d.background_check_date && (
-                    <p className="text-xs text-muted-foreground">Checked: {new Date(d.background_check_date).toLocaleDateString()}</p>
-                  )}
+                  <div className="flex gap-1.5 shrink-0">
+                    {s !== 'clear' && (
+                      <Button size="sm" onClick={() => initiate(d.id)} disabled={processing === d.id} className="min-h-[36px]">
+                        {processing === d.id ? <Loader2 size={14} className="animate-spin" /> : <Scan size={14} />}
+                        {hasReport ? 'Re-run' : 'Run Screening'}
+                      </Button>
+                    )}
+                    {s !== 'clear' && s !== 'not_started' && (
+                      <Button size="sm" onClick={() => setManualStatus(d.id, 'clear')} disabled={processing === d.id} className="bg-emerald-500 hover:bg-emerald-600 min-h-[36px]">
+                        {processing === d.id ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
+                        Mark Clear
+                      </Button>
+                    )}
+                    {s !== 'failed' && s !== 'not_started' && (
+                      <Button size="sm" variant="outline" onClick={() => setManualStatus(d.id, 'failed')} disabled={processing === d.id} className="min-h-[36px]">
+                        <ShieldAlert size={14} />
+                        Fail
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-1.5 shrink-0">
-                  {s === 'not_started' && (
-                    <Button size="sm" onClick={() => initiate(d.id)} disabled={processing === d.id} className="min-h-[36px]">
-                      {processing === d.id ? <Loader2 size={14} className="animate-spin" /> : <FileSearch size={14} />}
-                      Initiate
-                    </Button>
-                  )}
-                  {s !== 'clear' && s !== 'not_started' && (
-                    <Button size="sm" onClick={() => setManualStatus(d.id, 'clear')} disabled={processing === d.id} className="bg-emerald-500 hover:bg-emerald-600 min-h-[36px]">
-                      {processing === d.id ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
-                      Mark Clear
-                    </Button>
-                  )}
-                  {s !== 'failed' && s !== 'not_started' && (
-                    <Button size="sm" variant="outline" onClick={() => setManualStatus(d.id, 'failed')} disabled={processing === d.id} className="min-h-[36px]">
-                      <ShieldAlert size={14} />
-                      Fail
-                    </Button>
-                  )}
-                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Report Viewer Modal */}
+      {selectedDriver && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setReportDriver(null)}>
+          <div className="bg-card border rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b">
+              <div>
+                <h3 className="font-display font-bold text-sm">Screening Report</h3>
+                <p className="text-xs text-muted-foreground">{selectedDriver.full_name}</p>
               </div>
-            );
-          })}
+              <Button variant="ghost" size="sm" onClick={() => setReportDriver(null)}>Close</Button>
+            </div>
+            <div className="overflow-y-auto p-4">
+              <pre className="text-xs font-mono whitespace-pre-wrap">
+                {selectedDriver.background_check_report || 'No report available.'}
+              </pre>
+            </div>
+            <div className="flex gap-2 p-4 border-t">
+              <Button size="sm" onClick={() => { setManualStatus(selectedDriver.id, 'clear'); setReportDriver(null); }} className="bg-emerald-500 hover:bg-emerald-600 flex-1">
+                <ShieldCheck size={14} className="mr-1" /> Mark Clear
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => { setManualStatus(selectedDriver.id, 'consider'); setReportDriver(null); }} className="flex-1">
+                <AlertTriangle size={14} className="mr-1" /> Needs Review
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => { setManualStatus(selectedDriver.id, 'failed'); setReportDriver(null); }} className="flex-1">
+                <ShieldAlert size={14} className="mr-1" /> Fail
+              </Button>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

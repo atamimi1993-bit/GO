@@ -143,6 +143,9 @@
     },
     "background_check_report_url": {
       "type": "string"
+    },
+    "background_check_report": {
+      "type": "string"
     }
   },
   "required": [
