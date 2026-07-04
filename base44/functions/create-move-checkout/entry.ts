@@ -211,11 +211,13 @@ Deno.serve(async (req) => {
       updateData.discount_amount = discountAmount;
       updateData.discounted_total = discountedTotal;
 
-      // Increment promo code usage count
+      // Atomically increment promo code usage count — prevents race condition
+      // where two concurrent checkouts could exceed max_uses
       try {
-        await base44.asServiceRole.entities.PromoCode.update(appliedPromoCode.promo_id, {
-          uses_count: (appliedPromoCode.uses_count || 0) + 1,
-        });
+        await base44.asServiceRole.entities.PromoCode.updateMany(
+          { id: appliedPromoCode.promo_id, active: true },
+          { $inc: { uses_count: 1 } }
+        );
       } catch (e) {
         console.error('Failed to increment promo uses:', e.message);
       }
