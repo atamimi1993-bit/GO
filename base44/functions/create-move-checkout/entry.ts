@@ -133,6 +133,18 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'This promo code has reached its usage limit' }, { status: 400 });
       }
 
+      // First-time customer check — if promo is first-time-only, reject if customer
+      // has any previously paid moves
+      if (promo.first_time_customers_only) {
+        const previousMoves = await base44.asServiceRole.entities.MoveRequest.filter({
+          customer_email: move.customer_email,
+          paid: true,
+        });
+        if (previousMoves.length > 0) {
+          return Response.json({ error: 'This promo code is for first-time customers only' }, { status: 400 });
+        }
+      }
+
       discountAmount = (move.total_price * promo.discount_percent) / 100;
       discountedTotal = Math.max(0, move.total_price - discountAmount);
       appliedPromoCode = {

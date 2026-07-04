@@ -27,6 +27,10 @@
     },
     "description": {
       "type": "string"
+    },
+    "first_time_customers_only": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
