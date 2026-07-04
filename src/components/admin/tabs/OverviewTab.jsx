@@ -22,6 +22,7 @@ const STATUS_COLORS = {
 const RecordExportButton = lazy(() => import('@/components/admin/RecordExportButton'));
 const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'));
 const AcquisitionBlastButton = lazy(() => import('@/components/admin/AcquisitionBlastButton'));
+const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
 
 export default function OverviewTab({ data, processingId, onDriverAction }) {
   const { stats, movesByStatus, recentMoves, pendingDrivers, recentPayouts, recentUsers } = data;
@@ -54,6 +55,11 @@ export default function OverviewTab({ data, processingId, onDriverAction }) {
       {/* Record export */}
       <Suspense fallback={<SectionSkeleton />}>
         <RecordExportButton />
+      </Suspense>
+
+      {/* Global Operations Map — sales, jobs & drivers */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <AdminWorldMap />
       </Suspense>
 
       {/* Pending driver approvals — surfaced at top of overview for visibility */}
