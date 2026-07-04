@@ -43,6 +43,13 @@ Deno.serve(async (req) => {
     }
 
     if (response === 'accept') {
+      // Gate: driver must have Stripe Connect payouts enabled to accept jobs
+      if (!driver.stripe_payouts_enabled) {
+        return Response.json({
+          error: 'You must connect your bank account via Stripe before accepting jobs. Set up payouts in the Driver Hub.',
+        }, { status: 403 });
+      }
+
       // Accept the dispatch
       await base44.asServiceRole.entities.MoveRequest.update(move_request_id, {
         driver_rate_confirmed: true,

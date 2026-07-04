@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle2, XCircle, MapPin, Package, DollarSign, Clock, Truck, Zap } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, MapPin, Package, DollarSign, Clock, Truck, Zap, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { formatCurrency } from '@/lib/pricing';
 
@@ -174,10 +174,17 @@ export default function DispatchJobOffer({ driverProfile, onResponded }) {
           )}
 
           {/* Action buttons */}
+          {driverProfile && !driverProfile.stripe_payouts_enabled && (
+            <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-2.5 text-xs text-amber-700 dark:text-amber-400 flex items-start gap-2">
+              <AlertCircle size={14} className="shrink-0 mt-0.5" />
+              <span>Connect your bank in the Driver Hub to accept jobs and receive payouts.</span>
+            </div>
+          )}
+
           <div className="flex gap-2 pt-1">
             <Button
               className="flex-1 bg-emerald-500 hover:bg-emerald-600 min-h-[44px]"
-              disabled={responding || isExpired}
+              disabled={responding || isExpired || (driverProfile ? !driverProfile.stripe_payouts_enabled : false)}
               onClick={() => handleRespond('accept')}
             >
               {responding ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} className="mr-1" />}

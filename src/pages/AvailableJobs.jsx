@@ -38,6 +38,10 @@ export default function AvailableJobs() {
 
   const handleAccept = async (job) => {
     if (!driverProfile) return;
+    if (!driverProfile.stripe_payouts_enabled) {
+      toast({ title: 'Bank account required', description: 'Connect your bank via Stripe in the Driver Hub to accept jobs and get paid.', variant: 'destructive' });
+      return;
+    }
     setAccepting(job.id);
 
     // Check driver availability for the job date
@@ -163,6 +167,19 @@ export default function AvailableJobs() {
       <PageHeader title="Available Jobs" isRoot={false} />
       <p className="text-muted-foreground text-sm mb-6">Accept a move to get started.</p>
 
+      {!driverProfile.stripe_payouts_enabled && (
+        <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 mb-6 flex items-start gap-3">
+          <AlertCircle className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" size={18} />
+          <div className="flex-1">
+            <p className="font-medium text-sm text-amber-700 dark:text-amber-400">Connect your bank to get paid</p>
+            <p className="text-xs text-muted-foreground mt-0.5">You need to set up Stripe payouts before you can accept jobs. Your earnings are sent automatically to your bank after each completed move.</p>
+            <Button size="sm" className="mt-2 bg-amber-500 hover:bg-amber-600 min-h-[36px]" onClick={() => navigate('/driver-hub')}>
+              Set Up Payouts
+            </Button>
+          </div>
+        </div>
+      )}
+
       {acceptedJob && (
         <div className="mb-6">
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-4 flex items-center gap-3">
@@ -220,7 +237,7 @@ export default function AvailableJobs() {
                     size="sm"
                     className="bg-emerald-500 hover:bg-emerald-600"
                     onClick={() => handleAccept(job)}
-                    disabled={accepting === job.id || declining === job.id}
+                    disabled={accepting === job.id || declining === job.id || !driverProfile.stripe_payouts_enabled}
                   >
                     {accepting === job.id ? <Loader2 size={14} className="animate-spin" /> : 'Accept Job'}
                   </Button>
