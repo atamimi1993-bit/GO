@@ -81,6 +81,32 @@ export default function NewMove() {
     const params = new URLSearchParams(window.location.search);
     const refCode = params.get('ref');
     if (refCode) setForm(f => ({ ...f, referral_code: refCode.toUpperCase() }));
+    const rebookId = params.get('rebook');
+    if (rebookId) {
+      base44.entities.MoveRequest.get(rebookId).then((m) => {
+        setForm(f => ({
+          ...f,
+          pickup_address: m.pickup_address || '',
+          dropoff_address: m.dropoff_address || '',
+          pickup_state: m.pickup_state || '',
+          job_type: m.job_type || 'residential',
+          move_time: m.move_time || '',
+          notes: m.notes || '',
+          needs_storage: m.needs_storage || false,
+          storage_days: m.storage_days || 0,
+          pickup_steps: m.pickup_steps || 0,
+          dropoff_steps: m.dropoff_steps || 0,
+          pickup_distance_from_street: m.pickup_distance_from_street || 0,
+          dropoff_distance_from_street: m.dropoff_distance_from_street || 0,
+          materials_fee: m.materials_fee || 0,
+          extra_helper: m.extra_helper || false,
+          elevator_service: m.elevator_service || false,
+        }));
+        if (m.multi_stop_addresses) {
+          try { setIntermediateStops(JSON.parse(m.multi_stop_addresses)); } catch {}
+        }
+      }).catch(() => {});
+    }
   }, []);
 
   const handleAddItem = (item) => setItems(prev => [...prev, item]);

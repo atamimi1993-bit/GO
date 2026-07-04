@@ -11,6 +11,7 @@ import { Gift } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const HomeStats = lazy(() => import('@/components/go/HomeStats'));
+const CustomerQuickActions = lazy(() => import('@/components/go/CustomerQuickActions'));
 const Testimonials = lazy(() => import('@/components/go/Testimonials'));
 const DriverRecruitmentBanner = lazy(() => import('@/components/go/DriverRecruitmentBanner'));
 
@@ -61,6 +62,14 @@ export default function Home() {
             </Button>
           </div>
         </div>
+      </section>
+
+      {/* Track / Re-book Quick Actions */}
+      <section>
+        <h2 className="text-xl font-display font-bold mb-4">Pick up where you left off</h2>
+        <Suspense fallback={<LazyFallback />}>
+          <CustomerQuickActions />
+        </Suspense>
       </section>
 
       {/* Quick Access for Customers */}
