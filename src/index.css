@@ -115,7 +115,7 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* iOS WebView focus-visible fallback */
+  /* iOS / Android WebView focus-visible fallback */
   @supports not selector(:focus-visible) {
     button:focus, [role="tab"]:focus, [role="button"]:focus, a:focus, input:focus, select:focus, textarea:focus, [tabindex]:focus {
       @apply ring-2 ring-ring ring-offset-1;

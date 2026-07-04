@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { FileText, Loader2, Download, DollarSign, Users } from 'lucide-react';
+import MobileSelect from '@/components/go/MobileSelect';
 
 export default function TaxReportPanel() {
   const { toast } = useToast();
@@ -56,15 +57,13 @@ export default function TaxReportPanel() {
       </div>
 
       <div className="flex items-center gap-3 mb-4">
-        <select
-          value={year}
-          onChange={(e) => { setYear(parseInt(e.target.value)); setReport(null); }}
-          className="border border-input rounded-md px-3 py-2 text-sm bg-transparent min-h-[44px]"
-        >
-          {[currentYear, currentYear - 1].map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
+        <MobileSelect
+          value={String(year)}
+          onValueChange={(v) => { setYear(parseInt(v)); setReport(null); }}
+          options={[currentYear, currentYear - 1].map(y => ({ value: String(y), label: String(y) }))}
+          placeholder="Select year"
+          className="min-h-[44px]"
+        />
         <Button onClick={generate} disabled={loading} className="min-h-[44px]">
           {loading ? <Loader2 size={16} className="animate-spin mr-1" /> : <FileText size={16} className="mr-1" />}
           Generate Report

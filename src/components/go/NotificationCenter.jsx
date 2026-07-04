@@ -111,7 +111,14 @@ export default function NotificationCenter({ user }) {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div
+            className="fixed inset-0 z-40"
+            role="button"
+            tabIndex={0}
+            aria-label="Close notifications"
+            onClick={() => setOpen(false)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(false); } }}
+          />
           <div
             ref={dropdownRef}
             role="dialog"
@@ -122,7 +129,7 @@ export default function NotificationCenter({ user }) {
             <div className="flex items-center justify-between p-3 border-b">
               <h3 className="font-display font-bold text-sm">Notifications</h3>
               {unread > 0 && (
-                <button onClick={markAllRead} className="text-xs text-primary hover:underline">
+                <button onClick={markAllRead} className="text-xs text-primary hover:underline min-h-[44px] px-3">
                   Mark all read
                 </button>
               )}

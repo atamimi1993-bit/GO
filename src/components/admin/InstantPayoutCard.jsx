@@ -66,7 +66,7 @@ export default function InstantPayoutCard() {
           <Wallet size={20} className="text-emerald-600" />
           <h2 className="font-display font-bold text-lg">Instant Payout</h2>
         </div>
-        <Button variant="ghost" size="icon" onClick={load} disabled={loading} aria-label="Refresh balance">
+        <Button variant="ghost" size="icon" onClick={load} disabled={loading} aria-label="Refresh balance" className="min-h-[44px] min-w-[44px]">
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
         </Button>
       </div>

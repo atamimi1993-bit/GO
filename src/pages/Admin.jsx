@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import StatCard from '@/components/admin/StatCard';
 const DriverPerformance = lazy(() => import('@/components/admin/DriverPerformance'));
 const DriverTopPerformers = lazy(() => import('@/components/admin/DriverTopPerformers'));
@@ -44,32 +45,35 @@ export default function Admin() {
   const { scrollRef } = useOutletContext();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const load = useCallback(async () => {
-    try {
+  const queryClient = useQueryClient();
+  const overviewQueryKey = ['admin-dashboard-overview'];
+
+  const { data, isLoading, isFetching, error: queryError, refetch } = useQuery({
+    queryKey: overviewQueryKey,
+    queryFn: async () => {
       const res = await base44.functions.invoke('admin-dashboard', { action: 'overview' });
-      setData(res.data);
-      setError(null);
-    } catch (err) {
-      const status = err?.response?.status;
-      if (status === 401) {
-        setError({ title: 'Authentication Required', message: 'Please log in again to view this dashboard.' });
-      } else if (status === 403) {
-        setError({ title: 'Access Denied', message: 'You need admin privileges to view this dashboard.' });
-      } else {
-        setError({ title: 'Failed to Load', message: err?.message || 'Something went wrong. Please try again.' });
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
 
-  useEffect(() => { load(); }, [load]);
+  const load = async () => { await refetch(); };
+
+  const error = queryError
+    ? (() => {
+        const status = queryError?.response?.status;
+        if (status === 401) return { title: 'Authentication Required', message: 'Please log in again to view this dashboard.' };
+        if (status === 403) return { title: 'Access Denied', message: 'You need admin privileges to view this dashboard.' };
+        return { title: 'Failed to Load', message: queryError?.message || 'Something went wrong. Please try again.' };
+      })()
+    : null;
+
+  const loading = isLoading;
 
   const handleDriverAction = async (driverId, action) => {
     const driver = data?.pendingDrivers?.find((d) => d.id === driverId);
@@ -79,7 +83,7 @@ export default function Admin() {
     toast({ title: 'Processing...', description: `${action === 'approve_driver' ? 'Approving' : 'Rejecting'} ${driver?.full_name || 'driver'}` });
     // Optimistically remove the driver from the pending list
     if (data?.pendingDrivers) {
-      setData((prev) => ({
+      queryClient.setQueryData(overviewQueryKey, (prev) => ({
         ...prev,
         pendingDrivers: prev.pendingDrivers.filter((d) => d.id !== driverId),
       }));
@@ -88,13 +92,13 @@ export default function Admin() {
       await base44.functions.invoke('admin-dashboard', { action, driver_id: driverId });
       toast({ title: `${driver?.full_name || 'Driver'} has been ${action === 'approve_driver' ? 'approved' : 'rejected'}` });
       // Optimistically decrement the pending drivers count instead of a full re-fetch
-      setData((prev) => prev ? ({
+      queryClient.setQueryData(overviewQueryKey, (prev) => prev ? ({
         ...prev,
         stats: { ...prev.stats, pendingDrivers: Math.max(0, (prev.stats?.pendingDrivers || 0) - 1) },
       }) : prev);
     } catch (err) {
       // Restore the original pending drivers list on error
-      setData((prev) => ({ ...prev, pendingDrivers: prevPendingDrivers }));
+      queryClient.setQueryData(overviewQueryKey, (prev) => ({ ...prev, pendingDrivers: prevPendingDrivers }));
       toast({ title: 'Action failed', description: err.message, variant: 'destructive' });
     } finally {
       setProcessingId(null);
@@ -104,7 +108,7 @@ export default function Admin() {
   const handleUpdateLeadStatus = async (leadId, status) => {
     try {
       await base44.functions.invoke('admin-dashboard', { action: 'update_lead_status', lead_id: leadId, status });
-      await load();
+      await refetch();
     } catch (err) {
       toast({ title: 'Failed to update lead', description: err.message, variant: 'destructive' });
     }
@@ -120,7 +124,8 @@ export default function Admin() {
         <ShieldCheck className="text-muted-foreground mb-3" size={48} />
         <h2 className="font-display font-bold text-lg mb-1">{error.title}</h2>
         <p className="text-muted-foreground text-sm mb-4 max-w-xs">{error.message}</p>
-        <Button variant="outline" onClick={() => { setLoading(true); setError(null); load(); }}>
+        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+          {isFetching ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
           Retry
         </Button>
       </div>
@@ -341,15 +346,27 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* 1099 Tax Report */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <TaxReportPanel />
-        </Suspense>
-
-        {/* Background Check Management */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <BackgroundCheckPanel drivers={allDrivers} />
-        </Suspense>
+        {/* Advanced tools (deferred for mobile performance) */}
+        <div className="mb-6">
+          <Button
+            variant="outline"
+            className="w-full min-h-[44px]"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            aria-expanded={showAdvanced}
+          >
+            {showAdvanced ? 'Hide advanced tools' : 'Show advanced tools'}
+          </Button>
+          {showAdvanced && (
+            <>
+              <Suspense fallback={<SectionSkeleton />}>
+                <TaxReportPanel />
+              </Suspense>
+              <Suspense fallback={<SectionSkeleton />}>
+                <BackgroundCheckPanel drivers={allDrivers} />
+              </Suspense>
+            </>
+          )}
+        </div>
 
         {/* Recent users */}
         <div className="bg-card border rounded-2xl p-5 mt-6">
