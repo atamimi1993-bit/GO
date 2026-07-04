@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTabHistory } from '@/lib/TabHistoryContext';
-import { Home, Package, Truck, Warehouse, HelpCircle, Bot, Briefcase } from 'lucide-react';
+import { Home, Package, Truck, Warehouse, HelpCircle, Bot } from 'lucide-react';
 
 const tabs = [
   { label: 'Home', path: '/', icon: Home },
   { label: 'Moves', path: '/my-moves', icon: Package },
-  { label: 'Business', path: '/business', icon: Briefcase },
   { label: 'Driver', path: '/driver-hub', icon: Truck },
   { label: 'Storage', path: '/storage', icon: Warehouse },
+  { label: 'Help', path: '/help', icon: HelpCircle },
   { label: 'AI', path: '/support', icon: Bot },
 ];
 
@@ -27,7 +27,6 @@ export default function BottomTabBar() {
             to={tab.path}
             aria-label={tab.label}
             aria-current={active ? 'page' : undefined}
-            aria-pressed={active}
             onClick={(e) => {
               if (active) {
                 if (location.pathname === tab.path) {

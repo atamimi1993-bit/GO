@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Upload, Loader2, Award } from 'lucide-react';
+import { ArrowLeft, Upload, Loader2 } from 'lucide-react';
 
 export default function DriverRegister() {
   const navigate = useNavigate();
@@ -17,7 +16,6 @@ export default function DriverRegister() {
     full_name: '', email: '', phone: '', license_number: '', license_expiry: '',
     service_area: '', company_name: '',
     license_doc_url: '', insurance_doc_url: '', profile_photo_url: '',
-    cdl_certified: false, cdl_number: '', cdl_doc_url: '',
   });
 
   useEffect(() => {
@@ -102,29 +100,6 @@ export default function DriverRegister() {
           <FileUploadField label="Driver's License (photo/scan)" field="license_doc_url" />
           <FileUploadField label="Insurance Document" field="insurance_doc_url" />
           <FileUploadField label="Profile Photo" field="profile_photo_url" accept=".jpg,.png,.jpeg" />
-        </div>
-
-        <div className="border-t pt-4 space-y-4">
-          <div className="flex items-center gap-2">
-            <Award size={18} className="text-amber-500" />
-            <div>
-              <h3 className="font-display font-bold text-sm">CDL Certification (Optional)</h3>
-              <p className="text-xs text-muted-foreground">CDL drivers earn 25% per fulfilled job instead of the standard rate.</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-between bg-amber-500/10 rounded-xl p-4">
-            <div>
-              <p className="font-medium text-sm">I hold a Commercial Driver's License (CDL)</p>
-              <p className="text-xs text-muted-foreground">Required for large/extra-large trucks & freight jobs</p>
-            </div>
-            <Switch checked={form.cdl_certified} onCheckedChange={v => setForm({ ...form, cdl_certified: v })} />
-          </div>
-          {form.cdl_certified && (
-            <>
-              <div><Label htmlFor="cdl_number">CDL Number</Label><Input id="cdl_number" value={form.cdl_number} onChange={e => setForm({ ...form, cdl_number: e.target.value })} placeholder="Commercial DL number" /></div>
-              <FileUploadField label="CDL Document" field="cdl_doc_url" />
-            </>
-          )}
         </div>
 
         <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600" disabled={saving}>

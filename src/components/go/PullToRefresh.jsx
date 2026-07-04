@@ -82,13 +82,10 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
   }, [scrollRef]);
 
   return (
-    <div className="relative" style={{ position: 'relative' }}>
     <div
       ref={wrapperRef}
       className="relative"
       style={{
-        position: 'relative',
-        overflow: 'clip',
         isolation: 'isolate',
         willChange: 'transform',
         overscrollBehavior: pulling ? 'none' : 'auto',
@@ -97,17 +94,8 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
     >
       {(pullDistance > 0 || refreshing) && (
         <div
-          className="flex items-center justify-center pointer-events-none"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            height: 0,
-            overflow: 'visible',
-            transform: `translateY(${pullDistance - 40}px)`,
-          }}
+          className="absolute left-0 right-0 flex items-center justify-center z-50 pointer-events-none"
+          style={{ top: 0, transform: `translateY(${pullDistance - 40}px)` }}
         >
           {refreshing ? (
             <Loader2 className="text-primary animate-spin" size={24} />
@@ -122,14 +110,13 @@ export default function PullToRefresh({ onRefresh, children, scrollRef, disabled
       )}
       <div
         style={{
-          transform: pullDistance > 0 ? `translateY(${pullDistance}px)` : 'translateY(0)',
+          transform: `translateY(${pullDistance}px)`,
           transition: pulling ? 'none' : 'transform 0.3s ease',
           willChange: 'transform',
         }}
       >
         {children}
       </div>
-    </div>
     </div>
   );
 }

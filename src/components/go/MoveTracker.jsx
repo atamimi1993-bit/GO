@@ -50,11 +50,7 @@ export default function MoveTracker({ moveId }) {
       </div>
 
       <div aria-live="polite" aria-atomic="false" className="sr-only">
-        {latestPing && (
-          latestPing.milestone
-            ? `Driver milestone: ${MILESTONES.find(m => m.key === latestPing.milestone)?.label || latestPing.milestone}`
-            : 'Driver location updated'
-        )}
+        {latestPing && `Driver milestone: ${MILESTONES.find(m => m.key === latestPing.milestone)?.label || latestPing.milestone}`}
       </div>
 
       {latestPing && latestPing.lat ? (

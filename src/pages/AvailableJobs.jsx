@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck, Award } from 'lucide-react';
+import { MapPin, Calendar, Package, DollarSign, Loader2, ArrowLeft, Truck } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
 import PullToRefresh from '@/components/go/PullToRefresh';
@@ -90,15 +90,7 @@ export default function AvailableJobs() {
                     {format(parseISO(job.move_date), 'MMM d, yyyy')}{job.move_time && ` at ${job.move_time}`}
                   </p>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  {job.job_type && job.job_type !== 'residential' && (
-                    <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 capitalize">{job.job_type.replace('_', ' ')}</Badge>
-                  )}
-                  {job.business_name && (
-                    <span className="text-xs text-muted-foreground truncate max-w-[120px]">{job.business_name}</span>
-                  )}
-                  <Badge className="bg-muted text-muted-foreground capitalize">{job.truck_size_needed?.replace('_', ' ')}</Badge>
-                </div>
+                <Badge className="bg-muted text-muted-foreground capitalize">{job.truck_size_needed?.replace('_', ' ')}</Badge>
               </div>
               <div className="space-y-1 text-sm text-muted-foreground mb-3">
                 <p className="flex items-center gap-2"><MapPin size={14} className="text-emerald-500" /> {job.pickup_address}</p>
@@ -118,12 +110,6 @@ export default function AvailableJobs() {
                   {accepting === job.id ? <Loader2 size={14} className="animate-spin" /> : 'Accept Job'}
                 </Button>
               </div>
-              {driverProfile?.cdl_certified && (
-                <div className="mt-3 bg-amber-500/10 rounded-lg p-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <Award size={14} />
-                  CDL bonus: earn {formatCurrency(Math.round(job.total_price * 0.25 * 100) / 100, job.currency)} (25%) for this job
-                </div>
-              )}
             </div>
           ))}
         </div>

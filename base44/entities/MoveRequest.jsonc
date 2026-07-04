@@ -12,27 +12,6 @@
     "customer_phone": {
       "type": "string"
     },
-    "business_name": {
-      "type": "string"
-    },
-    "business_type": {
-      "type": "string",
-      "enum": [
-        "local_business",
-        "corporation",
-        "freight_carrier"
-      ]
-    },
-    "job_type": {
-      "type": "string",
-      "enum": [
-        "residential",
-        "commercial",
-        "freight",
-        "corporate_relocation"
-      ],
-      "default": "residential"
-    },
     "pickup_address": {
       "type": "string"
     },
@@ -124,22 +103,6 @@
     "driver_payout": {
       "type": "number",
       "default": 0
-    },
-    "pickup_tip": {
-      "type": "number",
-      "default": 0
-    },
-    "delivery_tip": {
-      "type": "number",
-      "default": 0
-    },
-    "pickup_tip_paid": {
-      "type": "boolean",
-      "default": false
-    },
-    "delivery_tip_paid": {
-      "type": "boolean",
-      "default": false
     },
     "assigned_driver_id": {
       "type": "string"

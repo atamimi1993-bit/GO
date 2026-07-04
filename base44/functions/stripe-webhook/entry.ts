@@ -22,29 +22,8 @@ Deno.serve(async (req) => {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const moveRequestId = session.metadata?.move_request_id;
-      const tipStage = session.metadata?.tip_stage;
 
-      if (moveRequestId && tipStage) {
-        // This is a tip payment
-        const tipAmount = parseFloat(session.metadata?.tip_amount || '0');
-        const updateData = tipStage === 'pickup'
-          ? { pickup_tip: tipAmount, pickup_tip_paid: true }
-          : { delivery_tip: tipAmount, delivery_tip_paid: true };
-        await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, updateData);
-
-        // Add tip to the driver's payout record
-        const payouts = await base44.asServiceRole.entities.DriverPayout.filter({
-          move_request_id: moveRequestId,
-        });
-        if (payouts.length > 0) {
-          const payout = payouts[0];
-          const newAmount = (payout.amount || 0) + tipAmount;
-          await base44.asServiceRole.entities.DriverPayout.update(payout.id, { amount: newAmount });
-          console.log('Updated driver payout ' + payout.id + ' with ' + tipStage + ' tip: ' + tipAmount);
-        }
-        console.log('Marked ' + tipStage + ' tip as paid for move ' + moveRequestId);
-      } else if (moveRequestId) {
-        // This is the main move payment
+      if (moveRequestId) {
         await base44.asServiceRole.entities.MoveRequest.update(moveRequestId, {
           paid: true,
         });
