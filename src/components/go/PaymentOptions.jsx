@@ -56,6 +56,9 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
 
   const halfAmount = round2(baseTotal / 2);
 
+  // Insurance fee: 2% of move total, $25 minimum, $200 maximum
+  const insuranceFee = Math.min(200, Math.max(25, round2(baseTotal * 0.02)));
+
   const OPTIONS = [
     {
       key: 'full',
@@ -224,7 +227,7 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
               <p className="font-medium text-sm">Damage Protection Insurance</p>
               <p className="text-xs text-muted-foreground">Covers up to $5,000 if your belongings are damaged or lost during the move</p>
             </div>
-            <span className="font-display font-bold text-emerald-600 dark:text-emerald-400 text-sm shrink-0">+$25</span>
+            <span className="font-display font-bold text-emerald-600 dark:text-emerald-400 text-sm shrink-0">+{fmt(insuranceFee)}</span>
           </div>
         </button>
       </div>
@@ -258,7 +261,7 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
         {addInsurance && (
           <div className="flex justify-between text-sm text-muted-foreground">
             <span className="flex items-center gap-1"><Shield size={12} /> Damage Protection</span>
-            <span>+$25</span>
+            <span>+{fmt(insuranceFee)}</span>
           </div>
         )}
       </div>
@@ -271,10 +274,10 @@ export default function PaymentOptions({ move, onPaid, onPromoApplied }) {
         {paying
           ? <><Loader2 size={16} className="animate-spin mr-1" /> Redirecting to checkout...</>
           : selectedOption === 'installment_plan'
-            ? <><CreditCard size={16} className="mr-1" /> Pay First Installment — {installmentPlan ? fmt(installmentPlan.monthlyPayment) : ''}</>
+            ? <><CreditCard size={16} className="mr-1" /> Pay First Installment — {installmentPlan ? fmt(installmentPlan.monthlyPayment + (addInsurance ? insuranceFee : 0)) : ''}</>
             : selectedOption === 'full'
-              ? <><CreditCard size={16} className="mr-1" /> Pay in Full — {fmt(baseTotal)}</>
-              : <><CreditCard size={16} className="mr-1" /> Pay at Pickup — {fmt(halfAmount)}</>}
+              ? <><CreditCard size={16} className="mr-1" /> Pay in Full — {fmt(baseTotal + (addInsurance ? insuranceFee : 0))}</>
+              : <><CreditCard size={16} className="mr-1" /> Pay at Pickup — {fmt(halfAmount + (addInsurance ? insuranceFee : 0))}</>}
       </Button>
       <PaymentMethods />
     </div>

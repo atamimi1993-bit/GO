@@ -63,8 +63,6 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { move_request_id, promo_code, validate_only, payment_plan, pay_balance, pay_installment, payment_option, credit_tier, installment_term_months, add_insurance } = body;
 
-    const INSURANCE_FEE = 25; // Flat fee for move damage protection (covers up to $5,000)
-
     if (!move_request_id) {
       return Response.json({ error: 'move_request_id is required' }, { status: 400 });
     }
@@ -92,6 +90,10 @@ Deno.serve(async (req) => {
     if (!move.total_price || move.total_price <= 0) {
       return Response.json({ error: 'Invalid move price' }, { status: 400 });
     }
+
+    // Move insurance: 2% of move total, $25 minimum, $200 maximum
+    // Covers up to $5,000 in damage to belongings during the move
+    const INSURANCE_FEE = Math.min(200, Math.max(25, Math.round(move.total_price * 0.02 * 100) / 100));
 
     // Validate promo code if provided
     let discountAmount = 0;
