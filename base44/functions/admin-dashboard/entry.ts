@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     // Whitelist of allowed actions to prevent unexpected code paths
     const ALLOWED_ACTIONS = [
       'overview', 'approve_driver', 'reject_driver', 'update_lead_status',
-      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials',
+      'pending_payouts', 'export_payouts', 'bulk_payout', 'driver_performance', 'financials', 'weekly_growth',
     ];
     if (!ALLOWED_ACTIONS.includes(action)) {
       return Response.json({ error: 'Invalid action' }, { status: 400 });
@@ -266,6 +266,99 @@ Deno.serve(async (req) => {
         cancellationRevenue: series.reduce((s, r) => s + r.cancellation_revenue, 0),
       };
       return Response.json({ series, totals });
+    }
+
+    // Weekly growth — 12-week time series of earnings, active moves, and driver signups
+    if (action === 'weekly_growth') {
+      const [allMoves, allPayouts, allDrivers] = await Promise.all([
+        base44.asServiceRole.entities.MoveRequest.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverPayout.list('-created_date', 500),
+        base44.asServiceRole.entities.DriverProfile.list('-created_date', 500),
+      ]);
+
+      const getWeekStart = (iso) => {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        const day = d.getUTCDay();
+        const diff = day === 0 ? -6 : 1 - day;
+        d.setUTCDate(d.getUTCDate() + diff);
+        d.setUTCHours(0, 0, 0, 0);
+        return d.toISOString().split('T')[0];
+      };
+
+      // Build the last 12 weeks (including the current week)
+      const now = new Date();
+      const currentDay = now.getUTCDay();
+      const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+      const thisMonday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      thisMonday.setUTCDate(thisMonday.getUTCDate() + mondayOffset);
+
+      const weekKeys = [];
+      for (let i = 11; i >= 0; i--) {
+        const ws = new Date(thisMonday);
+        ws.setUTCDate(thisMonday.getUTCDate() - i * 7);
+        weekKeys.push(ws.toISOString().split('T')[0]);
+      }
+
+      const weeks = {};
+      for (const wk of weekKeys) {
+        const d = new Date(wk);
+        const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+        weeks[wk] = {
+          week: wk,
+          label,
+          earnings: 0,
+          new_moves: 0,
+          active_moves: 0,
+          completed_moves: 0,
+          new_drivers: 0,
+          active_drivers: 0,
+        };
+      }
+
+      // Earnings from completed moves (by move_date or created_date)
+      for (const m of allMoves) {
+        const wk = getWeekStart(m.move_date || m.created_date);
+        if (!wk || !weeks[wk]) continue;
+        if (m.status === 'completed' && (m.total_price || 0) > 0) {
+          weeks[wk].earnings += m.total_price;
+          weeks[wk].completed_moves += 1;
+        }
+        if (['accepted', 'in_progress'].includes(m.status)) {
+          weeks[wk].active_moves += 1;
+        }
+        weeks[wk].new_moves += 1;
+      }
+
+      // New drivers by created_date
+      const driverIdsByWeek = {};
+      for (const d of allDrivers) {
+        const wk = getWeekStart(d.created_date);
+        if (!wk || !weeks[wk]) continue;
+        weeks[wk].new_drivers += 1;
+        if (!driverIdsByWeek[wk]) driverIdsByWeek[wk] = new Set();
+        driverIdsByWeek[wk].add(d.id);
+      }
+
+      // Active drivers: drivers with at least one move (any status) created that week
+      for (const m of allMoves) {
+        const wk = getWeekStart(m.move_date || m.created_date);
+        if (!wk || !weeks[wk]) continue;
+        if (m.assigned_driver_id) {
+          if (!driverIdsByWeek[wk]) driverIdsByWeek[wk] = new Set();
+          driverIdsByWeek[wk].add(m.assigned_driver_id);
+        }
+      }
+      for (const wk of weekKeys) {
+        weeks[wk].active_drivers = driverIdsByWeek[wk]?.size || 0;
+      }
+
+      const series = weekKeys.map((wk) => weeks[wk]);
+      const thisWeek = series[series.length - 1];
+      const lastWeek = series[series.length - 2] || { earnings: 0, new_moves: 0, new_drivers: 0 };
+
+      return Response.json({ series, thisWeek, lastWeek });
     }
 
     // Overview — aggregate everything
