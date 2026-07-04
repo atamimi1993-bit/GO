@@ -236,6 +236,13 @@
     },
     "referral_code": {
       "type": "string"
+    },
+    "onsite_photo_url": {
+      "type": "string"
+    },
+    "onsite_verified": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

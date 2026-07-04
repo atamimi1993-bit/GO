@@ -14,6 +14,7 @@ import PromoCodeInput from '@/components/go/PromoCodeInput';
 import AssignedDriverCard from '@/components/go/AssignedDriverCard';
 import PriceConfirmation from '@/components/go/PriceConfirmation';
 import PaymentMethods from '@/components/go/PaymentMethods';
+import OnSiteChecklist from '@/components/go/OnSiteChecklist';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/go/PageHeader';
 import { format, parseISO } from 'date-fns';
@@ -194,6 +195,8 @@ export default function MoveDetail() {
     baseCost: move.base_cost, fuelCost: move.fuel_cost, taxRate: move.tax_rate,
     taxAmount: move.tax_amount, appFee: move.app_fee, driverFee: move.driver_fee,
     totalPrice: move.total_price, driverPayout: move.driver_payout,
+    bulkyItemFee: move.bulky_item_fee, materialsFee: move.materials_fee, carryingFee: move.carrying_fee,
+    tolls: move.tolls,
     currency: curr,
     displayDistance: (move.distance_miles || 0) * 2,
     displayDistanceUnit: distUnit,
@@ -236,6 +239,20 @@ export default function MoveDetail() {
         </div>
       </div>
 
+      {/* On-site verification badge */}
+      {move.onsite_verified && (
+        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 mb-4 flex items-center gap-3">
+          <CheckCircle2 className="text-emerald-600 dark:text-emerald-400 shrink-0" size={20} />
+          <div>
+            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">On-site verified</p>
+            <p className="text-xs text-muted-foreground">Driver confirmed items, access, and finalized the office price.</p>
+          </div>
+          {move.onsite_photo_url && (
+            <img src={move.onsite_photo_url} alt="Site photo" className="ml-auto w-16 h-16 rounded-lg object-cover border" />
+          )}
+        </div>
+      )}
+
       {/* Items */}
       {items.length > 0 && (
         <div className="bg-card border rounded-2xl overflow-hidden mb-4">
@@ -268,6 +285,11 @@ export default function MoveDetail() {
       {/* Route mileage & time log — driver fills out, admin can view */}
       {move.assigned_driver_id && driverProfile?.id === move.assigned_driver_id && ['in_progress', 'completed'].includes(move.status) && (
         <RouteLogForm move={move} driverProfile={driverProfile} onSaved={load} />
+      )}
+
+      {/* On-site checklist — driver verifies items, records access, finalizes price */}
+      {move.assigned_driver_id && driverProfile?.id === move.assigned_driver_id && move.status === 'in_progress' && !move.onsite_verified && (
+        <OnSiteChecklist move={move} driverProfile={driverProfile} onComplete={load} />
       )}
 
       {/* Price — only visible when ready to pay or admin */}
