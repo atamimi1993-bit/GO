@@ -12,6 +12,7 @@ const EarningsCharts = lazy(() => import('@/components/admin/EarningsCharts'));
 import PullToRefresh from '@/components/go/PullToRefresh';
 import LeadFinder from '@/components/admin/LeadFinder';
 import LeadList from '@/components/admin/LeadList';
+import SectionSkeleton from '@/components/admin/SectionSkeleton';
 const MarketingPanel = lazy(() => import('@/components/admin/MarketingPanel'));
 const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'));
 const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
@@ -153,12 +154,12 @@ export default function Admin() {
         </div>
 
         {/* Quick access links */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <AdminQuickLinks />
         </Suspense>
 
         {/* Move status tracker */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <MoveStatusTracker />
         </Suspense>
 
@@ -176,49 +177,49 @@ export default function Admin() {
               </Button>
             </div>
           ) : (
-            <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+            <Suspense fallback={<SectionSkeleton />}>
               <AdminWorldMap />
             </Suspense>
           )}
         </div>
 
         {/* Move calendar */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <MoveCalendar scrollRef={scrollRef} />
         </Suspense>
 
         {/* Performance charts */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <EarningsCharts />
         </Suspense>
 
         {/* Driver performance */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <DriverPerformance />
         </Suspense>
 
         {/* Top performers ranking */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <DriverTopPerformers />
         </Suspense>
 
         {/* Marketing & promotions */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <MarketingPanel />
         </Suspense>
 
         {/* Pending vehicle listing approvals */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <RentalApprovalPanel scrollRef={scrollRef} />
         </Suspense>
 
         {/* Driver expense receipts */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <ExpenseReviewPanel />
         </Suspense>
 
         {/* Bulk payout processing */}
-        <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={24} /></div>}>
+        <Suspense fallback={<SectionSkeleton />}>
           <BulkPayoutPanel scrollRef={scrollRef} />
         </Suspense>
 

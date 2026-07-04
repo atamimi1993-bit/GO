@@ -157,7 +157,7 @@ export default function BulkPayoutPanel({ scrollRef }) {
           </div>
           <div className="flex gap-2 flex-wrap">
             <PayoutExportButton />
-            <Button size="sm" className="min-h-[44px]" variant="outline" onClick={selected.size === data.payouts.length ? clearAll : selectAll}>
+            <Button size="sm" className="min-h-[44px]" variant="outline" aria-label={selected.size === data.payouts.length ? 'Clear all selected payouts' : 'Select all payouts'} onClick={selected.size === data.payouts.length ? clearAll : selectAll}>
               {selected.size === data.payouts.length ? 'Clear All' : 'Select All'}
             </Button>
             <Button

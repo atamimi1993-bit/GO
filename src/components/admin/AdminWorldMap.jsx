@@ -77,7 +77,7 @@ export default function AdminWorldMap() {
     setGeocoding(true);
     (async () => {
       const pins = [];
-      for (const m of moves.slice(0, 30)) {
+      for (const m of moves.slice(0, 20)) {
         if (cancelled) return;
         const addr = m.pickup_address;
         if (!addr) continue;
@@ -247,14 +247,15 @@ export default function AdminWorldMap() {
       )}
 
       {geocoding && !loading && (
-        <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
-          <Loader2 size={12} className="animate-spin" /> Geocoding addresses...
-        </p>
+        <div className="mt-2 flex items-center gap-2 bg-blue-500/5 border border-blue-500/20 rounded-xl p-3" aria-live="polite">
+          <Loader2 size={14} className="animate-spin text-blue-500" />
+          <span className="text-sm text-blue-600 dark:text-blue-400">Geocoding addresses...</span>
+        </div>
       )}
 
-      {(moves.length > 30 || drivers.length > 20) && !loading && (
+      {(moves.length > 20 || drivers.length > 20) && !loading && (
         <p className="text-xs text-muted-foreground mt-2">
-          Showing up to 30 recent locations
+          Showing up to 20 recent locations
         </p>
       )}
 

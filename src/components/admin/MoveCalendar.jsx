@@ -75,6 +75,10 @@ export default function MoveCalendar({ scrollRef }) {
   const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
   const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
   const days = eachDayOfInterval({ start: calStart, end: calEnd });
+  const weekChunks = [];
+  for (let i = 0; i < days.length; i += 7) {
+    weekChunks.push(days.slice(i, i + 7));
+  }
 
   const today = new Date();
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -155,64 +159,67 @@ export default function MoveCalendar({ scrollRef }) {
 
       {/* Calendar grid — desktop view */}
       <div className="hidden sm:block overflow-x-auto -mx-2 px-2">
-        <div className="min-w-[640px]">
+        <div role="grid" className="min-w-[640px] space-y-1">
           {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-1 mb-1">
+          <div role="row" className="grid grid-cols-7 gap-1">
             {weekDays.map((d) => (
-              <div key={d} className="text-center text-xs font-medium text-muted-foreground py-2">
+              <div role="columnheader" key={d} className="text-center text-xs font-medium text-muted-foreground py-2">
                 {d}
               </div>
             ))}
           </div>
 
-          {/* Day cells */}
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((day) => {
-              const inMonth = isSameMonth(day, currentMonth);
-              const isToday = isSameDay(day, today);
-              const dayMoves = getDayMoves(day).filter((m) => m.status !== 'cancelled');
-              const status = getDayStatus(day);
-              const isSelected = selectedDay && isSameDay(day, selectedDay);
+          {/* Day cells grouped by week */}
+          {weekChunks.map((week, wi) => (
+            <div role="row" key={wi} className="grid grid-cols-7 gap-1">
+              {week.map((day) => {
+                const inMonth = isSameMonth(day, currentMonth);
+                const isToday = isSameDay(day, today);
+                const dayMoves = getDayMoves(day).filter((m) => m.status !== 'cancelled');
+                const status = getDayStatus(day);
+                const isSelected = selectedDay && isSameDay(day, selectedDay);
 
-              const dotColor = status === 'full' ? 'bg-red-500' : status === 'partial' ? 'bg-amber-500' : 'bg-emerald-500';
-              const cellBorder = isSelected ? 'ring-2 ring-primary' : status === 'full' ? 'border-red-500/30' : status === 'partial' ? 'border-amber-500/30' : 'border-border';
+                const dotColor = status === 'full' ? 'bg-red-500' : status === 'partial' ? 'bg-amber-500' : 'bg-emerald-500';
+                const cellBorder = isSelected ? 'ring-2 ring-primary' : status === 'full' ? 'border-red-500/30' : status === 'partial' ? 'border-amber-500/30' : 'border-border';
 
-              return (
-                <button
-                  key={day.toISOString()}
-                  onClick={() => setSelectedDay(day)}
-                  aria-label={`${format(day, 'EEEE, MMMM d')}, ${dayMoves.length} move${dayMoves.length !== 1 ? 's' : ''}, ${getDayStatus(day) === 'full' ? 'fully booked' : getDayStatus(day) === 'partial' ? 'partially booked' : 'open'}`}
-                  aria-pressed={isSelected}
-                  className={`relative min-h-[80px] p-1.5 rounded-lg border text-left transition-colors hover:bg-muted/50 ${cellBorder} ${!inMonth ? 'opacity-40' : ''} ${isToday ? 'ring-1 ring-primary' : ''}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-medium ${isToday ? 'text-primary' : ''}`}>
-                      {format(day, 'd')}
-                    </span>
-                    {dayMoves.length > 0 && (
-                      <span className="flex items-center gap-1">
-                        <div className={`w-2 h-2 rounded-full ${dotColor}`} />
-                        <span className="text-xs font-semibold">{dayMoves.length}</span>
+                return (
+                  <button
+                    role="gridcell"
+                    key={day.toISOString()}
+                    onClick={() => setSelectedDay(day)}
+                    aria-label={`${format(day, 'EEEE, MMMM d')}, ${dayMoves.length} move${dayMoves.length !== 1 ? 's' : ''}, ${getDayStatus(day) === 'full' ? 'fully booked' : getDayStatus(day) === 'partial' ? 'partially booked' : 'open'}`}
+                    aria-pressed={isSelected}
+                    className={`relative min-h-[80px] p-1.5 rounded-lg border text-left transition-colors hover:bg-muted/50 ${cellBorder} ${!inMonth ? 'opacity-40' : ''} ${isToday ? 'ring-1 ring-primary' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-xs font-medium ${isToday ? 'text-primary' : ''}`}>
+                        {format(day, 'd')}
                       </span>
-                    )}
-                  </div>
-                  {/* Move preview dots */}
-                  {inMonth && dayMoves.length > 0 && (
-                    <div className="mt-1 space-y-0.5">
-                      {dayMoves.slice(0, 3).map((m) => (
-                        <div key={m.id} className={`text-[10px] truncate px-1 py-0.5 rounded ${STATUS_COLORS[m.status] || ''}`}>
-                          {m.move_time || 'TBD'} {m.customer_name || ''}
-                        </div>
-                      ))}
-                      {dayMoves.length > 3 && (
-                        <p className="text-[10px] text-muted-foreground px-1">+{dayMoves.length - 3} more</p>
+                      {dayMoves.length > 0 && (
+                        <span className="flex items-center gap-1">
+                          <div className={`w-2 h-2 rounded-full ${dotColor}`} />
+                          <span className="text-xs font-semibold">{dayMoves.length}</span>
+                        </span>
                       )}
                     </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+                    {/* Move preview dots */}
+                    {inMonth && dayMoves.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {dayMoves.slice(0, 3).map((m) => (
+                          <div key={m.id} className={`text-[10px] truncate px-1 py-0.5 rounded ${STATUS_COLORS[m.status] || ''}`}>
+                            {m.move_time || 'TBD'} {m.customer_name || ''}
+                          </div>
+                        ))}
+                        {dayMoves.length > 3 && (
+                          <p className="text-[10px] text-muted-foreground px-1">+{dayMoves.length - 3} more</p>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
 

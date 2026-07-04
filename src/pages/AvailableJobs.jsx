@@ -103,8 +103,8 @@ export default function AvailableJobs() {
       toast({ title: 'Job accepted!', description: "You've been assigned to this move." });
       setAcceptedJob({ ...job, status: 'accepted', assigned_driver_id: driverProfile.id, assigned_driver_name: driverProfile.full_name, ...updatedPricing });
     } catch {
-      // Restore job on failure
-      setJobs(prev => [job, ...prev]);
+      // Restore job on failure, re-sorted by created_date
+      setJobs(prev => [...prev, job].sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0)));
       toast({ title: 'Error', description: 'Could not accept job.', variant: 'destructive' });
     }
     setAccepting(null);

@@ -8,25 +8,24 @@ import { getCurrency } from '@/lib/pricing';
 
 export default function PriceConfirmation({ move, onConfirmed }) {
   const [confirming, setConfirming] = useState(false);
+  const [localConfirmed, setLocalConfirmed] = useState(move.customer_price_confirmed);
   const { toast } = useToast();
 
   const curr = getCurrency(move.currency || 'USD');
   const effectiveTotal = move.discounted_total || move.total_price;
-  const customerConfirmed = move.customer_price_confirmed;
+  const customerConfirmed = localConfirmed;
   const driverConfirmed = move.driver_rate_confirmed;
 
   const handleConfirm = async () => {
     setConfirming(true);
-    // Optimistic: update local move state immediately, revert on error
-    onConfirmed();
-    const prevConfirmed = move.customer_price_confirmed;
-    move.customer_price_confirmed = true;
+    // Optimistic: update local state, revert on error
+    setLocalConfirmed(true);
     try {
       await base44.entities.MoveRequest.update(move.id, { customer_price_confirmed: true });
       toast({ title: 'Price approved!' });
-    } catch (err) {
-      move.customer_price_confirmed = prevConfirmed;
       onConfirmed();
+    } catch (err) {
+      setLocalConfirmed(false);
       toast({ title: 'Could not confirm', description: err.message, variant: 'destructive' });
     }
     setConfirming(false);

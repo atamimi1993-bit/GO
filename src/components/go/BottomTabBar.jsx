@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTabHistory } from '@/lib/TabHistoryContext';
 import { base44 } from '@/api/base44Client';
@@ -35,6 +35,11 @@ export default function BottomTabBar() {
   const navigate = useNavigate();
   const { getTargetPath } = useTabHistory();
   const { user } = useAuth();
+  const [navigating, setNavigating] = useState(false);
+
+  useEffect(() => {
+    setNavigating(false);
+  }, [location.pathname]);
 
   const { data: driverProfile } = useQuery({
     queryKey: ['myDriverProfile', user?.id],
@@ -59,6 +64,7 @@ export default function BottomTabBar() {
             to={tab.path}
             aria-label={tab.label}
             aria-current={active ? 'page' : undefined}
+            aria-disabled={navigating}
             onClick={(e) => {
               if (active) {
                 if (location.pathname === tab.path) {
@@ -66,6 +72,7 @@ export default function BottomTabBar() {
                 }
               } else {
                 e.preventDefault();
+                setNavigating(true);
                 navigate(getTargetPath(tab.path));
               }
             }}
