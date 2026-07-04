@@ -1,0 +1,46 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "driver_mileage_reminder",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "wait_30_min": {
+          "wait": "PT30M",
+          "then": "send_reminder"
+        }
+      },
+      {
+        "send_reminder": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "notify-driver-mileage",
+            "args": {
+              "move_request_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Remind driver to log mileage",
+            "description": "Email the assigned driver 30 min after completion to log their route mileage"
+          }
+        }
+      }
+    ]
+  },
+  "name": "Driver Mileage Reminder",
+  "trigger": {
+    "condition": "${ .trigger.event_type == \"update\" and .trigger.data.status == \"completed\" and .trigger.old_data.status != \"completed\" and .trigger.data.assigned_driver_id != null and .trigger.data.assigned_driver_id != \"\" }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "MoveRequest"
+    }
+  },
+  "description": "When a move is marked complete, wait 30 minutes then remind the assigned driver to log their actual mileage and route details. Skips if a route log already exists."
+}
