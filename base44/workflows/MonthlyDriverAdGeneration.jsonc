@@ -2,30 +2,30 @@
   "definition": {
     "document": {
       "dsl": "1.0.0",
-      "name": "biweekly_ad_generation",
+      "name": "monthly_driver_ad_generation",
       "version": "1.0",
       "namespace": "base44"
     },
     "do": [
       {
-        "generate_ads": {
+        "generate_driver_ads": {
           "call": "invoke_backend_function",
           "with": {
             "function_name": "generate-ads",
             "args": {
-              "audience": "customers"
+              "audience": "drivers"
             }
           },
           "then": "end",
           "x-base44": {
-            "title": "Generate customer ads & leads",
-            "description": "Create new customer promo ads, codes, and leads every 2 weeks"
+            "title": "Generate driver ads",
+            "description": "Create new driver incentive ads and codes every month"
           }
         }
       }
     ]
   },
-  "name": "Biweekly Ad Generation",
+  "name": "Monthly Driver Ad Generation",
   "trigger": {
     "condition": null,
     "config": {
@@ -35,7 +35,7 @@
       "cron_expression": null,
       "one_time_date": null,
       "timezone": "UTC",
-      "interval_value": 14,
+      "interval_value": 30,
       "interval_unit": "days",
       "interval_anchor": "2026-07-04T09:00:00Z",
       "ends_type": "never",
@@ -43,5 +43,5 @@
       "ends_after_count": null
     }
   },
-  "description": "Auto-generates promotional ads, promo codes, and leads for customers every 2 weeks. Deactivates old customer campaigns and creates fresh content."
+  "description": "Auto-generates promotional ads and promo codes for drivers every month. Deactivates old driver campaigns and creates fresh earning incentive content."
 }

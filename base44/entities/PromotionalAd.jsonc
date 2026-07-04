@@ -24,6 +24,14 @@
       ],
       "default": "promo"
     },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "customers",
+        "drivers"
+      ],
+      "default": "customers"
+    },
     "promo_code": {
       "type": "string"
     },
