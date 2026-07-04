@@ -18,6 +18,7 @@ const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'))
 const ExpenseReviewPanel = lazy(() => import('@/components/admin/ExpenseReviewPanel'));
 const RentalApprovalPanel = lazy(() => import('@/components/admin/RentalApprovalPanel'));
 const AdminWorldMap = lazy(() => import('@/components/admin/AdminWorldMap'));
+const RecruitmentPipeline = lazy(() => import('@/components/admin/RecruitmentPipeline'));
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
@@ -206,6 +207,11 @@ export default function Admin() {
         {/* Marketing & promotions */}
         <Suspense fallback={<SectionSkeleton />}>
           <MarketingPanel />
+        </Suspense>
+
+        {/* Driver recruitment pipeline */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <RecruitmentPipeline />
         </Suspense>
 
         {/* Pending vehicle listing approvals */}
