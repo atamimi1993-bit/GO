@@ -7,6 +7,7 @@ import DriverTrackingControls from '@/components/go/DriverTrackingControls';
 import DriverLeaderboardCard from '@/components/go/DriverLeaderboardCard';
 import ExpenseSubmission from '@/components/go/ExpenseSubmission';
 import DriverNavigationCard from '@/components/go/DriverNavigationCard';
+import ComplianceManager from '@/components/go/ComplianceManager';
 import PullToRefresh from '@/components/go/PullToRefresh';
 import PageHeader from '@/components/go/PageHeader';
 import { Truck, Plus, Star, DollarSign, Briefcase, Loader2, ShieldCheck, AlertCircle, FileText, Shield, Navigation } from 'lucide-react';
@@ -151,6 +152,9 @@ export default function DriverHub() {
           </Button>
         </Link>
       </div>
+
+      {/* Compliance & documents */}
+      <ComplianceManager driverProfile={profile} onUpdated={setProfile} />
 
       {/* Signed contract */}
       {contract && (
