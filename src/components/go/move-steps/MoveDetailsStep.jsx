@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import MobileSelect from '@/components/go/MobileSelect';
-import { MapPin, Ruler, Loader2, Sparkles } from 'lucide-react';
+import { MapPin, Ruler, Loader2, Sparkles, Footprints } from 'lucide-react';
 import { COUNTRY_LIST, COUNTRY_CONFIG, CURRENCIES, US_STATES } from '@/lib/pricing';
 
 const JOB_TYPES = [
@@ -133,6 +133,59 @@ export default function MoveDetailsStep({ form, setForm, handleCountryChange }) 
             onBlur={handleAddressBlur}
             placeholder="456 Oak Ave, City, Country"
           />
+        </div>
+
+        {/* Access details — steps and distance from street */}
+        <div className="border-t border-border pt-4 space-y-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Footprints size={16} /> Access Details (affects carrying fees)
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label>Pickup — Steps / Stairs</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="e.g. 12"
+                value={form.pickup_steps || ''}
+                onChange={e => setForm({ ...form, pickup_steps: Number(e.target.value) || 0 })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">Number of stair steps from door to truck</p>
+            </div>
+            <div>
+              <Label>Pickup — Distance from Street (ft)</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="e.g. 50"
+                value={form.pickup_distance_from_street || ''}
+                onChange={e => setForm({ ...form, pickup_distance_from_street: Number(e.target.value) || 0 })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">How far is the door from where the truck parks?</p>
+            </div>
+            <div>
+              <Label>Drop-off — Steps / Stairs</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="e.g. 8"
+                value={form.dropoff_steps || ''}
+                onChange={e => setForm({ ...form, dropoff_steps: Number(e.target.value) || 0 })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">Number of stair steps from truck to door</p>
+            </div>
+            <div>
+              <Label>Drop-off — Distance from Street (ft)</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="e.g. 30"
+                value={form.dropoff_distance_from_street || ''}
+                onChange={e => setForm({ ...form, dropoff_distance_from_street: Number(e.target.value) || 0 })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">How far is the door from where the truck parks?</p>
+            </div>
+          </div>
         </div>
 
         {autoFilling && (

@@ -132,6 +132,34 @@
       "type": "number",
       "default": 0
     },
+    "bulky_item_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "materials_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "carrying_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "pickup_steps": {
+      "type": "number",
+      "default": 0
+    },
+    "dropoff_steps": {
+      "type": "number",
+      "default": 0
+    },
+    "pickup_distance_from_street": {
+      "type": "number",
+      "default": 0
+    },
+    "dropoff_distance_from_street": {
+      "type": "number",
+      "default": 0
+    },
     "assigned_driver_id": {
       "type": "string"
     },

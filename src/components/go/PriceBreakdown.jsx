@@ -16,6 +16,9 @@ export default function PriceBreakdown({ pricing, truckSize, currencyCode, showI
     { label: `Base cost (${TRUCK_SIZE_LABELS[truckSize] || truckSize})`, value: pricing.baseCost },
     { label: fuelLabel, value: pricing.fuelCost },
     ...(pricing.tolls ? [{ label: 'Tolls (reimbursed to driver)', value: pricing.tolls }] : []),
+    ...(pricing.bulkyItemFee ? [{ label: 'Bulky item surcharge', value: pricing.bulkyItemFee }] : []),
+    ...(pricing.materialsFee ? [{ label: 'Packing materials', value: pricing.materialsFee }] : []),
+    ...(pricing.carryingFee ? [{ label: 'Carrying surcharge (steps + distance)', value: pricing.carryingFee }] : []),
     { label: `Tax (${(pricing.taxRate * 100).toFixed(2)}%)`, value: pricing.taxAmount },
     ...(showInternalCosts ? [{ label: 'GO App Fee (25%)', value: pricing.appFee }] : []),
   ];

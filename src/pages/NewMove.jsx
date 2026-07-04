@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
-import { calculateMovePrice, recommendTruckSize, formatCurrency, COUNTRY_CONFIG } from '@/lib/pricing';
+import { calculateMovePrice, recommendTruckSize, formatCurrency, COUNTRY_CONFIG, BULKY_WEIGHT_THRESHOLD } from '@/lib/pricing';
 import StepProgress from '@/components/go/move-steps/StepProgress';
 const CustomerInfoStep = lazy(() => import('@/components/go/move-steps/CustomerInfoStep'));
 const MoveDetailsStep = lazy(() => import('@/components/go/move-steps/MoveDetailsStep'));
@@ -35,6 +35,9 @@ export default function NewMove() {
     notes: '', needs_storage: false,
     customer_name: '', customer_email: '', customer_phone: '',
     referral_code: '',
+    pickup_steps: 0, dropoff_steps: 0,
+    pickup_distance_from_street: 0, dropoff_distance_from_street: 0,
+    materials_fee: 0,
   });
   const [items, setItems] = useState([]);
   const [media, setMedia] = useState([]);
@@ -85,6 +88,8 @@ export default function NewMove() {
   const handleAddMedia = (m) => setMedia(prev => [...prev, m]);
   const handleRemoveMedia = (idx) => setMedia(media.filter((_, i) => i !== idx));
 
+  const bulkyItemCount = items.filter(i => i.special_handling || i.weight_lbs >= BULKY_WEIGHT_THRESHOLD).reduce((sum, i) => sum + i.quantity, 0);
+
   const liveEstimate = items.length > 0 && form.distance_miles
     ? calculateMovePrice({
         totalWeightLbs: totalWeight,
@@ -96,6 +101,12 @@ export default function NewMove() {
         distanceUnit: form.distance_unit,
         jobType: form.job_type,
         tolls: Number(form.tolls) || 0,
+        bulkyItemCount,
+        materialsFee: Number(form.materials_fee) || 0,
+        pickupSteps: form.pickup_steps,
+        dropoffSteps: form.dropoff_steps,
+        pickupDistanceFromStreet: form.pickup_distance_from_street,
+        dropoffDistanceFromStreet: form.dropoff_distance_from_street,
       })
     : null;
 
@@ -175,6 +186,13 @@ export default function NewMove() {
         base_cost: pricing.baseCost,
         fuel_cost: pricing.fuelCost,
         tolls: Number(form.tolls) || 0,
+        bulky_item_fee: pricing.bulkyItemFee,
+        materials_fee: pricing.materialsFee,
+        carrying_fee: pricing.carryingFee,
+        pickup_steps: form.pickup_steps || 0,
+        dropoff_steps: form.dropoff_steps || 0,
+        pickup_distance_from_street: form.pickup_distance_from_street || 0,
+        dropoff_distance_from_street: form.dropoff_distance_from_street || 0,
         tax_rate: pricing.taxRate,
         tax_amount: pricing.taxAmount,
         app_fee: pricing.appFee,
@@ -241,6 +259,7 @@ export default function NewMove() {
             onUploadPDF={handleUploadPDF}
             uploading={uploading}
             form={form}
+            setForm={setForm}
             liveEstimate={liveEstimate}
           />
           <PhotoVideoStep media={media} onAddMedia={handleAddMedia} onRemoveMedia={handleRemoveMedia} onAnalysis={setMediaAnalysis} />
