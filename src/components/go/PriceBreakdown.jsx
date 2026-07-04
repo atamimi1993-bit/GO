@@ -25,11 +25,11 @@ export default function PriceBreakdown({ pricing, truckSize }) {
       </div>
       <div className="border-t pt-3 flex justify-between">
         <span className="font-display font-bold text-lg">Total</span>
-        <span className="font-display font-black text-2xl text-emerald-600">
+        <span className="font-display font-black text-2xl text-emerald-600 dark:text-emerald-400">
           ${pricing.totalPrice.toFixed(2)}
         </span>
       </div>
-      <div className="bg-emerald-50 rounded-lg p-3 text-sm text-emerald-700">
+      <div className="bg-emerald-50 dark:bg-emerald-950 rounded-lg p-3 text-sm text-emerald-700 dark:text-emerald-300">
         Driver payout for this job: <span className="font-bold">${pricing.driverPayout.toFixed(2)}</span>
       </div>
     </div>

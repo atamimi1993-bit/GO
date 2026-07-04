@@ -88,10 +88,10 @@ export default function MoveTracker({ moveId }) {
               <div key={m.key} className={`flex items-center gap-3 ${reached ? '' : 'opacity-40'}`}>
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                    reached ? 'bg-emerald-100' : 'bg-muted'
+                    reached ? 'bg-emerald-100 dark:bg-emerald-900' : 'bg-muted'
                   }`}
                 >
-                  <m.icon size={16} className={reached ? 'text-emerald-600' : 'text-muted-foreground'} />
+                  <m.icon size={16} className={reached ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'} />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">{m.label}</p>

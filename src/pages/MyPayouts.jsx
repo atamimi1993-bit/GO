@@ -7,10 +7,10 @@ import { format, parseISO } from 'date-fns';
 import PullToRefresh from '@/components/go/PullToRefresh';
 
 const STATUS_COLORS = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  processing: 'bg-blue-100 text-blue-700',
-  paid: 'bg-emerald-100 text-emerald-700',
-  deducted: 'bg-red-100 text-red-700',
+  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  processing: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+  paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300',
+  deducted: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
 };
 
 export default function MyPayouts() {
@@ -40,7 +40,7 @@ export default function MyPayouts() {
   return (
     <PullToRefresh onRefresh={load}>
     <div className="max-w-2xl mx-auto">
-      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
+      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
         <ArrowLeft size={16} /> Back
       </button>
       <h1 className="text-2xl font-display font-bold mb-1">Payouts</h1>

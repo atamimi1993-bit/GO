@@ -158,7 +158,7 @@ export default function NewMove() {
           <React.Fragment key={s}>
             <div className={`flex items-center gap-2 ${i <= step ? 'text-emerald-600' : 'text-muted-foreground'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                i < step ? 'bg-emerald-500 text-white' : i === step ? 'bg-emerald-100 text-emerald-700' : 'bg-muted'
+                i < step ? 'bg-emerald-500 text-white' : i === step ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 'bg-muted'
               }`}>
                 {i + 1}
               </div>
@@ -224,7 +224,7 @@ export default function NewMove() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center justify-between bg-blue-50 rounded-xl p-4">
+            <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-950 rounded-xl p-4">
               <div>
                 <p className="font-medium text-sm">Need storage?</p>
                 <p className="text-xs text-muted-foreground">We'll help you find a facility near your move.</p>

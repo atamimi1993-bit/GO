@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/go/Logo';
-import { Home, Package, Truck, HelpCircle, User, Menu, X, LogOut, Warehouse } from 'lucide-react';
+import { Home, Package, Truck, HelpCircle, User, LogOut, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BottomTabBar from '@/components/go/BottomTabBar';
 
@@ -15,7 +15,6 @@ const navItems = [
 ];
 
 export default function AppLayout() {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
   return (
@@ -62,46 +61,7 @@ export default function AppLayout() {
               <LogOut size={16} />
             </Button>
           </div>
-
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
-
-        {/* Mobile nav */}
-        {mobileOpen && (
-          <div className="md:hidden border-t bg-card pb-4">
-            {navItems.map(item => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileOpen(false)}
-                className={`select-none flex items-center gap-3 px-6 py-3 text-sm font-medium ${
-                  location.pathname === item.path
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-muted-foreground'
-                }`}
-              >
-                <item.icon size={18} />
-                {item.label}
-              </Link>
-            ))}
-            <div className="border-t mt-2 pt-2 px-6 flex flex-col gap-1">
-              <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 text-sm text-muted-foreground">
-                <User size={18} /> Account
-              </Link>
-              <button onClick={() => base44.auth.logout('/')} className="flex items-center gap-3 py-3 text-sm text-muted-foreground">
-                <LogOut size={18} /> Sign Out
-              </button>
-            </div>
-          </div>
-        )}
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 pb-16 md:pb-0 overscroll-y-none">

@@ -151,12 +151,12 @@ export default function Home() {
 
       {/* Quick Links */}
       <section className="grid md:grid-cols-2 gap-4">
-        <Link to="/storage" className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 hover:shadow-md transition-shadow group">
+        <Link to="/storage" className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-2xl p-6 hover:shadow-md transition-shadow group">
           <h3 className="font-display font-bold text-lg mb-1">Need Storage?</h3>
           <p className="text-sm text-muted-foreground mb-3">Find climate-controlled storage facilities near your move.</p>
           <span className="text-blue-600 font-semibold text-sm group-hover:underline">Browse Storage →</span>
         </Link>
-        <Link to="/help" className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-2xl p-6 hover:shadow-md transition-shadow group">
+        <Link to="/help" className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 rounded-2xl p-6 hover:shadow-md transition-shadow group">
           <h3 className="font-display font-bold text-lg mb-1">Need Help?</h3>
           <p className="text-sm text-muted-foreground mb-3">Visit our Help Center for guides, FAQs, and support.</p>
           <span className="text-amber-600 font-semibold text-sm group-hover:underline">Get Help →</span>

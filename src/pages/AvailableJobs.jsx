@@ -58,7 +58,7 @@ export default function AvailableJobs() {
   return (
     <PullToRefresh onRefresh={load}>
     <div>
-      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
+      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 min-h-[44px]">
         <ArrowLeft size={16} /> Back
       </button>
       <h1 className="text-2xl font-display font-bold mb-1">Available Jobs</h1>

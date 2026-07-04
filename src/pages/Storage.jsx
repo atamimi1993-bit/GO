@@ -56,7 +56,7 @@ export default function Storage() {
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-display font-bold">{f.name}</h3>
                 {f.climate_controlled && (
-                  <Badge className="bg-blue-50 text-blue-600"><Snowflake size={12} className="mr-1" /> Climate</Badge>
+                  <Badge className="bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400"><Snowflake size={12} className="mr-1" /> Climate</Badge>
                 )}
               </div>
               <p className="text-sm text-muted-foreground flex items-center gap-1 mb-1">
