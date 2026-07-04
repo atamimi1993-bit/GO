@@ -53,9 +53,20 @@ export default function NewRental() {
   }, [userState]);
 
   useEffect(() => {
-    base44.auth.me().then(u => {
+    base44.auth.me().then(async u => {
       setUser(u);
       setForm(f => ({ ...f, owner_name: u.full_name || '', owner_email: u.email || '' }));
+      // Pre-fill from driver profile + existing trucks
+      try {
+        const profile = await base44.entities.DriverProfile.filter({ email: u.email }).then(r => r[0]);
+        if (profile) {
+          setForm(f => ({
+            ...f,
+            owner_type: 'driver',
+            state: f.state || profile.service_area?.trim() || '',
+          }));
+        }
+      } catch { /* not a driver — keep defaults */ }
     }).catch(() => navigate('/login'));
   }, [navigate]);
 
