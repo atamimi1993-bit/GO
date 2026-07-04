@@ -231,14 +231,18 @@ export function calculateMovePrice({ totalWeightLbs, distanceMiles, truckSize, s
   // Operational subtotal = everything it costs to do the job
   const operationalSubtotal = baseCost + fuelCost + driverPayout + tollCost + bulkyItemFee + materialsFeeCost + carryingFee + extraServiceFee;
 
-  // GO platform fee — 25% of the FULL operational cost (base + fuel + driver labor + tolls)
-  const appFee = operationalSubtotal * APP_FEE_RATE;
-  const goProfit = appFee; // GO keeps this; customer already paid for gas/miles/driver
-  const driverFee = 0;
-
-  // Tax rate: country config overrides state — applied to operational + platform fee
+  // Tax rate: country config overrides state
   const country = countryCode ? COUNTRY_CONFIG[countryCode] : null;
   const taxRate = country ? country.taxRate : (STATE_TAX_RATES[stateCode?.toUpperCase()] || 0.06);
+
+  // GO platform fee — 25% of the TOTAL price the customer pays (including tax)
+  // Solving: goProfit = APP_FEE_RATE * (operationalSubtotal + goProfit) * (1 + taxRate)
+  const taxMultiplier = 1 + taxRate;
+  const goProfit = (APP_FEE_RATE * taxMultiplier * operationalSubtotal) / (1 - APP_FEE_RATE * taxMultiplier);
+  const appFee = goProfit;
+  const driverFee = 0;
+
+  // Tax applied to operational + platform fee
   const taxAmount = (operationalSubtotal + appFee) * taxRate;
 
   // Total price (in USD) — customer pays operational + GO fee + tax
