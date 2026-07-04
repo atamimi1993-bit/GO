@@ -21,6 +21,7 @@ const STATUS_COLORS = {
 
 const RecordExportButton = lazy(() => import('@/components/admin/RecordExportButton'));
 const AdminQuickLinks = lazy(() => import('@/components/admin/AdminQuickLinks'));
+const AcquisitionBlastButton = lazy(() => import('@/components/admin/AcquisitionBlastButton'));
 
 export default function OverviewTab({ data, processingId, onDriverAction }) {
   const { stats, movesByStatus, recentMoves, pendingDrivers, recentPayouts, recentUsers } = data;
@@ -39,6 +40,11 @@ export default function OverviewTab({ data, processingId, onDriverAction }) {
         <StatCard icon={AlertCircle} label="Cancelled" value={movesByStatus.cancelled} accent="red" />
         <StatCard icon={Truck} label="Trucks Registered" value={stats.totalTrucks} accent="blue" />
       </div>
+
+      {/* Daily acquisition blast */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <AcquisitionBlastButton />
+      </Suspense>
 
       {/* Quick links */}
       <Suspense fallback={<SectionSkeleton />}>

@@ -19,12 +19,30 @@
     },
     {
       "function_name": "find-cdl-drivers",
-      "description": "Search the web for CDL Class A/B drivers, certified movers, and box truck operators by type and location. Pass driver_type (cdl_a|cdl_b|box_truck|certified_mover) and optional location. Returns driver profiles, communities, and recommended platforms."
+      "description": "Search the web for CDL Class A/B drivers, certified movers, and box truck operators by type and location"
     },
     {
       "function_name": "generate-driver-recruitment",
-      "description": "Generate job postings, outreach messages, social posts, and recruitment strategies using AI with web research. Pass content_type (job_posting|outreach_message|social_post|recruitment_strategy), optional platform, and optional additional_context."
+      "description": "Generate job postings, outreach messages, social posts, and recruitment strategies for CDL/certified drivers"
     }
   ],
+  "context_files": [],
+  "app_user_connector_configs": [],
+  "selected_skill_names": [],
+  "selected_workspace_skill_ids": [],
+  "model": "automatic",
+  "whatsapp_greeting": null,
+  "telegram_greeting": null,
+  "line_greeting": null,
+  "memory_config": {
+    "enabled": true,
+    "scope": "both",
+    "include_other_conversation_context": false,
+    "instructions": null
+  },
+  "voice_config": {
+    "voice_id": null
+  },
+  "allow_anonymous_access": false,
   "name": "cdl_driver_finder"
 }

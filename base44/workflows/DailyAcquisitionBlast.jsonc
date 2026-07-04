@@ -1,0 +1,48 @@
+{
+  "name": "Daily Acquisition Blast",
+  "description": "Every day at 8am, automatically find 50+ new moving leads across rotating US markets and 50+ CDL/certified drivers across types and locations, saving leads to the pipeline and surfacing driver prospects for outreach.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 8 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_acquisition_blast",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_blast": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "daily-acquisition-blast",
+            "args": {
+              "target_leads": 50,
+              "target_drivers": 50
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Find 50 leads + 50 drivers",
+            "description": "Daily acquisition blast across rotating markets"
+          }
+        }
+      }
+    ]
+  }
+}
