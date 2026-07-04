@@ -9,6 +9,7 @@ import AdBanner from '@/components/go/AdBanner';
 import FaqSection from '@/components/go/FaqSection';
 import { Gift } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { appParams } from '@/lib/app-params';
 
 const HomeStats = memo(lazy(() => import('@/components/go/HomeStats')));
 const CustomerQuickActions = memo(lazy(() => import('@/components/go/CustomerQuickActions')));
@@ -204,7 +205,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border pt-6 pb-2 text-center">
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} GO · <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link> · <Link to="/terms" className="underline hover:text-foreground">Privacy Policy</Link>
+          © {new Date().getFullYear()} GO · <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link> · <Link to="/terms" className="underline hover:text-foreground">Privacy Policy</Link> · <a href={`https://base44.com/app/${appParams.appId}`} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">Edit with Base44</a>
         </p>
       </footer>
     </div>
