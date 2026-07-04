@@ -9,6 +9,7 @@ import PullToRefresh from '@/components/go/PullToRefresh';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, Loader2, Phone, Mail, CreditCard, CheckCircle2, Star, ClipboardCheck, MailCheck, FileText, Shield, Wallet, CalendarClock, Video, AlertTriangle } from 'lucide-react';
 import RatingForm from '@/components/go/RatingForm';
 import DamageReportForm from '@/components/go/DamageReportForm';
+import ReceiptDownload from '@/components/go/ReceiptDownload';
 import RouteLogForm from '@/components/go/RouteLogForm';
 import PromoCodeInput from '@/components/go/PromoCodeInput';
 import AssignedDriverCard from '@/components/go/AssignedDriverCard';
@@ -546,6 +547,13 @@ export default function MoveDetail() {
       {move.status === 'completed' && invoiceSent && (
         <div className="flex items-center gap-2 mt-4 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
           <MailCheck size={16} /> Move summary and invoice emailed to {move.customer_email || 'your email'}
+        </div>
+      )}
+
+      {/* Download PDF receipt — available on completed moves */}
+      {move.status === 'completed' && (
+        <div className="mt-4">
+          <ReceiptDownload move={move} />
         </div>
       )}
 
