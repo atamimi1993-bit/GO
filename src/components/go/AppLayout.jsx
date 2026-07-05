@@ -11,6 +11,8 @@ import BottomTabBar from '@/components/go/BottomTabBar';
 import OfflineBanner from '@/components/go/OfflineBanner';
 import NotificationCenter from '@/components/go/NotificationCenter';
 import LazyTroubleshootWidget from '@/components/go/LazyTroubleshootWidget';
+import { lazy, Suspense } from 'react';
+const CustomerChatWidget = lazy(() => import('@/components/go/CustomerChatWidget'));
 
 const navItems = [
   { label: 'Home', path: '/', icon: Home },
@@ -150,6 +152,9 @@ export default function AppLayout() {
         <BottomTabBar />
       </div>
       <LazyTroubleshootWidget />
+      <Suspense fallback={null}>
+        <CustomerChatWidget />
+      </Suspense>
     </div>
   );
 }
