@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 import DamageReportForm from '@/components/go/DamageReportForm';
 import PageHeader from '@/components/go/PageHeader';
 
@@ -49,14 +49,12 @@ export default function ReportDamage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6">
-      <Button variant="ghost" size="sm" onClick={() => navigate(`/move/${id}`)} className="mb-3 -ml-2">
-        <ArrowLeft size={16} className="mr-1" /> Back to Move
-      </Button>
-
       <PageHeader
         title="Report Damaged or Missing Item"
         subtitle={`For move on ${move.move_date || 'N/A'} — ${move.pickup_address?.slice(0, 40) || ''}...`}
         icon={<AlertTriangle className="text-red-500" />}
+        isRoot={false}
+        onBack={() => navigate(`/move/${id}`)}
       />
 
       {move.assigned_driver_name && (

@@ -86,7 +86,7 @@ export default function DriverUpgrade() {
       setCurrentTier(res.data?.tier || 'free');
     }}>
       <div className="pb-8">
-        <PageHeader title="Driver Plans" />
+        <PageHeader title="Driver Plans" isRoot={false} />
 
         <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-2xl p-6 mb-6 text-white">
           <h2 className="text-2xl font-display font-bold mb-2">Maximize Your Earnings</h2>

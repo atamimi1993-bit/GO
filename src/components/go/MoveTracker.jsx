@@ -1,5 +1,5 @@
-import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect } from 'react';
+import { useLeafletCss } from '@/hooks/useLeafletCss';
 import { base44 } from '@/api/base44Client';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, useMap } from 'react-leaflet';
 import { Navigation, MapPin, PackageCheck, Truck, CheckCircle2, Loader2, Flag } from 'lucide-react';
@@ -25,6 +25,7 @@ const MILESTONES = [
 ];
 
 export default function MoveTracker({ moveId }) {
+  useLeafletCss();
   const [pings, setPings] = useState([]);
   const [loading, setLoading] = useState(true);
 

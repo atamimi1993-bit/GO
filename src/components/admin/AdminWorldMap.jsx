@@ -1,5 +1,5 @@
-import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLeafletCss } from '@/hooks/useLeafletCss';
 import { MapContainer, TileLayer, CircleMarker, Popup, Marker, Tooltip } from 'react-leaflet';
 import { base44 } from '@/api/base44Client';
 import { Loader2, MapPin, DollarSign, Package, Truck } from 'lucide-react';
@@ -92,6 +92,7 @@ async function geocodeBatch(addresses) {
 }
 
 export default function AdminWorldMap() {
+  useLeafletCss();
   const [moves, setMoves] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);

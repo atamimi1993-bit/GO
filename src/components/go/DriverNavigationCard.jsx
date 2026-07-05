@@ -1,5 +1,5 @@
-import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect } from 'react';
+import { useLeafletCss } from '@/hooks/useLeafletCss';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { Navigation, MapPin, Flag, Loader2, ExternalLink, Smartphone } from 'lucide-react';
 
@@ -48,6 +48,7 @@ function FitBounds({ positions }) {
 }
 
 export default function DriverNavigationCard({ job }) {
+  useLeafletCss();
   const [pickupCoords, setPickupCoords] = useState(null);
   const [dropoffCoords, setDropoffCoords] = useState(null);
   const [geocoding, setGeocoding] = useState(true);

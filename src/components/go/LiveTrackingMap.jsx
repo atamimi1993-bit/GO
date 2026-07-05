@@ -1,5 +1,5 @@
-import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLeafletCss } from '@/hooks/useLeafletCss';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline } from 'react-leaflet';
@@ -16,6 +16,7 @@ const MILESTONE_LABELS = {
 };
 
 export default function LiveTrackingMap({ move }) {
+  useLeafletCss();
   const [pings, setPings] = useState([]);
   const [loading, setLoading] = useState(true);
 

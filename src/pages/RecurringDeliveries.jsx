@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Repeat, Loader2, Trash2, Plus, Calendar, Clock, Thermometer, PenLine } from 'lucide-react';
+import { Repeat, Loader2, Trash2, Plus, Calendar, Clock, Thermometer, PenLine } from 'lucide-react';
 import MobileSelect from '@/components/go/MobileSelect';
+import PageHeader from '@/components/go/PageHeader';
 
 const CATEGORIES = ['hospital','bank','office','pharmacy','lab_medical','legal_documents','retail','restaurant','other'];
 const FREQUENCIES = [
@@ -104,17 +105,8 @@ export default function RecurringDeliveries() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="min-h-[44px] min-w-[44px]" aria-label="Go back">
-          <ArrowLeft size={20} />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-            <Repeat className="text-emerald-500" size={24} /> Recurring Deliveries
-          </h1>
-          <p className="text-muted-foreground text-sm">Automate daily, weekly, or monthly delivery schedules.</p>
-        </div>
-      </div>
+      <PageHeader title="Recurring Deliveries" isRoot={false} />
+      <p className="text-muted-foreground text-sm mb-6">Automate daily, weekly, or monthly delivery schedules.</p>
 
       {!showForm ? (
         <Button className="w-full mb-4 bg-emerald-500 hover:bg-emerald-600" onClick={() => setShowForm(true)}>

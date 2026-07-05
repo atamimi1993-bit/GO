@@ -598,7 +598,7 @@ export default function MoveDetail() {
       {/* Cancel move — free before driver acceptance, $250 fee after */}
       {!['completed', 'cancelled'].includes(move.status) && (
         <div className="mt-4">
-          <CancelMoveButton move={move} onCancelled={load} />
+          <CancelMoveButton move={move} onCancelled={load} onError={load} />
         </div>
       )}
 

@@ -35,7 +35,7 @@ export default function AppLayout() {
     queryKey: ['myDriverProfile', user?.id],
     queryFn: () => base44.entities.DriverProfile.filter({ email: user.email }).then(r => r[0] || null),
     enabled: !!user?.email && user?.role !== 'admin',
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
   });
   const visibleNavItems = navItems.filter(item => {
     if (item.adminOnly) return user?.role === 'admin';

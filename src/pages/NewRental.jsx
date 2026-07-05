@@ -317,15 +317,10 @@ export default function NewRental() {
           </div>
         )}
 
-        <div className="flex justify-between">
-          <Button type="button" variant="ghost" onClick={() => navigate('/rentals')}>
-            <ArrowLeft size={16} className="mr-1" /> Cancel
-          </Button>
-          <Button type="submit" disabled={saving || uploading} className="bg-emerald-500 hover:bg-emerald-600">
-            {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : null}
-            Publish Listing
-          </Button>
-        </div>
+        <Button type="submit" disabled={saving || uploading} className="w-full bg-emerald-500 hover:bg-emerald-600 min-h-[44px]">
+          {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : null}
+          Publish Listing
+        </Button>
       </form>
     </div>
   );

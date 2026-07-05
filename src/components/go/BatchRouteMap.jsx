@@ -1,5 +1,5 @@
-import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useLeafletCss } from '@/hooks/useLeafletCss';
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, Marker, Tooltip } from 'react-leaflet';
 import { Loader2, MapPin } from 'lucide-react';
 import L from 'leaflet';
@@ -73,6 +73,7 @@ const ROUTE_COLORS = {
 };
 
 export default function BatchRouteMap({ jobs }) {
+  useLeafletCss();
   const [stops, setStops] = useState([]);
   const [loading, setLoading] = useState(true);
 

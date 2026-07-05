@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 
-export default function CancelMoveButton({ move, onCancelled }) {
+export default function CancelMoveButton({ move, onCancelled, onError }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -34,8 +34,8 @@ export default function CancelMoveButton({ move, onCancelled }) {
         toast({ title: 'Move cancelled', description: 'Your move has been cancelled.' });
         setOpen(false);
       } catch {
-        // Revert the optimistic update
-        onCancelled?.(prevStatus, true);
+        // Revert the optimistic update via dedicated onError callback
+        onError?.();
         toast({ title: 'Could not cancel', description: 'Please try again.', variant: 'destructive' });
       } finally {
         setLoading(false);

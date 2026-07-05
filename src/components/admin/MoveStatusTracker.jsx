@@ -9,13 +9,7 @@ import {
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import MobileSelect from '@/components/go/MobileSelect';
 
 const STATUS_GROUPS = [
   { key: 'pending', label: 'Pending', icon: Clock, color: 'text-amber-500', badge: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300' },
@@ -152,21 +146,13 @@ export default function MoveStatusTracker() {
                                 <div className="mt-2">
                                   {assigningMoveId === m.id ? (
                                     <div className="flex items-center gap-2">
-                                      <Select
+                                      <MobileSelect
                                         value={selectedDriver[m.id] || ''}
                                         onValueChange={(val) => setSelectedDriver({ ...selectedDriver, [m.id]: val })}
-                                      >
-                                        <SelectTrigger className="h-8 text-xs flex-1">
-                                          <SelectValue placeholder="Select a driver..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {approvedDrivers.map((d) => (
-                                            <SelectItem key={d.id} value={d.id}>
-                                              {d.full_name} · {d.vehicle_category}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                        options={approvedDrivers.map((d) => ({ value: d.id, label: `${d.full_name} · ${d.vehicle_category}` }))}
+                                        placeholder="Select a driver..."
+                                        className="h-8 text-xs flex-1"
+                                      />
                                       <Button
                                         size="sm"
                                         className="h-8"
