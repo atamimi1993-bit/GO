@@ -86,10 +86,10 @@ export default function Profile() {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+              <AlertDialogTitle>Delete Your Account</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-3 text-sm">
-                  <p>This will permanently delete your personal data including your profile, addresses, and loyalty account. Financial records required by law will be anonymized. This cannot be undone.</p>
+                  <p>This will permanently delete all your personal data, saved addresses, loyalty points, and move history. Active moves may be cancelled. This action cannot be undone.</p>
                   <div>
                     <p className="mb-2">Type <strong className="text-destructive">DELETE</strong> to confirm:</p>
                     <Input

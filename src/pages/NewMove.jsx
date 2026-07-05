@@ -269,7 +269,6 @@ export default function NewMove() {
         referral_code: form.referral_code || undefined,
         status: 'pending',
       }, DEFAULT_SKIP_KEYS);
-      navigate('/my-moves', { state: { optimisticMove: { ...moveData, _optimistic: true } } });
       const move = await base44.entities.MoveRequest.create(moveData);
       if (items.length > 0) {
         await base44.entities.MoveItem.bulkCreate(
