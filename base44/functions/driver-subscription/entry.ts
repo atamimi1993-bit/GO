@@ -4,14 +4,11 @@ import Stripe from 'npm:stripe@17.0.0';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    if (!(await base44.auth.isAuthenticated())) {
+    // 🔒 Auth check — reject unauthenticated requests
+    const user = await base44.auth.me();
+    if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    let user;
-    try { user = await base44.auth.me(); } catch {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
     const { action } = body;
