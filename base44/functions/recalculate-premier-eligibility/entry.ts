@@ -9,9 +9,17 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    const isAuth = await base44.auth.isAuthenticated().catch(() => false);
-    if (!isAuth) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    // 🔒 Admin-only — allows admin users or service-role workflow invocations
+    const user = await base44.auth.me().catch(() => null);
+    if (user) {
+      if (user.role !== 'admin') {
+        return Response.json({ error: 'Admin access required' }, { status: 403 });
+      }
+    } else {
+      const isServiceRole = await base44.auth.isAuthenticated().catch(() => false);
+      if (!isServiceRole) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
 
     const body = await req.json().catch(() => ({}));
